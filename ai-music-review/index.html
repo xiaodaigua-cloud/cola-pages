@@ -1,0 +1,1168 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI生成音乐评价</title>
+    <style>
+      :root{
+        /* 更亮一些，但仍以黑色为底 */
+        --bg: #0a1020;
+        --panel: rgba(255,255,255,0.14);
+        --panel2: rgba(255,255,255,0.10);
+        --text: rgba(255,255,255,0.94);
+        --muted: rgba(255,255,255,0.76);
+        --line: rgba(255,255,255,0.16);
+        --accent: #ff8a2a; /* 暖橙点缀 */
+        --accent2: #ffb26b;
+        --barA: #2b7cff; /* 蓝 */
+        --barB: #7a3cff; /* 紫 */
+        --shadow: 0 18px 40px rgba(0,0,0,0.30);
+        --radius: 16px;
+        --w: 800px;
+        --glass: rgba(255,255,255,0.10);
+        --glass2: rgba(255,255,255,0.07);
+        --edge: rgba(255,255,255,0.18);
+        --edge2: rgba(255,255,255,0.12);
+      }
+      *{ box-sizing: border-box; }
+      body{
+        margin:0;
+        min-height:100vh;
+        background:
+          radial-gradient(1100px 620px at 10% 8%, rgba(255,138,42,0.30), transparent 60%),
+          radial-gradient(1100px 620px at 88% 14%, rgba(122,60,255,0.30), transparent 60%),
+          radial-gradient(1200px 760px at 50% 120%, rgba(43,124,255,0.20), transparent 62%),
+          linear-gradient(180deg, #090d18 0%, var(--bg) 52%, #090d18 100%);
+        color: var(--text);
+        font-family: ui-rounded, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+        letter-spacing: .05px;
+      }
+      /* “音乐流动”氛围：缓慢漂移的光流与细线（不影响黑底） */
+      .bgFlow{
+        position: fixed;
+        inset: -20vh -20vw;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.92;
+        filter: blur(0px);
+      }
+      .bgFlow::before{
+        content:"";
+        position:absolute;
+        inset:0;
+        background:
+          linear-gradient(90deg, rgba(43,124,255,0.00) 0%, rgba(43,124,255,0.07) 28%, rgba(122,60,255,0.09) 60%, rgba(255,138,42,0.06) 100%),
+          repeating-linear-gradient(
+            120deg,
+            rgba(255,255,255,0.00) 0px,
+            rgba(255,255,255,0.00) 22px,
+            rgba(255,255,255,0.05) 23px,
+            rgba(255,255,255,0.00) 26px
+          );
+        background-size: 160% 140%, 320px 320px;
+        background-position: 0% 0%, 0px 0px;
+        mix-blend-mode: screen;
+        animation: flowDrift 16s linear infinite;
+      }
+      .bgFlow::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        background:
+          radial-gradient(closest-side at 20% 30%, rgba(255,138,42,0.10), transparent 70%),
+          radial-gradient(closest-side at 70% 20%, rgba(122,60,255,0.10), transparent 72%),
+          radial-gradient(closest-side at 55% 65%, rgba(43,124,255,0.08), transparent 74%);
+        animation: glowFloat 10s ease-in-out infinite;
+        opacity: 0.95;
+      }
+      @keyframes flowDrift{
+        0%{ background-position: 0% 0%, 0px 0px; }
+        100%{ background-position: 100% 0%, 320px 320px; }
+      }
+      @keyframes glowFloat{
+        0%,100%{ transform: translate3d(0,0,0); }
+        50%{ transform: translate3d(0,-14px,0); }
+      }
+      .wrap{
+        position: relative;
+        width: min(var(--w), calc(100vw - 32px));
+        margin: 28px auto 40px;
+        z-index: 1; /* 盖在背景光流之上 */
+      }
+      header{
+        display:flex;
+        align-items:flex-end;
+        justify-content:space-between;
+        gap:16px;
+        margin-bottom: 14px;
+      }
+      h1{
+        margin:0;
+        font-size: 24px;
+        font-weight: 860;
+        letter-spacing: .9px;
+      }
+      .sub{
+        margin:0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.3;
+      }
+      .waveLine{
+        position: relative;
+        height: 10px;
+        margin-top: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        opacity: 0.85;
+      }
+      .waveLine::before{
+        content:"";
+        position:absolute;
+        inset:-40% -60%;
+        background: linear-gradient(90deg, rgba(43,124,255,0.0), rgba(43,124,255,0.35), rgba(122,60,255,0.35), rgba(255,138,42,0.30), rgba(43,124,255,0.0));
+        filter: blur(0.2px);
+        animation: waveMove 3.8s linear infinite;
+      }
+      @keyframes waveMove{
+        0%{ transform: translateX(-10%) rotate(0deg); }
+        100%{ transform: translateX(10%) rotate(0deg); }
+      }
+      .badge{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255,138,42,0.18);
+        border: 1px solid rgba(255,138,42,0.38);
+        color: rgba(255,255,255,0.92);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .dot{
+        width:8px;height:8px;border-radius:50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px rgba(255,138,42,0.18);
+      }
+      .grid{
+        display:grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .card{
+        position: relative;
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, var(--glass) 0%, var(--glass2) 100%);
+        border: 1px solid rgba(255,255,255,0.10);
+        backdrop-filter: blur(12px) saturate(130%);
+        box-shadow: var(--shadow);
+        overflow:hidden;
+      }
+      /* 渐变描边（更“高级”的边缘质感） */
+      .card::before{
+        content:"";
+        position:absolute;
+        inset:0;
+        padding: 1px;
+        border-radius: inherit;
+        background: linear-gradient(135deg,
+          rgba(255,255,255,0.30),
+          rgba(255,255,255,0.10),
+          rgba(43,124,255,0.18),
+          rgba(122,60,255,0.18),
+          rgba(255,138,42,0.18)
+        );
+        -webkit-mask:
+          linear-gradient(#000 0 0) content-box,
+          linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events:none;
+        opacity: 0.9;
+      }
+      /* 细腻颗粒（避免“太简化”的塑料感） */
+      .card::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        background:
+          radial-gradient(circle at 20% 10%, rgba(255,255,255,0.06), transparent 35%),
+          radial-gradient(circle at 80% 30%, rgba(255,255,255,0.04), transparent 42%),
+          repeating-radial-gradient(circle at 10% 20%,
+            rgba(255,255,255,0.015) 0,
+            rgba(255,255,255,0.015) 1px,
+            rgba(255,255,255,0.00) 2px,
+            rgba(255,255,255,0.00) 6px
+          );
+        opacity: .55;
+        pointer-events:none;
+        mix-blend-mode: overlay;
+      }
+      .card .hd{
+        padding: 14px 16px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap: 10px;
+        border-bottom: 1px solid var(--line);
+        position: relative;
+        z-index: 1;
+      }
+      .card .hd strong{
+        font-size: 14px;
+        font-weight: 820;
+        letter-spacing: .25px;
+      }
+      .card .bd{
+        padding: 16px;
+        position: relative;
+        z-index: 1;
+      }
+      .form{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 14px;
+      }
+      .field{
+        display:flex;
+        flex-direction:column;
+        gap: 8px;
+      }
+      .field.full{ grid-column: 1 / -1; }
+      label{
+        font-size: 12px;
+        color: var(--muted);
+      }
+      input, select, textarea{
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.20);
+        background: rgba(10,12,22,0.32);
+        color: var(--text);
+        outline: none;
+        transition: border-color .15s ease, box-shadow .15s ease, transform .06s ease;
+      }
+      textarea{ min-height: 92px; resize: vertical; }
+      input::placeholder, textarea::placeholder{ color: rgba(255,255,255,0.38); }
+      input:focus, select:focus, textarea:focus{
+        border-color: rgba(255,138,42,0.60);
+        box-shadow: 0 0 0 4px rgba(255,138,42,0.15);
+      }
+      .actions{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap: 12px;
+        margin-top: 6px;
+      }
+      .hint{
+        font-size: 12px;
+        color: rgba(255,255,255,0.58);
+      }
+      .hint strong{ color: rgba(255,255,255,0.78); }
+      .btn{
+        appearance:none;
+        border: 1px solid rgba(255,138,42,0.55);
+        background: linear-gradient(180deg, rgba(255,138,42,0.30) 0%, rgba(255,138,42,0.16) 100%);
+        color: rgba(255,255,255,0.94);
+        padding: 11px 16px;
+        border-radius: 12px;
+        font-weight: 700;
+        letter-spacing: .2px;
+        cursor: pointer;
+        transition: transform .06s ease, box-shadow .15s ease, border-color .15s ease;
+        box-shadow: 0 8px 18px rgba(255,138,42,0.10);
+      }
+      .btn:hover{
+        border-color: rgba(255,178,107,0.85);
+        box-shadow: 0 10px 26px rgba(255,138,42,0.16);
+      }
+      .btn.secondary{
+        border-color: rgba(255,255,255,0.20);
+        background: linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.06) 100%);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+      }
+      .btn.secondary:hover{
+        border-color: rgba(255,255,255,0.34);
+        box-shadow: 0 12px 26px rgba(0,0,0,0.22);
+      }
+      .btn:active{ transform: translateY(1px); }
+      .btn:disabled{
+        opacity: .55;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      .err{
+        display:none;
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,86,86,0.40);
+        background: rgba(255,86,86,0.10);
+        color: rgba(255,230,230,0.95);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .results{
+        display:none;
+      }
+      .summary{
+        display:flex;
+        flex-wrap:wrap;
+        align-items:center;
+        justify-content:space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(0,0,0,0.12);
+      }
+      .scoreBox{
+        display:flex;
+        align-items:baseline;
+        gap: 10px;
+      }
+      .total{
+        font-size: 28px;
+        font-weight: 820;
+        letter-spacing: .4px;
+      }
+      .total small{
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+        margin-left: 6px;
+      }
+      .grade{
+        display:inline-flex;
+        align-items:center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        font-weight: 800;
+        letter-spacing: .8px;
+      }
+      .grade.S{ border-color: rgba(255,178,107,0.55); background: rgba(255,138,42,0.14); }
+      .grade.A{ border-color: rgba(43,124,255,0.55); background: rgba(43,124,255,0.12); }
+      .grade.B{ border-color: rgba(122,60,255,0.55); background: rgba(122,60,255,0.12); }
+      .grade.C{ border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); }
+      .meta{
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .bars{
+        padding: 14px 16px 6px;
+      }
+      .row{
+        display:grid;
+        grid-template-columns: 160px 1fr 42px;
+        align-items:center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px dashed rgba(255,255,255,0.10);
+      }
+      .row:last-child{ border-bottom: none; }
+      .dim{
+        font-size: 13px;
+        font-weight: 680;
+        color: rgba(255,255,255,0.88);
+      }
+      .barTrack{
+        position: relative;
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.12);
+        overflow:hidden;
+      }
+      .bar{
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--barA), var(--barB), var(--accent2));
+        background-size: 180% 100%;
+        box-shadow: 0 10px 22px rgba(43,124,255,0.14);
+        transform-origin: left center;
+      }
+      /* 入场动画：从左到右展开 */
+      .animate .bar{
+        animation: grow 850ms cubic-bezier(.22,1,.22,1) both;
+      }
+      .animate .bar::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        background: linear-gradient(90deg, rgba(255,255,255,0.00), rgba(255,255,255,0.22), rgba(255,255,255,0.00));
+        transform: translateX(-120%);
+        animation: shine 1.2s ease-out 0.2s both;
+        mix-blend-mode: screen;
+        opacity: .75;
+      }
+      @keyframes grow{
+        from{ transform: scaleX(0); }
+        to{ transform: scaleX(1); }
+      }
+      @keyframes shine{
+        to{ transform: translateX(120%); }
+      }
+      .num{
+        text-align:right;
+        font-variant-numeric: tabular-nums;
+        font-size: 13px;
+        color: rgba(255,255,255,0.78);
+      }
+      .comment{
+        padding: 10px 16px 16px;
+        position: relative;
+        z-index: 1;
+      }
+      .commentBox{
+        border-radius: 14px;
+        border: 1px solid rgba(255,138,42,0.28);
+        background: linear-gradient(180deg, rgba(255,138,42,0.10) 0%, rgba(255,138,42,0.06) 100%);
+        padding: 12px 12px;
+        color: rgba(255,255,255,0.90);
+        line-height: 1.7;
+        font-size: 13px;
+      }
+
+      /* 班级累计/平均分 */
+      .stats{
+        display:none;
+      }
+      .stats .bd{
+        padding-top: 14px;
+      }
+      .statsTop{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .kpis{
+        display:flex;
+        flex-wrap:wrap;
+        gap: 10px;
+      }
+      .kpi{
+        display:flex;
+        flex-direction:column;
+        gap: 6px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(0,0,0,0.10);
+        min-width: 158px;
+      }
+      .kpi .k{ font-size: 12px; color: rgba(255,255,255,0.70); }
+      .kpi .v{ font-size: 18px; font-weight: 840; letter-spacing: .2px; }
+      .kpi .v small{ font-size: 12px; color: rgba(255,255,255,0.70); font-weight: 700; margin-left: 6px; }
+      .btnRow{
+        display:flex;
+        flex-wrap:wrap;
+        gap: 10px;
+        justify-content:flex-end;
+      }
+      .miniNote{
+        margin-top: 10px;
+        color: rgba(255,255,255,0.60);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .recent{
+        margin-top: 12px;
+        border-top: 1px dashed rgba(255,255,255,0.12);
+        padding-top: 12px;
+      }
+      .recent h3{
+        margin: 0 0 8px;
+        font-size: 13px;
+        letter-spacing: .2px;
+        color: rgba(255,255,255,0.88);
+      }
+      .table{
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      .table th, .table td{
+        padding: 8px 8px;
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        color: rgba(255,255,255,0.82);
+        vertical-align: top;
+      }
+      .table th{
+        color: rgba(255,255,255,0.62);
+        font-weight: 700;
+        text-align:left;
+      }
+      .chip{
+        display:inline-flex;
+        align-items:center;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.86);
+        font-weight: 750;
+        letter-spacing: .5px;
+        white-space: nowrap;
+      }
+      footer{
+        margin-top: 12px;
+        color: rgba(255,255,255,0.48);
+        font-size: 12px;
+        text-align:center;
+      }
+      .tiny{
+        margin: 0;
+        padding: 0 8px;
+      }
+      @media (max-width: 720px){
+        .form{ grid-template-columns: 1fr; }
+        .row{ grid-template-columns: 1fr; gap: 8px; }
+        .num{ text-align:left; }
+      }
+
+      /* 右侧小机器人（装饰与“在旁边活动一下”） */
+      .bot{
+        position: absolute;
+        right: -128px;
+        top: 78px;
+        width: 170px;
+        height: 220px;
+        pointer-events: none;
+        user-select: none;
+        filter: drop-shadow(0 18px 24px rgba(0,0,0,0.35));
+      }
+      .bot .bob{ animation: botBob 3.2s ease-in-out infinite; transform-origin: 50% 60%; }
+      .bot .armR{ transform-origin: 88px 86px; animation: botWave 2.6s ease-in-out infinite; }
+      .bot .eye{ transform-origin: center; animation: botBlink 5.4s infinite; }
+      .bot .note{
+        opacity: 0;
+        animation: noteUp 2.8s ease-in-out infinite;
+      }
+      .bot .note.n2{ animation-delay: .8s; }
+      .bot .note.n3{ animation-delay: 1.6s; }
+      @keyframes botBob{
+        0%,100%{ transform: translateY(0); }
+        50%{ transform: translateY(-8px); }
+      }
+      @keyframes botWave{
+        0%,100%{ transform: rotate(10deg); }
+        50%{ transform: rotate(-18deg); }
+      }
+      @keyframes botBlink{
+        0%, 2%, 60%, 62%, 100%{ transform: scaleY(1); }
+        1%, 61%{ transform: scaleY(0.12); }
+      }
+      @keyframes noteUp{
+        0%{ transform: translate3d(0, 10px, 0) scale(0.9); opacity: 0; }
+        20%{ opacity: 0.85; }
+        100%{ transform: translate3d(0, -36px, 0) scale(1.05); opacity: 0; }
+      }
+      @media (max-width: 980px){
+        .bot{ display:none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bgFlow" aria-hidden="true"></div>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>AI生成音乐评价</h1>
+          <p class="sub">音乐鉴赏课 · 多维度评分与简短专业评语</p>
+          <div class="waveLine" aria-hidden="true"></div>
+        </div>
+        <div class="badge" title="适合大屏展示（固定宽度800px）">
+          <span class="dot" aria-hidden="true"></span>
+          轻量级评分面板
+        </div>
+      </header>
+
+      <!-- 右侧小机器人：轻量装饰，表现“在旁边活动一下” -->
+      <div class="bot" aria-hidden="true">
+        <svg class="bob" viewBox="0 0 180 230" width="170" height="220">
+          <!-- 音符 -->
+          <g fill="none" stroke="rgba(255,178,107,0.85)" stroke-width="2">
+            <path class="note n1" d="M30 40 v18 c0 10 -14 10 -14 0 c0-9 14-10 14-3" />
+            <path class="note n2" d="M148 34 v18 c0 10 -14 10 -14 0 c0-9 14-10 14-3" />
+            <path class="note n3" d="M150 70 v18 c0 10 -14 10 -14 0 c0-9 14-10 14-3" />
+          </g>
+
+          <!-- 身体 -->
+          <defs>
+            <linearGradient id="botG" x1="0" x2="1">
+              <stop offset="0" stop-color="rgba(43,124,255,0.70)"/>
+              <stop offset="1" stop-color="rgba(122,60,255,0.70)"/>
+            </linearGradient>
+          </defs>
+
+          <!-- 手臂 -->
+          <g>
+            <path d="M52 96 C36 100, 28 114, 30 132 C32 150, 46 154, 58 146"
+                  fill="none" stroke="rgba(255,255,255,0.70)" stroke-width="10" stroke-linecap="round"/>
+            <g class="armR">
+              <path d="M128 98 C144 104, 152 118, 150 136 C148 154, 134 158, 122 150"
+                    fill="none" stroke="rgba(255,255,255,0.70)" stroke-width="10" stroke-linecap="round"/>
+              <circle cx="154" cy="136" r="7" fill="rgba(255,138,42,0.85)"/>
+            </g>
+          </g>
+
+          <!-- 头 -->
+          <rect x="52" y="48" width="78" height="58" rx="16"
+                fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.22)" />
+          <rect x="60" y="56" width="62" height="34" rx="12"
+                fill="rgba(0,0,0,0.22)" stroke="rgba(255,255,255,0.14)"/>
+          <g class="eye" fill="rgba(255,255,255,0.92)">
+            <circle cx="78" cy="73" r="4"/>
+            <circle cx="104" cy="73" r="4"/>
+          </g>
+          <path d="M84 85 Q91 90 98 85" fill="none" stroke="rgba(255,178,107,0.85)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="91" cy="42" r="8" fill="rgba(255,138,42,0.22)" stroke="rgba(255,138,42,0.55)"/>
+          <path d="M91 42 v-10" stroke="rgba(255,178,107,0.80)" stroke-width="3" stroke-linecap="round"/>
+
+          <!-- 躯干 -->
+          <rect x="44" y="106" width="94" height="86" rx="20"
+                fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.22)"/>
+          <rect x="56" y="124" width="70" height="20" rx="10" fill="url(#botG)" opacity="0.75"/>
+          <rect x="56" y="152" width="70" height="10" rx="6" fill="rgba(255,255,255,0.14)"/>
+          <circle cx="67" cy="176" r="4" fill="rgba(255,138,42,0.75)"/>
+          <circle cx="91" cy="176" r="4" fill="rgba(255,255,255,0.40)"/>
+          <circle cx="115" cy="176" r="4" fill="rgba(43,124,255,0.60)"/>
+
+          <!-- 轮子/底座 -->
+          <path d="M60 196 C72 208, 110 208, 122 196" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="10" stroke-linecap="round"/>
+          <circle cx="72" cy="204" r="10" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.18)"/>
+          <circle cx="110" cy="204" r="10" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.18)"/>
+        </svg>
+      </div>
+
+      <div class="grid">
+        <!-- 输入区 -->
+        <section class="card" aria-label="输入区">
+          <div class="hd">
+            <strong>作品信息</strong>
+            <span class="meta">填写后点击「开始评价」</span>
+          </div>
+          <div class="bd">
+            <form class="form" id="form">
+              <div class="field">
+                <label for="title">作品名称</label>
+                <input id="title" name="title" type="text" placeholder="例如：归途的风" required />
+              </div>
+              <div class="field">
+                <label for="style">创作风格选择</label>
+                <select id="style" name="style" required>
+                  <option value="巴洛克时期">巴洛克时期</option>
+                  <option value="古典主义时期">古典主义时期</option>
+                  <option value="浪漫主义时期">浪漫主义时期</option>
+                  <option value="印象派">印象派</option>
+                  <option value="流行音乐">流行音乐</option>
+                  <option value="爵士">爵士</option>
+                  <option value="五声调式">五声调式</option>
+                  <option value="实验">实验</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="goal">创作目标描述</label>
+                <textarea
+                  id="goal"
+                  name="goal"
+                  placeholder="例如：用五声音阶创作一段表达思乡之情的钢琴片段"
+                  required
+                ></textarea>
+              </div>
+              <div class="field full">
+                <label for="audio">音频链接或文件名（仅做记录）</label>
+                <input id="audio" name="audio" type="text" placeholder="例如：https://... 或 my_song.mp3（也可直接选择本地文件）" />
+              </div>
+
+              <div class="field full">
+                <label for="audioFile">选择本地音频文件（不上传，仅在本页面读取文件名）</label>
+                <input id="audioFile" name="audioFile" type="file" accept="audio/*" />
+                <div class="hint">说明：浏览器出于安全限制，网页只能<strong>读取你选择的文件</strong>，不会自动上传；若要上传到服务器需后端接口配合。</div>
+              </div>
+
+              <div class="field full">
+                <label for="audioSample">示例/同学作品链接（可选）</label>
+                <select id="audioSample" name="audioSample">
+                  <option value="">（不选择示例）</option>
+                  <option value="https://example.com/demo-piano.mp3">示例：钢琴片段（链接）</option>
+                  <option value="https://example.com/demo-pop.mp3">示例：流行段落（链接）</option>
+                  <option value="https://example.com/demo-jazz.mp3">示例：爵士律动（链接）</option>
+                </select>
+                <div class="hint">选择示例后，会自动填入上方“音频链接或文件名”。</div>
+              </div>
+
+              <div class="field full">
+                <div class="actions">
+                  <div class="hint">提示：当前页面为前端演示版；后续可将「开始评价」对接真实AI评分接口。</div>
+                  <button class="btn" id="btn" type="submit">开始评价</button>
+                </div>
+                <div class="err" id="err" role="alert"></div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- 输出区 -->
+        <section class="card results" id="results" aria-label="输出区">
+          <div class="summary">
+            <div class="scoreBox">
+              <div class="total" id="total">0<small>/ 60</small></div>
+              <div class="grade" id="grade">-</div>
+            </div>
+            <div class="meta" id="meta"></div>
+          </div>
+
+          <div class="bars" id="bars" aria-label="评价维度柱状图"></div>
+
+          <div class="comment">
+            <div class="commentBox" id="comment"></div>
+          </div>
+        </section>
+
+        <!-- 班级累计与平均分（最下方） -->
+        <section class="card stats" id="stats" aria-label="班级累计与平均分">
+          <div class="hd">
+            <strong>班级累计</strong>
+            <span class="meta" id="statsMeta">（本机浏览器本地保存）</span>
+          </div>
+          <div class="bd">
+            <div class="statsTop">
+              <div class="kpis">
+                <div class="kpi">
+                  <div class="k">累计评价次数</div>
+                  <div class="v" id="kpiCount">0<small>次</small></div>
+                </div>
+                <div class="kpi">
+                  <div class="k">平均总分</div>
+                  <div class="v" id="kpiAvg">0<small>/ 60</small></div>
+                </div>
+              </div>
+              <div class="btnRow">
+                <button class="btn secondary" id="btnExportCsv" type="button">导出CSV</button>
+                <button class="btn secondary" id="btnExportJson" type="button">导出JSON</button>
+                <button class="btn secondary" id="btnClear" type="button">清空本机记录</button>
+              </div>
+            </div>
+
+            <div class="meta" style="margin: 6px 0 8px;">平均分（各维度 1-10）</div>
+            <div class="bars" id="avgBars" aria-label="平均分柱状图"></div>
+
+            <div class="recent" id="recentWrap">
+              <h3>最近5条</h3>
+              <table class="table" aria-label="最近评价记录">
+                <thead>
+                  <tr>
+                    <th style="width: 92px;">时间</th>
+                    <th>作品</th>
+                    <th style="width: 88px;">风格</th>
+                    <th style="width: 72px;">总分</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTbody"></tbody>
+              </table>
+            </div>
+
+            <div class="miniNote">
+              说明：这里的累计与平均分默认保存在<strong>当前电脑/当前浏览器</strong>里（不上传）。如需跨设备、多人汇总或保存音频文件本体，建议接入后端数据库/对象存储或做桌面端本地库（SQLite）。
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer>
+        <p class="tiny">本评价基于音乐基本要素分析框架，仅供学习参考</p>
+      </footer>
+    </div>
+
+    <script>
+      const DIMENSIONS = [
+        { key: "melody", name: "旋律流畅度", desc: "旋律线条是否自然、有方向感" },
+        { key: "rhythm", name: "节奏稳定性", desc: "节奏是否清晰、有律动感" },
+        { key: "timbre", name: "音色适配度", desc: "选用的音色是否匹配创作意图和风格" },
+        { key: "dynamics", name: "力度表现力", desc: "力度变化是否丰富、有情感层次" },
+        { key: "structure", name: "结构完整性", desc: "是否有起承转合或明确的段落结构" },
+        { key: "styleFit", name: "风格契合度", desc: "是否符合所选风格的音乐特征" },
+      ];
+
+      function clamp(n, min, max) {
+        return Math.max(min, Math.min(max, n));
+      }
+
+      const STORAGE_KEY = "ai_music_reviews_v1";
+      const MAX_RECORDS = 200;
+
+      function getRecords() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return [];
+          const data = JSON.parse(raw);
+          return Array.isArray(data) ? data : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function setRecords(records) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        } catch {
+          // ignore
+        }
+      }
+
+      function addRecord(record) {
+        const records = getRecords();
+        records.unshift(record);
+        const trimmed = records.slice(0, MAX_RECORDS);
+        setRecords(trimmed);
+        return trimmed;
+      }
+
+      function fmtTime(ts) {
+        try {
+          const d = new Date(ts);
+          const mm = String(d.getMonth() + 1).padStart(2, "0");
+          const dd = String(d.getDate()).padStart(2, "0");
+          const hh = String(d.getHours()).padStart(2, "0");
+          const mi = String(d.getMinutes()).padStart(2, "0");
+          return `${mm}-${dd} ${hh}:${mi}`;
+        } catch {
+          return "";
+        }
+      }
+
+      // 简单稳定哈希：同一输入得到可复现结果
+      function hashString(str) {
+        let h = 2166136261;
+        for (let i = 0; i < str.length; i++) {
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return h >>> 0;
+      }
+
+      // 生成 1-10 的分数：围绕不同维度做轻微差异
+      function scoreFromSeed(seed, salt) {
+        const x = (seed ^ hashString(salt)) >>> 0;
+        // 1..10：使用取模 + 小偏移，让分布更像“中间高”
+        const raw = (x % 1000) / 1000; // 0..0.999
+        const shaped = 0.18 + 0.72 * raw; // 0.18..0.90
+        const s = Math.round(1 + shaped * 9);
+        return clamp(s, 1, 10);
+      }
+
+      function gradeFromTotal(total) {
+        if (total >= 54) return "S";
+        if (total >= 48) return "A";
+        if (total >= 36) return "B";
+        return "C";
+      }
+
+      function pickHighlight(scores) {
+        let best = scores[0], worst = scores[0];
+        for (const s of scores) {
+          if (s.score > best.score) best = s;
+          if (s.score < worst.score) worst = s;
+        }
+        return { best, worst };
+      }
+
+      // 评语 <= 80 字（尽量），包含亮点 + 改进方向
+      function buildComment({ title, style, goal, scores, total, grade }) {
+        const { best, worst } = pickHighlight(scores);
+        const styleTipMap = {
+          "巴洛克时期": "可尝试持续低音与模进推进，装饰音适度，保持声部线条清晰。",
+          "古典主义时期": "注意乐句对称与动机发展，和声功能更清晰，结构比例更规整。",
+          "浪漫主义时期": "建议强化歌唱性旋律与和声色彩，拉开力度层次与情绪弧线。",
+          "印象派": "多用色彩和声与音色叠置，弱化强功能终止，营造朦胧流动感。",
+          "流行音乐": "建议加强Hook动机与节奏型统一，兼顾和声循环与层次推进。",
+          "爵士": "可关注Swing/律动与和声扩展语汇，低音走向更连贯，即兴句更“落点”。",
+          "五声调式": "注意尽量避开半音倾向，突出宫/商/角/徵/羽的重心转换。",
+          "实验": "可更明确声音材料的规则与对比关系，避免随机感盖过意图。",
+        };
+        const tip = styleTipMap[style] || "可根据风格特征进一步细化材料与结构组织。";
+
+        const base =
+          `《${title}》目标清晰（${goal.trim().slice(0, 18)}…）。` +
+          `亮点：${best.name}表现突出（${best.score}/10），听感更具方向感。` +
+          `改进：优先优化${worst.name}（${worst.score}/10），让段落衔接更稳定。` +
+          `${tip}`;
+
+        // 字数控制：80字以内（尽量不破坏语义）
+        // 简单策略：超过 80 就截断到 78 并加“…”
+        const limit = 80;
+        if (base.length <= limit) return base;
+        return base.slice(0, Math.max(0, limit - 1)) + "…";
+      }
+
+      function renderBars(scores, containerId) {
+        const bars = document.getElementById(containerId || "bars");
+        if (!bars) return;
+        bars.innerHTML = "";
+        for (const s of scores) {
+          const row = document.createElement("div");
+          row.className = "row";
+
+          const dim = document.createElement("div");
+          dim.className = "dim";
+          dim.textContent = s.name;
+          dim.title = s.desc;
+
+          const track = document.createElement("div");
+          track.className = "barTrack";
+          track.setAttribute("aria-label", `${s.name}：${s.score}/10`);
+
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          // width 用于最终占比；动画用 scaleX 实现“从左展开”
+          bar.style.width = `${s.score * 10}%`;
+          track.appendChild(bar);
+
+          const num = document.createElement("div");
+          num.className = "num";
+          num.textContent = `${s.score}/10`;
+
+          row.appendChild(dim);
+          row.appendChild(track);
+          row.appendChild(num);
+          bars.appendChild(row);
+        }
+
+        // 触发入场动画：先去掉，再加上 class
+        bars.classList.remove("animate");
+        // 强制重排
+        void bars.offsetWidth;
+        bars.classList.add("animate");
+      }
+
+      function setGradePill(grade) {
+        const el = document.getElementById("grade");
+        el.className = `grade ${grade}`;
+        el.textContent = `等级 ${grade}`;
+      }
+
+      function setError(msg) {
+        const err = document.getElementById("err");
+        if (!msg) {
+          err.style.display = "none";
+          err.textContent = "";
+          return;
+        }
+        err.style.display = "block";
+        err.textContent = msg;
+      }
+
+      function computeAverages(records) {
+        const n = records.length;
+        if (n === 0) return null;
+        const sums = Object.fromEntries(DIMENSIONS.map((d) => [d.key, 0]));
+        let totalSum = 0;
+        for (const r of records) {
+          totalSum += Number(r.total || 0);
+          for (const d of DIMENSIONS) {
+            const v = r.scores && typeof r.scores[d.key] === "number" ? r.scores[d.key] : 0;
+            sums[d.key] += v;
+          }
+        }
+        const avgTotal = totalSum / n;
+        const avgDims = DIMENSIONS.map((d) => ({
+          ...d,
+          score: clamp(Math.round((sums[d.key] / n) * 10) / 10, 1, 10), // 1位小数
+        }));
+        return { n, avgTotal, avgDims };
+      }
+
+      function renderStats(records) {
+        const stats = document.getElementById("stats");
+        if (!stats) return;
+        if (!records || records.length === 0) {
+          stats.style.display = "none";
+          return;
+        }
+        stats.style.display = "block";
+
+        const a = computeAverages(records);
+        if (!a) return;
+        document.getElementById("kpiCount").innerHTML = `${a.n}<small>次</small>`;
+        document.getElementById("kpiAvg").innerHTML = `${Math.round(a.avgTotal * 10) / 10}<small>/ 60</small>`;
+        renderBars(a.avgDims, "avgBars");
+
+        const tbody = document.getElementById("recentTbody");
+        if (tbody) {
+          tbody.innerHTML = "";
+          for (const r of records.slice(0, 5)) {
+            const tr = document.createElement("tr");
+            const t1 = document.createElement("td");
+            t1.textContent = fmtTime(r.ts);
+            const t2 = document.createElement("td");
+            t2.textContent = r.title || "-";
+            const t3 = document.createElement("td");
+            const chip = document.createElement("span");
+            chip.className = "chip";
+            chip.textContent = r.style || "-";
+            t3.appendChild(chip);
+            const t4 = document.createElement("td");
+            t4.textContent = `${r.total || 0}/60`;
+            tr.appendChild(t1);
+            tr.appendChild(t2);
+            tr.appendChild(t3);
+            tr.appendChild(t4);
+            tbody.appendChild(tr);
+          }
+        }
+      }
+
+      function downloadText(filename, text, mime) {
+        const blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 500);
+      }
+
+      function exportJSON(records) {
+        downloadText(
+          `music_reviews_${Date.now()}.json`,
+          JSON.stringify(records, null, 2),
+          "application/json;charset=utf-8"
+        );
+      }
+
+      function exportCSV(records) {
+        const header = [
+          "ts",
+          "title",
+          "style",
+          "goal",
+          "audioRecord",
+          ...DIMENSIONS.map((d) => d.key),
+          "total",
+          "grade",
+          "comment",
+        ];
+        const esc = (v) => {
+          const s = String(v ?? "");
+          if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+          return s;
+        };
+        const lines = [header.join(",")];
+        for (const r of records) {
+          const row = [];
+          row.push(esc(r.ts || ""));
+          row.push(esc(r.title || ""));
+          row.push(esc(r.style || ""));
+          row.push(esc(r.goal || ""));
+          row.push(esc(r.audioRecord || ""));
+          for (const d of DIMENSIONS) row.push(esc(r.scores?.[d.key] ?? ""));
+          row.push(esc(r.total ?? ""));
+          row.push(esc(r.grade ?? ""));
+          row.push(esc(r.comment ?? ""));
+          lines.push(row.join(","));
+        }
+        downloadText(`music_reviews_${Date.now()}.csv`, lines.join("\n"), "text/csv;charset=utf-8");
+      }
+
+      document.getElementById("form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        setError("");
+
+        const title = document.getElementById("title").value.trim();
+        const style = document.getElementById("style").value;
+        const goal = document.getElementById("goal").value.trim();
+        const audio = document.getElementById("audio").value.trim();
+        const audioFileEl = document.getElementById("audioFile");
+        const audioFile = audioFileEl && audioFileEl.files && audioFileEl.files[0] ? audioFileEl.files[0] : null;
+
+        if (!title) return setError("请填写作品名称。");
+        if (!goal) return setError("请填写创作目标描述。");
+
+        const audioRecord = audioFile ? `本地文件：${audioFile.name}` : (audio ? `链接/文件名：${audio}` : "");
+        const seed = hashString([title, style, goal, audioRecord].join("|"));
+        const scores = DIMENSIONS.map((d, i) => ({
+          ...d,
+          score: scoreFromSeed(seed, d.key + ":" + i),
+        }));
+
+        const total = scores.reduce((sum, s) => sum + s.score, 0);
+        const grade = gradeFromTotal(total);
+
+        document.getElementById("total").innerHTML = `${total}<small>/ 60</small>`;
+        setGradePill(grade);
+        document.getElementById("meta").textContent =
+          `风格：${style} ｜ 作品：${title} ｜ 记录：${audioRecord ? audioRecord : "（未选择本地文件，也未填写链接/文件名）"}`;
+
+        renderBars(scores, "bars");
+        const comment = buildComment({
+          title,
+          style,
+          goal,
+          scores,
+          total,
+          grade,
+        });
+        document.getElementById("comment").textContent = comment;
+
+        const results = document.getElementById("results");
+        results.style.display = "block";
+
+        // 保存本次评价到本机（仅保存信息与分数，不保存音频文件本体）
+        const record = {
+          ts: new Date().toISOString(),
+          title,
+          style,
+          goal,
+          audioRecord,
+          scores: Object.fromEntries(scores.map((s) => [s.key, s.score])),
+          total,
+          grade,
+          comment,
+        };
+        const records = addRecord(record);
+        renderStats(records);
+
+        // 滚动到结果区（大屏演示一般无需滚动，但小屏更友好）
+        results.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      // 选择示例后，自动回填到“音频链接或文件名”
+      const audioSample = document.getElementById("audioSample");
+      if (audioSample) {
+        audioSample.addEventListener("change", () => {
+          const v = audioSample.value || "";
+          if (!v) return;
+          document.getElementById("audio").value = v;
+        });
+      }
+
+      // 初始化：渲染已有累计数据
+      renderStats(getRecords());
+
+      // 数据按钮
+      const btnExportCsv = document.getElementById("btnExportCsv");
+      const btnExportJson = document.getElementById("btnExportJson");
+      const btnClear = document.getElementById("btnClear");
+      if (btnExportCsv) btnExportCsv.addEventListener("click", () => exportCSV(getRecords()));
+      if (btnExportJson) btnExportJson.addEventListener("click", () => exportJSON(getRecords()));
+      if (btnClear) btnClear.addEventListener("click", () => {
+        if (!confirm("确定要清空本机的所有评价记录吗？此操作不可恢复。")) return;
+        setRecords([]);
+        renderStats([]);
+      });
+    </script>
+  </body>
+</html>
