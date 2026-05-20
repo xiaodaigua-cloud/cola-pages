@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五声音阶 · 互动小游戏 - AI乐搭</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            color: #fff;
+        }
+
+        /* 引入区 - MUSIC的M（动机激发） */
+        .intro {
+            text-align: center;
+            padding: 40px 20px 20px;
+            animation: fadeInDown 1s ease;
+        }
+        .intro h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #FFD700, #FF6B6B, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .intro p {
+            font-size: 22px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+        }
+        .stars {
+            font-size: 32px;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        /* 支架引导区 - MUSIC的S */
+        .guide {
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 24px 32px;
+            margin: 20px;
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            border: 2px solid rgba(255,215,0,0.3);
+        }
+        .guide p {
+            font-size: 22px;
+            line-height: 2;
+            color: rgba(255,255,255,0.9);
+        }
+        .guide .highlight {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 26px;
+        }
+
+        /* 互动操作区 - MUSIC的I */
+        .piano-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            padding: 30px 20px;
+            max-width: 800px;
+        }
+        .key {
+            width: 120px;
+            height: 120px;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 4px solid rgba(255,255,255,0.3);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .key:active, .key.active {
+            transform: scale(1.15);
+            border-color: #FFD700;
+            box-shadow: 0 0 30px rgba(255,215,0,0.6);
+        }
+        .key .note-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .key .note-label {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        .key-do { background: linear-gradient(135deg, #FF6B6B, #ee5a24); }
+        .key-re { background: linear-gradient(135deg, #FF9F43, #f39c12); }
+        .key-mi { background: linear-gradient(135deg, #4ECDC4, #0abde3); }
+        .key-sol { background: linear-gradient(135deg, #6C5CE7, #a55eea); }
+        .key-la { background: linear-gradient(135deg, #FD79A8, #e84393); }
+
+        /* 游戏区域 */
+        .game-section {
+            width: 90%;
+            max-width: 700px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .game-title {
+            font-size: 26px;
+            margin-bottom: 16px;
+            color: #4ECDC4;
+        }
+        .game-prompt {
+            font-size: 28px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(78,205,196,0.5);
+        }
+        .game-prompt .emoji {
+            font-size: 48px;
+            margin-right: 16px;
+        }
+
+        /* 反馈区 */
+        .feedback {
+            font-size: 32px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            padding: 16px;
+        }
+        .feedback.correct {
+            animation: celebrate 0.6s ease;
+        }
+        .feedback.wrong {
+            animation: shake 0.5s ease;
+        }
+
+        /* 创意表达区 - MUSIC的C */
+        .creative-section {
+            width: 90%;
+            max-width: 700px;
+            margin: 30px auto;
+            text-align: center;
+            padding: 24px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            border: 2px solid rgba(108,92,231,0.3);
+        }
+        .creative-section h2 {
+            font-size: 24px;
+            color: #a55eea;
+            margin-bottom: 16px;
+        }
+        .creative-section p {
+            font-size: 20px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 16px;
+        }
+        .melody-display {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            min-height: 60px;
+            padding: 16px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .melody-note {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            animation: popIn 0.3s ease;
+        }
+        .btn {
+            padding: 14px 32px;
+            font-size: 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 8px;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-play {
+            background: linear-gradient(135deg, #4ECDC4, #0abde3);
+            color: white;
+        }
+        .btn-clear {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        /* 总结收获 - MUSIC的U */
+        .summary {
+            width: 90%;
+            max-width: 700px;
+            margin: 30px auto 40px;
+            text-align: center;
+            padding: 24px;
+            background: rgba(255,215,0,0.08);
+            border-radius: 20px;
+            border: 2px solid rgba(255,215,0,0.2);
+        }
+        .summary h2 {
+            font-size: 24px;
+            color: #FFD700;
+            margin-bottom: 12px;
+        }
+        .summary p {
+            font-size: 20px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.85);
+        }
+        .score-display {
+            font-size: 22px;
+            margin-top: 12px;
+            color: #4ECDC4;
+        }
+
+        /* 底部标注 */
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* 模式切换 */
+        .mode-switch {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+        }
+        .mode-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(0,0,0,0.4);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .mode-btn.active {
+            border-color: #FFD700;
+            background: rgba(255,215,0,0.2);
+        }
+
+        /* 动画 */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        @keyframes popIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .intro h1 { font-size: 28px; }
+            .key { width: 90px; height: 90px; }
+            .key .note-name { font-size: 22px; }
+            .game-prompt { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 模式切换 -->
+    <div class="mode-switch">
+        <button class="mode-btn" onclick="switchMode('free')" id="mode-free">自由弹奏</button>
+        <button class="mode-btn active" onclick="switchMode('game')" id="mode-game">闯关游戏</button>
+    </div>
+
+    <!-- 区块1：引入 → MUSIC的M -->
+    <div class="intro">
+        <div class="stars">🌟 🎵 🌟</div>
+        <h1>五声音阶小世界</h1>
+        <p>用五个神奇的音符，弹出中国的声音！</p>
+    </div>
+
+    <!-- 区块2：支架引导 → MUSIC的S -->
+    <div class="guide">
+        <p>中国音乐有 <span class="highlight">5个</span> 特别的音：</p>
+        <p>🔴 宫（do）· 🟠 商（re）· 🟢 角（mi）· 🟣 徵（sol）· 🩷 羽（la）</p>
+        <p style="margin-top:12px; font-size:18px; opacity:0.7;">👆 点击下面的彩色按钮听听它们的声音吧！</p>
+    </div>
+
+    <!-- 区块3：互动操作 → MUSIC的I -->
+    <div class="piano-area">
+        <div class="key key-do" onclick="playNote('C4', this)" data-note="do">
+            <span class="note-name">宫</span>
+            <span class="note-label">do</span>
+        </div>
+        <div class="key key-re" onclick="playNote('D4', this)" data-note="re">
+            <span class="note-name">商</span>
+            <span class="note-label">re</span>
+        </div>
+        <div class="key key-mi" onclick="playNote('E4', this)" data-note="mi">
+            <span class="note-name">角</span>
+            <span class="note-label">mi</span>
+        </div>
+        <div class="key key-sol" onclick="playNote('G4', this)" data-note="sol">
+            <span class="note-name">徵</span>
+            <span class="note-label">sol</span>
+        </div>
+        <div class="key key-la" onclick="playNote('A4', this)" data-note="la">
+            <span class="note-name">羽</span>
+            <span class="note-label">la</span>
+        </div>
+    </div>
+
+    <!-- 游戏区域 -->
+    <div class="game-section" id="game-section">
+        <div class="game-title">🎯 听音闯关</div>
+        <div class="game-prompt" id="game-prompt">
+            <span class="emoji">👂</span>
+            <span id="prompt-text">准备好了吗？点击开始！</span>
+        </div>
+        <button class="btn btn-play" onclick="startGame()" id="start-btn">开始游戏 🎮</button>
+        <div class="feedback" id="feedback"></div>
+        <div class="score-display" id="score-display"></div>
+    </div>
+
+    <!-- 区块4：创意表达 → MUSIC的C -->
+    <div class="creative-section" id="creative-section" style="display:none;">
+        <h2>🎨 创作你的旋律</h2>
+        <p>自由点击上面的音符，编一段属于你的五声旋律吧！</p>
+        <div class="melody-display" id="melody-display"></div>
+        <button class="btn btn-play" onclick="playMelody()">▶ 播放我的旋律</button>
+        <button class="btn btn-clear" onclick="clearMelody()">🗑 清空重来</button>
+    </div>
+
+    <!-- 区块5：总结收获 → MUSIC的U -->
+    <div class="summary">
+        <h2>💡 今天学到了什么？</h2>
+        <p>五声音阶（宫商角徵羽）是中国音乐的密码。<br>
+        它们没有"发"和"西"（fa和si），<br>
+        所以听起来特别温暖、特别"中国"！🇨🇳</p>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer">
+        AI乐搭 · 五声音阶 · MUSIC动机模型设计 · 适用于特殊儿童音乐启蒙
+    </div>
+
+    <script>
+        // Web Audio API
+        let audioCtx = null;
+        function getAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            return audioCtx;
+        }
+
+        // 音高频率映射
+        const noteFreq = {
+            'C4': 261.63,
+            'D4': 293.66,
+            'E4': 329.63,
+            'G4': 392.00,
+            'A4': 440.00,
+            'C5': 523.25
+        };
+
+        const noteColors = {
+            'do': '#FF6B6B',
+            're': '#FF9F43',
+            'mi': '#4ECDC4',
+            'sol': '#6C5CE7',
+            'la': '#FD79A8'
+        };
+
+        // 播放音符
+        function playNote(note, element) {
+            const ctx = getAudioCtx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.value = noteFreq[note];
+            gain.gain.setValueAtTime(0.5, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.8);
+
+            // 视觉反馈
+            if (element) {
+                element.classList.add('active');
+                setTimeout(() => element.classList.remove('active'), 300);
+            }
+
+            // 创作模式下记录
+            if (currentMode === 'free') {
+                const noteName = element ? element.dataset.note : '';
+                addToMelody(noteName);
+            }
+
+            // 游戏模式下判断
+            if (currentMode === 'game' && gameActive) {
+                checkAnswer(note);
+            }
+        }
+
+        // 游戏逻辑
+        let currentMode = 'game';
+        let gameActive = false;
+        let currentQuestion = null;
+        let score = 0;
+        let totalQuestions = 0;
+        const maxQuestions = 5;
+
+        const questions = [
+            { note: 'C4', hint: '🔴 最低的那个音', name: '宫（do）' },
+            { note: 'D4', hint: '🟠 比宫高一点点', name: '商（re）' },
+            { note: 'E4', hint: '🟢 中间的音', name: '角（mi）' },
+            { note: 'G4', hint: '🟣 比较高的音', name: '徵（sol）' },
+            { note: 'A4', hint: '🩷 最高的那个音', name: '羽（la）' }
+        ];
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-free').classList.toggle('active', mode === 'free');
+            document.getElementById('mode-game').classList.toggle('active', mode === 'game');
+            document.getElementById('game-section').style.display = mode === 'game' ? 'block' : 'none';
+            document.getElementById('creative-section').style.display = mode === 'free' ? 'block' : 'none';
+        }
+
+        function startGame() {
+            score = 0;
+            totalQuestions = 0;
+            gameActive = true;
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('score-display').textContent = '';
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if (totalQuestions >= maxQuestions) {
+                endGame();
+                return;
+            }
+            const q = questions[Math.floor(Math.random() * questions.length)];
+            currentQuestion = q;
+            document.getElementById('prompt-text').textContent = `听一听，找到这个音：${q.name}`;
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+
+            // 播放目标音
+            setTimeout(() => {
+                const ctx = getAudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = noteFreq[q.note];
+                gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 1);
+            }, 500);
+        }
+
+        function checkAnswer(note) {
+            if (!currentQuestion) return;
+            totalQuestions++;
+            const fb = document.getElementById('feedback');
+
+            if (note === currentQuestion.note) {
+                score++;
+                fb.textContent = '🎉 太棒了！你找对了！';
+                fb.className = 'feedback correct';
+            } else {
+                fb.textContent = '💪 没关系，再试试！你很勇敢！';
+                fb.className = 'feedback wrong';
+            }
+
+            setTimeout(nextQuestion, 1500);
+        }
+
+        function endGame() {
+            gameActive = false;
+            currentQuestion = null;
+            document.getElementById('prompt-text').textContent = '🏆 闯关完成！';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('score-display').textContent =
+                `你答对了 ${score}/${maxQuestions} 题！${score >= 4 ? ' 🌟超级厉害！' : score >= 2 ? ' 👏很不错！' : ' 💪继续加油！'}`;
+            document.getElementById('start-btn').style.display = 'inline-block';
+            document.getElementById('start-btn').textContent = '再玩一次 🎮';
+        }
+
+        // 创作模式
+        let melody = [];
+
+        function addToMelody(noteName) {
+            if (melody.length >= 12) return; // 最多12个音
+            melody.push(noteName);
+            renderMelody();
+        }
+
+        function renderMelody() {
+            const container = document.getElementById('melody-display');
+            container.innerHTML = '';
+            melody.forEach(n => {
+                const el = document.createElement('div');
+                el.className = 'melody-note';
+                el.style.background = noteColors[n] || '#666';
+                el.textContent = n;
+                container.appendChild(el);
+            });
+        }
+
+        function playMelody() {
+            if (melody.length === 0) return;
+            const noteMap = { 'do': 'C4', 're': 'D4', 'mi': 'E4', 'sol': 'G4', 'la': 'A4' };
+            melody.forEach((n, i) => {
+                setTimeout(() => {
+                    const noteKey = noteMap[n];
+                    if (noteKey) {
+                        const keyEl = document.querySelector(`[data-note="${n}"]`);
+                        playNote(noteKey, keyEl);
+                    }
+                }, i * 400);
+            });
+        }
+
+        function clearMelody() {
+            melody = [];
+            document.getElementById('melody-display').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
