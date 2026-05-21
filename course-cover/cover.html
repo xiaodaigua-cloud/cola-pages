@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音乐鉴赏 - 教创赛国赛进阶打磨</title>
+  <style>
+    /* ===== 设计系统（与主页一致）===== */
+    :root {
+      --gold: #c9a96e;
+      --gold-light: #dfc698;
+      --warm-50: #fefcf9;
+      --warm-100: #faf6f0;
+      --blue-900: #0f2847;
+      --blue-800: #1a3a5f;
+      --text-serif: 'Noto Serif SC', 'Songti SC', serif;
+      --text-sans: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --ease-legato: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--text-sans);
+      background: var(--warm-50);
+      color: var(--blue-900);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ===== 封面容器 ===== */
+    .cover {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(170deg, #fefcf9 0%, #f5ede3 40%, #efe6d8 100%);
+    }
+
+    /* ===== 背景装饰 ===== */
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: 
+        radial-gradient(ellipse 80% 60% at 20% 80%, rgba(201,169,110,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 20%, rgba(15,40,71,0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 五线谱装饰线 */
+    .staff-lines {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.06;
+    }
+
+    .staff-line {
+      position: absolute;
+      left: 0; width: 100%;
+      height: 1px;
+      background: var(--blue-900);
+    }
+
+    .staff-line:nth-child(1) { top: 18%; }
+    .staff-line:nth-child(2) { top: 28%; }
+    .staff-line:nth-child(3) { top: 38%; }
+    .staff-line:nth-child(4) { top: 62%; }
+    .staff-line:nth-child(5) { top: 72%; }
+
+    /* 浮动音符 */
+    .floating-notes {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .note {
+      position: absolute;
+      font-family: 'Apple Symbols', serif;
+      color: var(--gold);
+      opacity: 0.12;
+      animation: floatNote 20s ease-in-out infinite;
+    }
+
+    .note:nth-child(1) { font-size: 4rem; top: 10%; left: 8%; animation-delay: 0s; }
+    .note:nth-child(2) { font-size: 3rem; top: 20%; right: 12%; animation-delay: -5s; }
+    .note:nth-child(3) { font-size: 5rem; bottom: 25%; left: 15%; animation-delay: -10s; }
+    .note:nth-child(4) { font-size: 2.5rem; top: 45%; right: 8%; animation-delay: -15s; }
+    .note:nth-child(5) { font-size: 3.5rem; bottom: 15%; right: 20%; animation-delay: -8s; }
+
+    @keyframes floatNote {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.12; }
+      50% { transform: translateY(-20px) rotate(5deg); opacity: 0.18; }
+    }
+
+    /* ===== 内容层 ===== */
+    .cover-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    /* 系列标签 */
+    .series-tag {
+      display: inline-block;
+      font-family: var(--text-sans);
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 0.4em 1.2em;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-legato) 0.2s forwards;
+    }
+
+    /* 主标题 */
+    .cover-title {
+      font-family: var(--text-serif);
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 700;
+      color: var(--blue-900);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-legato) 0.4s forwards;
+    }
+
+    .cover-title .highlight {
+      color: var(--gold);
+      position: relative;
+    }
+
+    .cover-title .highlight::after {
+      content: '';
+      position: absolute;
+      bottom: 0.1em; left: -0.1em;
+      width: calc(100% + 0.2em);
+      height: 0.4em;
+      background: rgba(201,169,110,0.15);
+      z-index: -1;
+      border-radius: 2px;
+    }
+
+    /* 副标题 */
+    .cover-subtitle {
+      font-family: var(--text-sans);
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--blue-900);
+      opacity: 0.7;
+      margin-bottom: 3rem;
+      font-weight: 400;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-legato) 0.6s forwards;
+    }
+
+    /* 分隔线 */
+    .cover-divider {
+      width: 60px;
+      height: 2px;
+      background: var(--gold);
+      margin: 0 auto 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-legato) 0.8s forwards;
+    }
+
+    /* 信息块 */
+    .cover-info {
+      display: grid;
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-legato) 1s forwards;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .info-label {
+      font-size: 0.85rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      min-width: 4em;
+      text-align: right;
+    }
+
+    .info-value {
+      font-family: var(--text-serif);
+      font-size: 1.1rem;
+      color: var(--blue-900);
+      font-weight: 500;
+    }
+
+    .info-value.course-name {
+      font-size: 1.3rem;
+      color: var(--blue-800);
+    }
+
+    /* 赛道标签 */
+    .track-tag {
+      display: inline-block;
+      font-size: 0.9rem;
+      color: var(--warm-50);
+      background: var(--blue-900);
+      padding: 0.5em 1.5em;
+      margin-top: 0.5rem;
+      letter-spacing: 0.1em;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-legato) 1.2s forwards;
+    }
+
+    /* 底部装饰 */
+    .cover-footer {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      color: var(--blue-900);
+      opacity: 0.3;
+      letter-spacing: 0.2em;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-legato) 1.4s forwards;
+    }
+
+    /* 装饰音符符号（左上、右下） */
+    .decorative-symbol {
+      position: absolute;
+      font-family: 'Apple Symbols', serif;
+      color: var(--gold);
+      opacity: 0.08;
+      z-index: 0;
+    }
+
+    .decorative-symbol.tl {
+      top: 2rem; left: 2rem;
+      font-size: 6rem;
+    }
+
+    .decorative-symbol.br {
+      bottom: 2rem; right: 2rem;
+      font-size: 5rem;
+      transform: rotate(180deg);
+    }
+
+    /* 动画 */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 打印样式 */
+    @media print {
+      .cover { min-height: 100vh; }
+      .note, .floating-notes, .staff-lines { display: none; }
+      .series-tag, .cover-title, .cover-subtitle, 
+      .cover-divider, .cover-info, .track-tag, .cover-footer {
+        opacity: 1 !important;
+        animation: none !important;
+      }
+    }
+
+    /* 响应式 */
+    @media (max-width: 640px) {
+      .cover { padding: 1.5rem; }
+      .info-row { flex-direction: column; align-items: center; gap: 0.3rem; }
+      .info-label { text-align: center; min-width: auto; }
+      .decorative-symbol { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cover">
+    <!-- 五线谱装饰线 -->
+    <div class="staff-lines">
+      <div class="staff-line"></div>
+      <div class="staff-line"></div>
+      <div class="staff-line"></div>
+      <div class="staff-line"></div>
+      <div class="staff-line"></div>
+    </div>
+
+    <!-- 浮动音符 -->
+    <div class="floating-notes">
+      <span class="note">♪</span>
+      <span class="note">♫</span>
+      <span class="note">𝄞</span>
+      <span class="note">♬</span>
+      <span class="note">♩</span>
+    </div>
+
+    <!-- 装饰性大型音符符号 -->
+    <div class="decorative-symbol tl">𝄞</div>
+    <div class="decorative-symbol br">𝄞</div>
+
+    <!-- 内容 -->
+    <div class="cover-content">
+      <!-- 系列标签 -->
+      <div class="series-tag">在线公开磨课 · 第 10 期</div>
+
+      <!-- 主标题 -->
+      <h1 class="cover-title">
+        混合式教学创新者联盟<br>
+        <span class="highlight">"在线公开磨课"</span>系列活动
+      </h1>
+
+      <!-- 副标题 -->
+      <p class="cover-subtitle">教创赛国赛进阶打磨</p>
+
+      <!-- 分隔线 -->
+      <div class="cover-divider"></div>
+
+      <!-- 信息块 -->
+      <div class="cover-info">
+        <div class="info-row">
+          <span class="info-label">单位</span>
+          <span class="info-value">河南师范大学</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">申报人</span>
+          <span class="info-value">薛碧芸</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">课程</span>
+          <span class="info-value course-name">《音乐鉴赏》</span>
+        </div>
+      </div>
+
+      <!-- 赛道标签 -->
+      <div class="track-tag">地方高校 · 人工智能组</div>
+    </div>
+
+    <!-- 底部装饰文字 -->
+    <div class="cover-footer">MUSIC APPRECIATION · TEACHING INNOVATION</div>
+  </div>
+
+  <!-- 自动跳转提示（可选） -->
+  <script>
+    // 点击封面进入主页
+    document.querySelector('.cover').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    // 或者按任意键跳转
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>

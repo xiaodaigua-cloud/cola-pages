@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音乐鉴赏 — 情感线条</title>
+
+  <style>
+    /* ===== CSS Variables & Design Tokens ===== */
+    :root {
+      /* 暖色调 + 蓝色调层次 */
+      --warm-50: #fefcf9;
+      --warm-100: #faf6f0;
+      --warm-200: #f3ede3;
+      --warm-300: #e8e0d4;
+      --gold: #c9a96e;
+      --gold-light: #d4b87a;
+      --gold-dark: #a6884a;
+
+      --blue-900: #0f2847;
+      --blue-800: #1a3a5f;
+      --blue-700: #1a4a6f;
+      --blue-600: #2a6a8f;
+      --blue-100: #e8f0f8;
+
+      --ink: #1a1816;
+      --ink-muted: #5a5650;
+      --paper: var(--warm-100);
+
+      /* 字体 */
+      --font-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Noto Sans SC", "Pingfang SC", "Microsoft YaHei", sans-serif;
+
+      /* 流动间距 */
+      --flow-xs: clamp(0.5rem, 1vw, 0.75rem);
+      --flow-sm: clamp(0.75rem, 1.5vw, 1rem);
+      --flow-md: clamp(1rem, 2vw, 1.5rem);
+      --flow-lg: clamp(1.5rem, 3vw, 2.5rem);
+      --flow-xl: clamp(2rem, 4vw, 4rem);
+      --flow-2xl: clamp(3rem, 6vw, 6rem);
+
+      /* 字体缩放 */
+      --text-sm: clamp(0.8rem, 1.2vw, 0.95rem);
+      --text-base: clamp(1rem, 1.5vw, 1.15rem);
+      --text-lg: clamp(1.15rem, 2vw, 1.4rem);
+      --text-xl: clamp(1.4rem, 2.5vw, 1.8rem);
+      --text-2xl: clamp(1.8rem, 3.5vw, 2.8rem);
+      --text-3xl: clamp(2.5rem, 5vw, 4.5rem);
+      --text-4xl: clamp(3.5rem, 7vw, 7rem);
+
+      /* 音乐缓动 */
+      --ease-legato: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-staccato: cubic-bezier(0.7, 0, 0.84, 0);
+      --ease-fermata: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      font-size: var(--text-base);
+      line-height: 1.9;
+      color: var(--ink);
+      background-color: var(--paper);
+      overflow-x: hidden;
+    }
+
+    /* ===== 全局背景图 ===== */
+    .bg-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.06;
+      background: url('music_bg_warm.png') center/cover no-repeat;
+    }
+
+    /* ===== 情感导航轴 ===== */
+    .emotion-axis {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(250, 246, 240, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--warm-300);
+      transform: translateY(-100%);
+      transition: transform 0.6s var(--ease-legato);
+    }
+
+    .emotion-axis.visible {
+      transform: translateY(0);
+    }
+
+    .axis-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--flow-sm) var(--flow-md);
+      display: flex;
+      align-items: center;
+      gap: var(--flow-md);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .axis-inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    .axis-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-sm);
+      color: var(--gold);
+      white-space: nowrap;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+    }
+
+    .axis-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      min-width: 40px;
+    }
+
+    .axis-nodes {
+      display: flex;
+      align-items: center;
+      gap: var(--flow-xs);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .axis-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.4s var(--ease-legato);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .axis-node:hover {
+      background: rgba(201, 169, 110, 0.1);
+    }
+
+    .axis-node.active .axis-dot {
+      background: var(--gold);
+      transform: scale(1.3);
+      box-shadow: 0 0 0 4px rgba(201, 169, 110, 0.2);
+    }
+
+    .axis-node.active .axis-label {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .axis-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--warm-300);
+      border: 2px solid var(--gold);
+      transition: all 0.4s var(--ease-legato);
+    }
+
+    .axis-label {
+      font-size: 11px;
+      color: var(--ink-muted);
+      transition: all 0.4s var(--ease-legato);
+      letter-spacing: 0.05em;
+    }
+
+    /* ===== 章节（全屏沉浸式） ===== */
+    .chapter {
+      position: relative;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--flow-2xl) var(--flow-md);
+      overflow: hidden;
+    }
+
+    /* 章节背景装饰 */
+    .chapter-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.08;
+      object-fit: cover;
+    }
+
+    .chapter-number {
+      font-family: var(--font-serif);
+      font-size: var(--text-4xl);
+      font-weight: 900;
+      color: var(--warm-300);
+      position: absolute;
+      right: var(--flow-lg);
+      top: var(--flow-lg);
+      line-height: 1;
+      z-index: 0;
+    }
+
+    .chapter-label {
+      font-size: var(--text-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      margin-bottom: var(--flow-xs);
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .chapter-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      max-width: 12ch;
+      position: relative;
+      z-index: 1;
+      color: var(--blue-800);
+    }
+
+    .chapter-subtitle {
+      font-size: var(--text-lg);
+      color: var(--ink-muted);
+      max-width: 45ch;
+      margin-top: var(--flow-md);
+      line-height: 1.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== 视觉分隔（全宽背景图） ===== */
+    .visual-divider {
+      position: relative;
+      min-height: 60dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .visual-divider img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.15;
+    }
+
+    .visual-divider-text {
+      position: relative;
+      z-index: 1;
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      font-weight: 300;
+      color: var(--blue-800);
+      text-align: center;
+      max-width: 50ch;
+      padding: var(--flow-xl) var(--flow-md);
+      font-style: italic;
+    }
+
+    /* ===== 内容段落 ===== */
+    .verse {
+      max-width: 70ch;
+      margin: var(--flow-2xl) auto;
+      padding: 0 var(--flow-md);
+      position: relative;
+      z-index: 1;
+    }
+
+    .verse-quote {
+      font-family: var(--font-serif);
+      font-size: var(--text-xl);
+      font-weight: 300;
+      line-height: 1.8;
+      color: var(--blue-800);
+      border-left: 3px solid var(--gold);
+      padding-left: var(--flow-md);
+      font-style: italic;
+    }
+
+    .verse-text {
+      font-size: var(--text-base);
+      line-height: 2;
+      color: var(--ink-muted);
+    }
+
+    .verse-text strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* ===== 时间轴（乐谱式） ===== */
+    .score-timeline {
+      position: relative;
+      padding: var(--flow-2xl) var(--flow-md);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .score-line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+      transform: translateX(-50%);
+    }
+
+    .score-item {
+      position: relative;
+      margin-bottom: var(--flow-2xl);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--flow-lg);
+    }
+
+    .score-item:nth-child(odd) {
+      flex-direction: row;
+      text-align: right;
+      padding-right: calc(50% + var(--flow-lg));
+    }
+
+    .score-item:nth-child(even) {
+      flex-direction: row-reverse;
+      text-align: left;
+      padding-left: calc(50% + var(--flow-lg));
+    }
+
+    .score-dot {
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--warm-100);
+      border: 3px solid var(--gold);
+      transform: translateX(-50%);
+      z-index: 1;
+      transition: all 0.6s var(--ease-legato);
+    }
+
+    .score-item.active .score-dot {
+      background: var(--gold);
+      box-shadow: 0 0 0 6px rgba(201, 169, 110, 0.2);
+    }
+
+    .score-content {
+      flex: 1;
+    }
+
+    .score-period {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: var(--flow-xs);
+    }
+
+    .score-desc {
+      font-size: var(--text-base);
+      color: var(--ink-muted);
+      line-height: 1.8;
+    }
+
+    /* ===== 情感维度卡片 ===== */
+    .emotion-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--flow-lg);
+      max-width: 1000px;
+      margin: var(--flow-2xl) auto;
+      padding: 0 var(--flow-md);
+    }
+
+    @media (min-width: 768px) {
+      .emotion-cards {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .emotion-card {
+      position: relative;
+      padding: var(--flow-lg);
+      background: var(--warm-50);
+      border: 1px solid var(--warm-300);
+      overflow: hidden;
+      transition: all 0.6s var(--ease-legato);
+    }
+
+    .emotion-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--gold);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.6s var(--ease-legato);
+    }
+
+    .emotion-card:hover::before {
+      transform: scaleY(1);
+    }
+
+    .emotion-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.1);
+    }
+
+    .emotion-card-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--blue-800);
+      margin-bottom: var(--flow-sm);
+    }
+
+    .emotion-card-text {
+      font-size: var(--text-base);
+      color: var(--ink-muted);
+      line-height: 1.9;
+    }
+
+    /* ===== 蓝色调区域 ===== */
+    .blue-section {
+      background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-800) 100%);
+      color: var(--warm-100);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blue-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('music_lines_blue.png') center/cover no-repeat;
+      opacity: 0.05;
+      z-index: 0;
+    }
+
+    .blue-section .chapter-label {
+      color: var(--gold-light);
+    }
+
+    .blue-section .chapter-title {
+      color: var(--warm-50);
+    }
+
+    .blue-section .chapter-subtitle {
+      color: var(--blue-100);
+    }
+
+    /* ===== 真善美（三列） ===== */
+    .virtues {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--flow-lg);
+      max-width: 1100px;
+      margin: var(--flow-2xl) auto;
+      padding: 0 var(--flow-md);
+    }
+
+    @media (min-width: 768px) {
+      .virtues {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    .virtue {
+      text-align: center;
+      padding: var(--flow-xl) var(--flow-md);
+      position: relative;
+    }
+
+    .virtue::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: var(--gold);
+      opacity: 0;
+      transition: all 0.6s var(--ease-legato);
+    }
+
+    .virtue:hover::after {
+      opacity: 1;
+      width: 100px;
+    }
+
+    .virtue-char {
+      font-family: var(--font-serif);
+      font-size: var(--text-4xl);
+      font-weight: 900;
+      color: var(--blue-800);
+      display: block;
+      margin-bottom: var(--flow-md);
+      line-height: 1;
+    }
+
+    .virtue-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--blue-800);
+      margin-bottom: var(--flow-sm);
+    }
+
+    .virtue-text {
+      font-size: var(--text-base);
+      color: var(--ink-muted);
+      line-height: 1.9;
+    }
+
+    /* ===== 引用区 ===== */
+    .coda {
+      background: var(--blue-900);
+      color: var(--warm-50);
+      padding: var(--flow-2xl) var(--flow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .coda::before {
+      content: '𝄢';
+      position: absolute;
+      top: -50px;
+      left: 50px;
+      font-size: 400px;
+      color: rgba(255, 255, 255, 0.03);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .coda-text {
+      font-family: var(--font-serif);
+      font-size: var(--text-2xl);
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 50ch;
+      margin: 0 auto;
+      text-align: center;
+      font-style: italic;
+      position: relative;
+      z-index: 1;
+    }
+
+    .coda-author {
+      text-align: center;
+      margin-top: var(--flow-lg);
+      font-size: var(--text-base);
+      opacity: 0.6;
+    }
+
+    /* ===== 结尾 ===== */
+    .fine {
+      text-align: center;
+      padding: var(--flow-2xl) var(--flow-md);
+      position: relative;
+      background: var(--warm-200);
+    }
+
+    .fine-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--blue-800);
+      margin-bottom: var(--flow-md);
+    }
+
+    .fine-text {
+      font-size: var(--text-lg);
+      color: var(--ink-muted);
+      max-width: 55ch;
+      margin: 0 auto var(--flow-lg);
+      line-height: 1.9;
+    }
+
+    .fine-line {
+      width: 60px;
+      height: 2px;
+      background: var(--gold);
+      margin: var(--flow-lg) auto;
+    }
+
+    /* ===== 滚动揭示 ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1s var(--ease-fermata),
+                  transform 1s var(--ease-fermata);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ===== 分隔线（五线谱式） ===== */
+    .staff-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--warm-300);
+      margin: var(--flow-2xl) 0;
+      position: relative;
+    }
+
+    .staff-divider::before,
+    .staff-divider::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--warm-300);
+    }
+
+    .staff-divider::before { top: -8px; }
+    .staff-divider::after { top: 8px; }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 767px) {
+      .chapter-title {
+        font-size: var(--text-2xl);
+      }
+
+      .score-item:nth-child(odd),
+      .score-item:nth-child(even) {
+        padding-left: var(--flow-xl);
+        padding-right: 0;
+        text-align: left;
+        flex-direction: column;
+      }
+
+      .score-line {
+        left: 20px;
+      }
+
+      .score-dot {
+        left: 20px;
+      }
+    }
+
+    /* ===== Reduced Motion ===== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 全局背景层 -->
+  <div class="bg-layer" aria-hidden="true"></div>
+
+  <!-- 情感导航轴 -->
+  <nav class="emotion-axis" id="emotionAxis">
+    <div class="axis-inner">
+      <span class="axis-title">情感线条</span>
+      <div class="axis-line"></div>
+      <div class="axis-nodes">
+        <a href="#intro" class="axis-node active" data-section="intro">
+          <div class="axis-dot"></div>
+          <span class="axis-label">二次创造</span>
+        </a>
+        <a href="#timeline" class="axis-node" data-section="timeline">
+          <div class="axis-dot"></div>
+          <span class="axis-label">时间轴</span>
+        </a>
+        <a href="#technology" class="axis-node" data-section="technology">
+          <div class="axis-dot"></div>
+          <span class="axis-label">技术赋能</span>
+        </a>
+        <a href="#emotion" class="axis-node" data-section="emotion">
+          <div class="axis-dot"></div>
+          <span class="axis-label">情感维度</span>
+        </a>
+        <a href="#digital" class="axis-node" data-section="digital">
+          <div class="axis-dot"></div>
+          <span class="axis-label">数字时代</span>
+        </a>
+        <a href="#values" class="axis-node" data-section="values">
+          <div class="axis-dot"></div>
+          <span class="axis-label">真善美</span>
+        </a>
+        <a href="#coda" class="axis-node" data-section="coda">
+          <div class="axis-dot"></div>
+          <span class="axis-label">情感闭环</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 第一章：二次创造 -->
+  <section class="chapter" id="intro">
+    <div class="chapter-number">I</div>
+
+    <div class="chapter-label reveal">Prologue · 序</div>
+    <h1 class="chapter-title reveal reveal-delay-1">
+      二次创造
+    </h1>
+    <p class="chapter-subtitle reveal reveal-delay-2">
+      艺术，尤其是音乐的解读，<br>
+      我们把它叫做<strong>"二次创造"</strong>。
+    </p>
+
+    <div style="margin-top: var(--flow-xl); max-width: 65ch;" class="reveal reveal-delay-3">
+      <p style="font-size: var(--text-lg); line-height: 2; color: var(--ink-muted);">
+        很多文科和理科学习的知识都是有标准答案的。<br>
+        但是艺术，尤其是音乐的解读，我们把它叫做<strong>"二次创造"</strong>。<br>
+        <span style="color: var(--gold); font-weight: 500;">在二次创造和传授的时候，其实是没有标准答案的。</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- 视觉分隔：暖色调 -->
+  <div class="visual-divider" aria-hidden="true">
+    <img src="music_bg_warm.png" alt="" />
+  </div>
+
+  <div class="staff-divider" aria-hidden="true"></div>
+
+  <!-- 第二章：音乐时间轴 -->
+  <section class="chapter" id="timeline" style="background: var(--warm-200);">
+    <div class="chapter-number">II</div>
+
+    <div class="chapter-label reveal">Timeline · 时间轴</div>
+    <h2 class="chapter-title reveal reveal-delay-1" style="max-width: 15ch;">
+      音乐史上的<br>完整脉络
+    </h2>
+    <p class="chapter-subtitle reveal reveal-delay-2">
+      首先在客观层面，我们接触到了音乐史上不同的时期，形成了一个完整的时间轴。
+    </p>
+
+    <div class="score-timeline" style="margin-top: var(--flow-2xl);">
+      <div class="score-line"></div>
+
+      <!-- 西方音乐 -->
+      <div style="margin-bottom: var(--flow-2xl);">
+        <h3 class="reveal" style="font-family: var(--font-serif); font-size: var(--text-xl); color: var(--blue-800); margin-bottom: var(--flow-lg);">
+          ♩ 西方音乐时间轴
+        </h3>
+      </div>
+
+      <div class="score-item reveal">
+        <div class="score-dot"></div>
+        <div class="score-content">
+          <div class="score-period">文艺复兴时期</div>
+          <div class="score-desc">人文主义的觉醒，音乐从教堂走向宫廷与民间</div>
+        </div>
+      </div>
+
+      <div class="score-item reveal reveal-delay-1">
+        <div class="score-dot"></div>
+        <div class="score-content">
+          <div class="score-period">巴洛克时期</div>
+          <div class="score-desc">通奏低音与对位法的辉煌，巴赫与亨德尔的巅峰</div>
+        </div>
+      </div>
+
+      <div class="score-item reveal reveal-delay-2">
+        <div class="score-dot"></div>
+        <div class="score-content">
+          <div class="score-period">古典主义时期</div>
+          <div class="score-desc">海顿、莫扎特、贝多芬 — 形式与情感的完美平衡</div>
+        </div>
+      </div>
+
+      <div class="score-item reveal reveal-delay-3">
+        <div class="score-dot"></div>
+        <div class="score-content">
+          <div class="score-period">浪漫主义时期</div>
+          <div class="score-desc">肖邦、李斯特、舒曼 — 个人情感与民族精神的爆发</div>
+        </div>
+      </div>
+
+      <div class="score-item reveal reveal-delay-4">
+        <div class="score-dot"></div>
+        <div class="score-content">
+          <div class="score-period">印象主义时期</div>
+          <div class="score-desc">德彪西与拉威尔 — 光影与色彩的音响绘画</div>
+        </div>
+      </div>
+
+      <div class="score-item reveal reveal-delay-4">
+        <div class="score-dot"></div>
+        <div class="score-content">
+          <div class="score-period">20世纪近现代</div>
+          <div class="score-desc">多元风格并存，从序列主义到简约主义，从爵士到电子音乐</div>
+        </div>
+      </div>
+
+      <!-- 中国音乐 -->
+      <div style="margin-top: var(--flow-2xl); margin-bottom: var(--flow-lg);">
+        <h3 class="reveal" style="font-family: var(--font-serif); font-size: var(--text-xl); color: var(--blue-800);">
+          ♩ 中国音乐与融合
+        </h3>
+      </div>
+
+      <div class="score-item reveal">
+        <div class="score-dot"></div>
+        <div class="score-content">
+          <div class="score-period">中国传统音乐</div>
+          <div class="score-desc">古琴、琵琶、二胡 — 千年文明的音响记忆</div>
+        </div>
+      </div>
+
+      <div class="score-item reveal reveal-delay-1">
+        <div class="score-dot"></div>
+        <div class="score-content">
+          <div class="score-period">中西融合</div>
+          <div class="score-desc">从学堂乐歌到现代流行，从民族管弦乐到跨界实验</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="verse reveal" style="margin-top: var(--flow-2xl);">
+      <div class="verse-quote">
+        在整体的音乐发展中，我们看似是在用相似的"尺子"和元素来拆解作品，
+        但其实其中的纹理、音乐知识，以及作品背后"力透纸背"的故事，才是我们在准备课程时的难点。
+      </div>
+    </div>
+  </section>
+
+  <!-- 视觉分隔：中西融合 -->
+  <div class="visual-divider" aria-hidden="true">
+    <img src="music_fusion_east_west.png" alt="" />
+    <div class="visual-divider-text">
+      音乐作为"流动的建筑"<br>
+      承载着中西文化的对话
+    </div>
+  </div>
+
+  <div class="staff-divider" aria-hidden="true"></div>
+
+  <!-- 第三章：技术赋能（蓝色调） -->
+  <section class="chapter blue-section" id="technology">
+    <div class="chapter-number">III</div>
+
+    <div class="chapter-label reveal">Technology · 技术</div>
+    <h2 class="chapter-title reveal reveal-delay-1" style="max-width: 14ch;">
+      技术赋能<br>艺术
+    </h2>
+
+    <div class="verse reveal reveal-delay-2" style="margin-top: var(--flow-xl);">
+      <p class="verse-text" style="color: var(--blue-100);">
+        尤其是当<strong>"技术赋能艺术"</strong>时。大家现在常说技术赋能，无论是作为口号还是付诸实践，
+        我们团队也一直在探索：
+      </p>
+    </div>
+
+    <div style="max-width: 70ch; margin: var(--flow-xl) auto; padding: 0 var(--flow-md);" class="reveal reveal-delay-3">
+      <div style="border-left: 3px solid var(--gold-light); padding-left: var(--flow-lg);">
+        <p style="font-size: var(--text-lg); font-weight: 500; color: var(--warm-50); margin-bottom: var(--flow-md);">
+          技术该如何赋能？
+        </p>
+        <ul style="list-style: none; padding: 0;">
+          <li style="margin-bottom: var(--flow-sm); padding-left: var(--flow-md); position: relative; color: var(--blue-100);">
+            <span style="position: absolute; left: 0; color: var(--gold-light);">→</span>
+            从什么时候开始赋能？
+          </li>
+          <li style="margin-bottom: var(--flow-sm); padding-left: var(--flow-md); position: relative; color: var(--blue-100);">
+            <span style="position: absolute; left: 0; color: var(--gold-light);">→</span>
+            以什么方式进行赋能？
+          </li>
+          <li style="margin-bottom: var(--flow-sm); padding-left: var(--flow-md); position: relative; color: var(--blue-100);">
+            <span style="position: absolute; left: 0; color: var(--gold-light);">→</span>
+            在哪些维度进行赋能？
+          </li>
+          <li style="padding-left: var(--flow-md); position: relative; color: var(--blue-100);">
+            <span style="position: absolute; left: 0; color: var(--gold-light);">→</span>
+            技术是否真的能让我们通过音乐，感受到艺术是在发芽、在生花？
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="verse reveal reveal-delay-4" style="margin-top: var(--flow-xl);">
+      <div class="verse-quote" style="border-left-color: var(--gold-light); color: var(--warm-50);">
+        所以，<strong>情感线</strong>是我们非常重要的一个闭环。
+      </div>
+    </div>
+  </section>
+
+  <div class="staff-divider" aria-hidden="true"></div>
+
+  <!-- 第四章：情感维度 -->
+  <section class="chapter" id="emotion" style="background: var(--warm-200);">
+    <div class="chapter-number">IV</div>
+
+    <div class="chapter-label reveal">Emotion · 情感</div>
+    <h2 class="chapter-title reveal reveal-delay-1" style="max-width: 14ch;">
+      情感维度<br>的延伸
+    </h2>
+    <p class="chapter-subtitle reveal reveal-delay-2">
+      我们考虑通过这门课，在情感上实现以下两个维度的延伸：
+    </p>
+
+    <div class="emotion-cards">
+      <div class="emotion-card reveal">
+        <div class="emotion-card-title">Inner Healing · 内在疗愈</div>
+        <div class="emotion-card-text">
+          让学生通过音乐实现个人的<strong>自我疗愈</strong>，
+          进而将这种情感赋能于不同地方文化的传承、变化与迭代。
+        </div>
+      </div>
+
+      <div class="emotion-card reveal reveal-delay-1">
+        <div class="emotion-card-title">Universal Love · 大国大爱</div>
+        <div class="emotion-card-text">
+          在时空维度上，呈现出<strong>国家之间、中西之间</strong>的大国大爱。
+          <br><br>
+          <em style="color: var(--blue-800); font-weight: 500;">
+          以肖邦为例 — 他的作品表达的不仅仅是作为"音乐诗人"定位上的悦耳好听，
+          其背后更有深刻的内涵：每一个指向都关乎大国大爱，以及对祖国和民族的责任感。
+          </em>
+        </div>
+      </div>
+    </div>
+
+    <div class="verse reveal" style="margin-top: var(--flow-2xl);">
+      <p style="font-size: var(--text-lg); line-height: 2; color: var(--blue-800); font-weight: 500;">
+        希望通过技术引导学生实现从<strong>"大国情怀"</strong>到<strong>"地方文化"</strong>，
+        再到<strong>"个人中西文化"</strong>的多维度表达与研读。
+      </p>
+    </div>
+  </section>
+
+  <!-- 视觉分隔：蓝色情感线条 -->
+  <div class="visual-divider" aria-hidden="true">
+    <img src="music_lines_blue.png" alt="" />
+  </div>
+
+  <div class="staff-divider" aria-hidden="true"></div>
+
+  <!-- 第五章：数字时代 -->
+  <section class="chapter" id="digital">
+    <div class="chapter-number">V</div>
+
+    <div class="chapter-label reveal">Digital · 数字</div>
+    <h2 class="chapter-title reveal reveal-delay-1" style="max-width: 13ch;">
+      数字时代<br>的思考
+    </h2>
+
+    <div class="verse reveal reveal-delay-2" style="margin-top: var(--flow-xl);">
+      <p class="verse-text">
+        当然，在数字时代，<strong>技术往往是无情的</strong>。
+        大家都知道，目前很多"一键生成"的音乐作品大多停留在技术实践和猎奇阶段。
+      </p>
+    </div>
+
+    <div style="max-width: 70ch; margin: var(--flow-xl) auto; padding: 0 var(--flow-md);" class="reveal reveal-delay-3">
+      <div style="padding: var(--flow-lg); background: var(--warm-200); border: 1px solid var(--warm-300);">
+        <p style="font-size: var(--text-lg); font-weight: 600; color: var(--blue-800); margin-bottom: var(--flow-md);">
+          因此，我们这节课一直在思考：
+        </p>
+        <ol style="list-style: none; padding: 0; counter-reset: digital-q;">
+          <li style="margin-bottom: var(--flow-md); padding-left: var(--flow-xl); position: relative;">
+            <span style="position: absolute; left: 0; font-size: var(--text-2xl); font-weight: 900; color: var(--gold);">1</span>
+            <strong>如何真正实现技术赋能，并达成"音乐无差别"的理想？</strong>
+          </li>
+          <li style="padding-left: var(--flow-xl); position: relative;">
+            <span style="position: absolute; left: 0; font-size: var(--text-2xl); font-weight: 900; color: var(--gold);">2</span>
+            <strong>音乐作为"流动的建筑"</strong>，如何以教育部正式认可的美育课程身份，承担起社会赋予的责任感？
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <div class="staff-divider" aria-hidden="true"></div>
+
+  <!-- 第六章：真善美 -->
+  <section class="chapter" id="values" style="background: var(--warm-200);">
+    <div class="chapter-number">VI</div>
+
+    <div class="chapter-label reveal">Core · 核心</div>
+    <h2 class="chapter-title reveal reveal-delay-1" style="max-width: 14ch;">
+      情感主线：<br>真 · 善 · 美
+    </h2>
+
+    <div class="virtues">
+      <div class="virtue reveal">
+        <span class="virtue-char">真</span>
+        <div class="virtue-title">Truth</div>
+        <div class="virtue-text">
+          以"真"为核心进行生发，解读音乐要素背后所蕴含的<strong>真实内容</strong>，
+          从而实现一系列的产出。不伪造情感，不编造故事，用真诚的态度面对每一部作品。
+        </div>
+      </div>
+
+      <div class="virtue reveal reveal-delay-1">
+        <span class="virtue-char">善</span>
+        <div class="virtue-title">Goodness</div>
+        <div class="virtue-text">
+          在培养学生<strong>"生成式学习"</strong>能力的同时，引导他们思考：
+          我们所教授的技术应如何进行迁移、升级与迭代，从而真正地<strong>回馈社会</strong>。
+        </div>
+      </div>
+
+      <div class="virtue reveal reveal-delay-2">
+        <span class="virtue-char">美</span>
+        <div class="virtue-title">Beauty</div>
+        <div class="virtue-text">
+          音乐作为"流动的建筑"，承载着人类对美的永恒追求。
+          通过这门课程，学生能真正感受到音乐中关于<strong>爱情、亲情、友情</strong>等层面的情感解读。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coda：情感闭环 -->
+  <section class="coda" id="coda">
+    <div class="coda-text reveal">
+      由于我们的学科面向全校各个专业，学生们在未来可以将这些情感体验进行迁移；
+      这种回馈社会的过程，也构成了从起步时的"大国爱国情怀"到最终社会实践的完整闭环。
+    </div>
+    <div class="coda-author reveal reveal-delay-1">
+      — 音乐鉴赏课程组
+    </div>
+  </section>
+
+  <!-- Fine：结尾 -->
+  <section class="fine">
+    <h2 class="fine-title reveal">情感闭环</h2>
+    <div class="fine-line reveal reveal-delay-1"></div>
+    <p class="fine-text reveal reveal-delay-2">
+      从<strong>大国情怀</strong>到<strong>地方文化</strong>，
+      从<strong>个人疗愈</strong>到<strong>社会回馈</strong> —
+      这就是我们在《音乐鉴赏》课程中构建的情感闭环。
+    </p>
+    <div class="fine-line reveal reveal-delay-3"></div>
+    <p class="fine-text reveal reveal-delay-4" style="font-size: var(--text-base); color: var(--ink-muted);">
+      技术无情，但音乐有情。<br>
+      标准答案不可得，但情感共鸣可追寻。
+    </p>
+    <p style="margin-top: var(--flow-2xl); font-size: var(--text-sm); color: var(--ink-muted); opacity: 0.6;" class="reveal reveal-delay-4">
+      音乐鉴赏 · 教学创新大赛展示
+    </p>
+
+  <!-- 情感闭环可视化：国→家→个人→社会反馈→国 -->
+  <section style="min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: var(--flow-2xl) var(--flow-md); background: linear-gradient(135deg, #0f2847 0%, #1a3a5f 100%); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('music_lines_blue.png') center/cover no-repeat; opacity: 0.05; z-index: 0;"></div>
+    
+    <h2 class="reveal" style="font-family: var(--font-serif); font-size: var(--text-3xl); font-weight: 700; color: #fefcf9; margin-bottom: var(--flow-lg); text-align: center; position: relative; z-index: 1;">情感闭环</h2>
+    <p class="reveal reveal-delay-1" style="font-size: var(--text-lg); color: #e8f0f8; margin-bottom: var(--flow-2xl); text-align: center; max-width: 55ch; position: relative; z-index: 1;">
+      国 → 家 → 个人 → 社会反馈 → 国
+    </p>
+    
+    <!-- SVG 闭环图 -->
+    <div class="reveal reveal-delay-2" style="position: relative; z-index: 1; width: min(90vw, 700px); margin: 0 auto;">
+      <svg viewBox="0 0 700 500" style="width: 100%; height: auto;">
+        <!-- 背景圆环 -->
+        <circle cx="350" cy="250" r="180" fill="none" stroke="#c9a96e" stroke-width="2" stroke-dasharray="8 4" opacity="0.3" />
+        
+        <!-- 节点：国（顶部） -->
+        <circle cx="350" cy="70" r="40" fill="#0f2847" stroke="#c9a96e" stroke-width="3" />
+        <text x="350" y="65" text-anchor="middle" fill="#c9a96e" font-size="16" font-weight="600" font-family="serif">国</text>
+        <text x="350" y="85" text-anchor="middle" fill="#fefcf9" font-size="11">大国情怀</text>
+        
+        <!-- 节点：家（右上） -->
+        <circle cx="530" cy="142" r="40" fill="#0f2847" stroke="#c9a96e" stroke-width="3" />
+        <text x="530" y="137" text-anchor="middle" fill="#c9a96e" font-size="16" font-weight="600" font-family="serif">家</text>
+        <text x="530" y="157" text-anchor="middle" fill="#fefcf9" font-size="11">文化传承</text>
+        
+        <!-- 节点：个人（右下） -->
+        <circle cx="530" cy="358" r="40" fill="#0f2847" stroke="#c9a96e" stroke-width="3" />
+        <text x="530" y="353" text-anchor="middle" fill="#c9a96e" font-size="16" font-weight="600" font-family="serif">个人</text>
+        <text x="530" y="373" text-anchor="middle" fill="#fefcf9" font-size="11">自我疗愈</text>
+        
+        <!-- 节点：社会反馈（左下） -->
+        <circle cx="170" cy="358" r="40" fill="#0f2847" stroke="#c9a96e" stroke-width="3" />
+        <text x="170" y="353" text-anchor="middle" fill="#c9a96e" font-size="16" font-weight="600" font-family="serif">社会反馈</text>
+        <text x="170" y="373" text-anchor="middle" fill="#fefcf9" font-size="11">实践闭环</text>
+        
+        <!-- 节点：国（左上，回到起点） -->
+        <circle cx="170" cy="142" r="40" fill="#0f2847" stroke="#c9a96e" stroke-width="3" />
+        <text x="170" y="137" text-anchor="middle" fill="#c9a96e" font-size="16" font-weight="600" font-family="serif">国</text>
+        <text x="170" y="157" text-anchor="middle" fill="#fefcf9" font-size="11">爱国情怀</text>
+        
+        <!-- 箭头：国→家 -->
+        <path d="M 350,110 Q 420,110 500,142" fill="none" stroke="#c9a96e" stroke-width="2" marker-end="url(#arrowhead)" />
+        
+        <!-- 箭头：家→个人 -->
+        <path d="M 530,182 Q 560,270 530,318" fill="none" stroke="#c9a96e" stroke-width="2" marker-end="url(#arrowhead)" />
+        
+        <!-- 箭头：个人→社会反馈 -->
+        <path d="M 490,358 Q 330,400 210,358" fill="none" stroke="#c9a96e" stroke-width="2" marker-end="url(#arrowhead)" />
+        
+        <!-- 箭头：社会反馈→国 -->
+        <path d="M 170,318 Q 140,230 170,182" fill="none" stroke="#c9a96e" stroke-width="2" marker-end="url(#arrowhead)" />
+        
+        <!-- 箭头：国→国（回到起点） -->
+        <path d="M 210,142 Q 280,110 330,110" fill="none" stroke="#c9a96e" stroke-width="2" marker-end="url(#arrowhead)" />
+        
+        <!-- 箭头标记 -->
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#c9a96e" />
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    
+    <p class="reveal reveal-delay-3" style="font-size: var(--text-base); color: #e8f0f8; margin-top: var(--flow-2xl); max-width: 65ch; text-align: center; position: relative; z-index: 1; line-height: 2;">
+      从<strong style="color: #c9a96e;">大国情怀</strong>出发，<br>
+      经过<strong style="color: #c9a96e;">文化传承</strong>与<strong style="color: #c9a96e;">个人疗愈</strong>，<br>
+      最终通过<strong style="color: #c9a96e;">社会回馈</strong>，回到<strong style="color: #c9a96e;">家国情怀</strong>的升华。
+    </p>
+  </section>
+  
+  <script>
+    /* ===== 滚动揭示动画 ===== */
+    const revealElements = document.querySelectorAll('.reveal');
+
+    const revealOnScroll = () => {
+      const windowHeight = window.innerHeight;
+      const revealPoint = 120;
+
+      revealElements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+
+        if (elementTop < windowHeight - revealPoint) {
+          element.classList.add('active');
+        }
+      });
+    };
+
+    revealOnScroll();
+    window.addEventListener('scroll', revealOnScroll);
+
+    /* ===== 情感导航轴 ===== */
+    const emotionAxis = document.getElementById('emotionAxis');
+    const axisNodes = document.querySelectorAll('.axis-node');
+    const sections = document.querySelectorAll('section[id]');
+
+    // 显示/隐藏导航
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+
+      if (currentScroll > 200) {
+        emotionAxis.classList.add('visible');
+      } else {
+        emotionAxis.classList.remove('visible');
+      }
+
+      lastScroll = currentScroll;
+
+      // 更新活跃节点
+      let currentSection = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 200;
+        if (currentScroll >= sectionTop) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+
+      axisNodes.forEach(node => {
+        node.classList.remove('active');
+        if (node.getAttribute('data-section') === currentSection) {
+          node.classList.add('active');
+        }
+      });
+    });
+
+    // 平滑滚动
+    axisNodes.forEach(node => {
+      node.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = node.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    /* ===== 时间轴节点高亮 ===== */
+    const scoreItems = document.querySelectorAll('.score-item');
+
+    const highlightTimeline = () => {
+      scoreItems.forEach(item => {
+        const itemTop = item.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+
+        if (itemTop < windowHeight * 0.75) {
+          item.classList.add('active');
+        }
+      });
+    };
+
+    window.addEventListener('scroll', highlightTimeline);
+    highlightTimeline();
+
+    /* ===== Reduced Motion ===== */
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (prefersReducedMotion.matches) {
+      revealElements.forEach(element => {
+        element.style.opacity = '1';
+        element.style.transform = 'none';
+      });
+    }
+  </script>
+</body>
+</html>
