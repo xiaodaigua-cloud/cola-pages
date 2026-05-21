@@ -78,13 +78,37 @@
             padding: 0 10px;
         }
         .col-title {
-            font-size: 12px;
-            color: rgba(0,212,255,0.7);
+            font-size: 11px;
+            color: rgba(0,212,255,0.6);
             letter-spacing: 4px;
             font-weight: 500;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 4px;
             font-family: monospace, "PingFang SC";
+        }
+        .col-title-cn {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, #fff 0%, #ffd866 30%, #fff 50%, #ffd866 70%, #fff 100%);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: goldShimmer 6s linear infinite;
+            filter: drop-shadow(0 0 6px rgba(255,216,102,0.3));
+        }
+        @keyframes goldShimmer {
+            0% { background-position: 0% 0; }
+            100% { background-position: 300% 0; }
+        }
+        .col-case {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 4px;
+            margin-bottom: 12px;
+            font-weight: 500;
+            letter-spacing: 1px;
         }
 
         .svg-wrap {
@@ -177,13 +201,7 @@
             letter-spacing: 1px;
         }
 
-        .blackout {
-            position: fixed; inset: 0;
-            background: #050e1a;
-            opacity: 0; pointer-events: none;
-            transition: opacity 1.5s ease; z-index: 100;
-        }
-        .blackout.show { opacity: 1; }
+
 
         .play-btn {
             position: fixed; inset: 0;
@@ -204,7 +222,6 @@
 </head>
 <body>
     <div class="play-btn" id="playBtn" onclick="startAnimation()"><span>[ ▶ START ]</span></div>
-    <div class="blackout" id="blackout"></div>
 
     <div class="top-label"><div class="text" id="topText"></div></div>
 
@@ -212,6 +229,8 @@
         <!-- 左：手拉葫芦 -->
         <div class="col">
             <div class="col-title">ENGINEERING</div>
+            <div class="col-title-cn">工程力学</div>
+            <div class="col-case">手拉葫芦拆解实验</div>
             <div class="svg-wrap">
                 <svg viewBox="0 0 240 400" fill="none">
                     <!-- 第1层：齿轮组 -->
@@ -280,6 +299,8 @@
         <!-- 中：音乐 -->
         <div class="col">
             <div class="col-title">MUSIC</div>
+            <div class="col-title-cn">音乐</div>
+            <div class="col-case">音乐基本要素拆解</div>
             <div class="svg-wrap">
                 <svg viewBox="0 0 240 400" fill="none">
                     <!-- 第1层：节奏 -->
@@ -350,6 +371,8 @@
         <!-- 右：天坛祈年殿 -->
         <div class="col">
             <div class="col-title">ARCHITECTURE</div>
+            <div class="col-title-cn">建筑结构</div>
+            <div class="col-case">天坛祈年殿结构分析</div>
             <div class="svg-wrap">
                 <svg viewBox="0 0 240 400" fill="none">
                     <!-- 第1层：基座 -->
@@ -446,15 +469,39 @@
             });
         }
 
+        let currentStep = 0;
+
         function startAnimation() {
             document.getElementById('playBtn').classList.add('hide');
-            setTimeout(() => showStep(1), 500);
-            setTimeout(() => showStep(2), 5500);
-            setTimeout(() => showStep(3), 10500);
-            setTimeout(() => showStep(4), 15500);
-            setTimeout(() => showStep(5), 20500);
-            setTimeout(() => blackout.classList.add('show'), 28500);
+            nextStep();
         }
+
+        function nextStep() {
+            if (currentStep >= 5) return;
+            currentStep++;
+            showStep(currentStep);
+            if (currentStep < 5) {
+                stepEl.textContent = `STEP: ${String(currentStep).padStart(2,'0')}/05 │ 点击继续`;
+            } else {
+                stepEl.textContent = `STEP: 05/05 │ 完成`;
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if (document.getElementById('playBtn').classList.contains('hide') && currentStep < 5) {
+                nextStep();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'Enter') {
+                e.preventDefault();
+                if (!document.getElementById('playBtn').classList.contains('hide')) {
+                    startAnimation();
+                } else if (currentStep < 5) {
+                    nextStep();
+                }
+            }
+        });
     </script>
 </body>
 </html>
