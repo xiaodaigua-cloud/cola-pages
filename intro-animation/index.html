@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨学科要素对比 · 虚拟仿真导入</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "SF Pro Display", "PingFang SC", sans-serif;
+            background: radial-gradient(ellipse at 50% 60%, #0a1e3d 0%, #050e1a 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+        }
+
+        /* 网格底纹 */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(30,120,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30,120,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* 扫描线 */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0,200,255,0.4), transparent);
+            animation: scanLine 4s linear infinite;
+            pointer-events: none;
+            z-index: 50;
+        }
+        @keyframes scanLine {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .top-label {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .top-label .text {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: #00d4ff;
+            opacity: 0;
+            transition: all 0.8s ease;
+            transform: translateY(-8px);
+            text-shadow: 0 0 12px rgba(0,212,255,0.4);
+            font-family: monospace, "PingFang SC";
+        }
+        .top-label .text.show { opacity: 1; transform: translateY(0); }
+
+        .columns {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1px 1fr 1px 1fr;
+            padding: 0 20px 20px;
+        }
+        .divider { background: linear-gradient(180deg, transparent, rgba(0,200,255,0.15), transparent); }
+
+        .col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 10px;
+        }
+        .col-title {
+            font-size: 12px;
+            color: rgba(0,212,255,0.7);
+            letter-spacing: 4px;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-family: monospace, "PingFang SC";
+        }
+
+        .svg-wrap {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .svg-wrap svg {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            filter: drop-shadow(0 0 8px rgba(0,200,255,0.1));
+        }
+
+        /* SVG层动画 */
+        .svg-layer {
+            opacity: 0;
+            transition: all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .svg-layer.show { opacity: 1; }
+
+        /* 发光线条风格 */
+        .glow-stroke {
+            stroke: #00d4ff;
+            filter: drop-shadow(0 0 3px rgba(0,212,255,0.6));
+        }
+        .glow-fill { fill: rgba(0,212,255,0.06); }
+        .warm-stroke {
+            stroke: #ffa500;
+            filter: drop-shadow(0 0 3px rgba(255,165,0,0.5));
+        }
+        .warm-fill { fill: rgba(255,165,0,0.06); }
+        .green-stroke {
+            stroke: #00ff88;
+            filter: drop-shadow(0 0 3px rgba(0,255,136,0.5));
+        }
+
+        .label-text {
+            font-size: 10px;
+            fill: rgba(0,212,255,0.8);
+            font-family: monospace, "PingFang SC";
+            letter-spacing: 1px;
+        }
+        .label-text-warm {
+            font-size: 10px;
+            fill: rgba(255,165,0,0.8);
+            font-family: monospace, "PingFang SC";
+        }
+
+        /* 第5层特殊 */
+        .mystery-ring {
+            animation: ringPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes ringPulse {
+            0%, 100% { opacity: 0.5; r: 28; }
+            50% { opacity: 1; r: 32; }
+        }
+        .mystery-text {
+            font-size: 28px;
+            fill: #ffd700;
+            font-weight: 800;
+            animation: textPulse 1s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
+        }
+        @keyframes textPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        .check-text {
+            font-size: 11px;
+            fill: #00ff88;
+            font-family: monospace;
+            font-weight: 700;
+            filter: drop-shadow(0 0 4px rgba(0,255,136,0.4));
+        }
+
+        /* 底部数据条 */
+        .data-bar {
+            height: 28px;
+            background: rgba(0,20,40,0.8);
+            border-top: 1px solid rgba(0,200,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            font-size: 10px;
+            color: rgba(0,212,255,0.5);
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .blackout {
+            position: fixed; inset: 0;
+            background: #050e1a;
+            opacity: 0; pointer-events: none;
+            transition: opacity 1.5s ease; z-index: 100;
+        }
+        .blackout.show { opacity: 1; }
+
+        .play-btn {
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 200; background: rgba(5,14,26,0.92);
+            cursor: pointer; transition: opacity 0.5s;
+        }
+        .play-btn.hide { opacity: 0; pointer-events: none; }
+        .play-btn span {
+            font-size: 16px; color: #00d4ff;
+            border: 1px solid rgba(0,212,255,0.4);
+            padding: 16px 40px; border-radius: 4px;
+            font-family: monospace; letter-spacing: 3px;
+            text-shadow: 0 0 8px rgba(0,212,255,0.3);
+        }
+        .play-btn:hover span { background: rgba(0,212,255,0.05); border-color: #00d4ff; }
+    </style>
+</head>
+<body>
+    <div class="play-btn" id="playBtn" onclick="startAnimation()"><span>[ ▶ START ]</span></div>
+    <div class="blackout" id="blackout"></div>
+
+    <div class="top-label"><div class="text" id="topText"></div></div>
+
+    <div class="columns">
+        <!-- 左：手拉葫芦 -->
+        <div class="col">
+            <div class="col-title">ENGINEERING</div>
+            <div class="svg-wrap">
+                <svg viewBox="0 0 240 400" fill="none">
+                    <!-- 第1层：齿轮组 -->
+                    <g class="svg-layer" data-step="1">
+                        <circle cx="120" cy="55" r="30" class="glow-stroke" stroke-width="1.5" fill="none"/>
+                        <circle cx="120" cy="55" r="14" class="glow-stroke" stroke-width="1" class="glow-fill"/>
+                        <circle cx="120" cy="55" r="5" fill="rgba(0,212,255,0.3)"/>
+                        <!-- 齿 -->
+                        <rect x="117" y="23" width="6" height="8" rx="1" fill="rgba(0,212,255,0.4)"/>
+                        <rect x="117" y="79" width="6" height="8" rx="1" fill="rgba(0,212,255,0.4)"/>
+                        <rect x="88" y="52" width="8" height="6" rx="1" fill="rgba(0,212,255,0.4)"/>
+                        <rect x="144" y="52" width="8" height="6" rx="1" fill="rgba(0,212,255,0.4)"/>
+                        <!-- 小齿轮 -->
+                        <circle cx="92" cy="80" r="14" class="glow-stroke" stroke-width="1" fill="none"/>
+                        <circle cx="148" cy="80" r="14" class="glow-stroke" stroke-width="1" fill="none"/>
+                        <circle cx="92" cy="80" r="4" fill="rgba(0,212,255,0.2)"/>
+                        <circle cx="148" cy="80" r="4" fill="rgba(0,212,255,0.2)"/>
+                        <text x="120" y="110" text-anchor="middle" class="label-text">齿轮传动组</text>
+                    </g>
+
+                    <!-- 第2层：外壳 -->
+                    <g class="svg-layer" data-step="2">
+                        <rect x="65" y="28" width="110" height="80" rx="6" class="glow-stroke" stroke-width="1.5" fill="rgba(0,212,255,0.02)" stroke-dasharray="6 3"/>
+                        <line x1="65" y1="90" x2="175" y2="90" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+                        <line x1="65" y1="60" x2="175" y2="60" stroke="rgba(0,212,255,0.1)" stroke-width="0.5"/>
+                        <text x="120" y="125" text-anchor="middle" class="label-text">外壳框架</text>
+                    </g>
+
+                    <!-- 第3层：链条 -->
+                    <g class="svg-layer" data-step="3">
+                        <line x1="120" y1="108" x2="120" y2="290" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+                        <ellipse cx="120" cy="140" rx="5" ry="9" class="glow-stroke" stroke-width="1.2" fill="none"/>
+                        <ellipse cx="120" cy="162" rx="5" ry="9" class="glow-stroke" stroke-width="1.2" fill="none"/>
+                        <ellipse cx="120" cy="184" rx="5" ry="9" class="glow-stroke" stroke-width="1.2" fill="none"/>
+                        <ellipse cx="120" cy="206" rx="5" ry="9" class="glow-stroke" stroke-width="1.2" fill="none"/>
+                        <ellipse cx="120" cy="228" rx="5" ry="9" class="glow-stroke" stroke-width="1.2" fill="none"/>
+                        <ellipse cx="120" cy="250" rx="5" ry="9" class="glow-stroke" stroke-width="1.2" fill="none"/>
+                        <ellipse cx="120" cy="272" rx="5" ry="9" class="glow-stroke" stroke-width="1.2" fill="none"/>
+                        <text x="120" y="305" text-anchor="middle" class="label-text">起重链条</text>
+                    </g>
+
+                    <!-- 第4层：制动+吊钩 -->
+                    <g class="svg-layer" data-step="4">
+                        <circle cx="120" cy="55" r="38" stroke="rgba(255,165,0,0.5)" stroke-width="1" fill="none" stroke-dasharray="4 4"/>
+                        <path d="M90 48 L95 55 L90 62" stroke="rgba(255,165,0,0.6)" stroke-width="1.5" fill="none"/>
+                        <path d="M150 48 L145 55 L150 62" stroke="rgba(255,165,0,0.6)" stroke-width="1.5" fill="none"/>
+                        <path d="M108 290 Q108 318 120 324 Q132 318 132 290" class="glow-stroke" stroke-width="2" fill="none"/>
+                        <circle cx="120" cy="330" r="6" stroke="#00d4ff" stroke-width="1.5" fill="rgba(0,212,255,0.15)"/>
+                        <line x1="114" y1="336" x2="126" y2="336" class="glow-stroke" stroke-width="1"/>
+                        <text x="120" y="355" text-anchor="middle" class="label-text">棘轮制动 + 吊钩</text>
+                    </g>
+
+                    <!-- 第5层：润滑 -->
+                    <g class="svg-layer" data-step="5">
+                        <circle cx="92" cy="80" r="6" fill="rgba(0,255,136,0.15)" stroke="rgba(0,255,136,0.5)" stroke-width="0.5"/>
+                        <circle cx="148" cy="80" r="6" fill="rgba(0,255,136,0.15)" stroke="rgba(0,255,136,0.5)" stroke-width="0.5"/>
+                        <circle cx="120" cy="55" r="7" fill="rgba(0,255,136,0.1)" stroke="rgba(0,255,136,0.4)" stroke-width="0.5"/>
+                        <text x="120" y="385" text-anchor="middle" class="check-text">✓ 润滑脂 · GB标准型号</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 中：音乐 -->
+        <div class="col">
+            <div class="col-title">MUSIC</div>
+            <div class="svg-wrap">
+                <svg viewBox="0 0 240 400" fill="none">
+                    <!-- 第1层：节奏 -->
+                    <g class="svg-layer" data-step="1">
+                        <ellipse cx="120" cy="340" rx="45" ry="16" class="glow-stroke" stroke-width="1.5" fill="rgba(0,212,255,0.04)"/>
+                        <path d="M75 310 L75 340 Q75 356 120 356 Q165 356 165 340 L165 310" class="glow-stroke" stroke-width="1.5" fill="rgba(0,212,255,0.03)"/>
+                        <!-- 节拍格 -->
+                        <line x1="88" y1="310" x2="88" y2="342" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+                        <line x1="104" y1="310" x2="104" y2="342" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+                        <line x1="120" y1="310" x2="120" y2="342" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
+                        <line x1="136" y1="310" x2="136" y2="342" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+                        <line x1="152" y1="310" x2="152" y2="342" stroke="rgba(0,212,255,0.3)" stroke-width="0.8"/>
+                        <text x="120" y="376" text-anchor="middle" class="label-text">节奏 · 节拍</text>
+                    </g>
+
+                    <!-- 第2层：曲式 -->
+                    <g class="svg-layer" data-step="2">
+                        <rect x="72" y="235" width="28" height="50" rx="2" class="glow-stroke" stroke-width="1" fill="rgba(0,212,255,0.03)"/>
+                        <rect x="106" y="235" width="28" height="50" rx="2" class="glow-stroke" stroke-width="1" fill="rgba(0,212,255,0.03)"/>
+                        <rect x="140" y="235" width="28" height="50" rx="2" class="glow-stroke" stroke-width="1" fill="rgba(0,212,255,0.03)"/>
+                        <text x="86" y="264" text-anchor="middle" fill="rgba(0,212,255,0.5)" font-size="11" font-family="monospace">A</text>
+                        <text x="120" y="264" text-anchor="middle" fill="rgba(0,212,255,0.5)" font-size="11" font-family="monospace">B</text>
+                        <text x="154" y="264" text-anchor="middle" fill="rgba(0,212,255,0.5)" font-size="11" font-family="monospace">A'</text>
+                        <path d="M68 230 Q120 218 172 230" class="glow-stroke" stroke-width="1" fill="none"/>
+                        <text x="120" y="300" text-anchor="middle" class="label-text">曲式结构</text>
+                    </g>
+
+                    <!-- 第3层：旋律 -->
+                    <g class="svg-layer" data-step="3">
+                        <path d="M55 180 Q75 155 95 172 Q115 190 135 165 Q155 140 175 160 Q190 175 195 168" class="glow-stroke" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <circle cx="95" cy="172" r="5" fill="rgba(0,212,255,0.5)"/>
+                        <circle cx="135" cy="165" r="5" fill="rgba(0,212,255,0.5)"/>
+                        <circle cx="175" cy="160" r="5" fill="rgba(0,212,255,0.5)"/>
+                        <line x1="99" y1="172" x2="99" y2="148" stroke="#00d4ff" stroke-width="1.2"/>
+                        <line x1="139" y1="165" x2="139" y2="141" stroke="#00d4ff" stroke-width="1.2"/>
+                        <line x1="179" y1="160" x2="179" y2="136" stroke="#00d4ff" stroke-width="1.2"/>
+                        <text x="120" y="205" text-anchor="middle" class="label-text">旋律</text>
+                    </g>
+
+                    <!-- 第4层：和声 -->
+                    <g class="svg-layer" data-step="4">
+                        <circle cx="85" cy="120" r="5" fill="rgba(0,212,255,0.6)"/>
+                        <circle cx="85" cy="106" r="5" fill="rgba(0,212,255,0.6)"/>
+                        <circle cx="85" cy="92" r="5" fill="rgba(0,212,255,0.6)"/>
+                        <line x1="90" y1="92" x2="90" y2="70" stroke="#00d4ff" stroke-width="1.2"/>
+                        <circle cx="155" cy="125" r="5" fill="rgba(0,212,255,0.6)"/>
+                        <circle cx="155" cy="111" r="5" fill="rgba(0,212,255,0.6)"/>
+                        <circle cx="155" cy="97" r="5" fill="rgba(0,212,255,0.6)"/>
+                        <line x1="160" y1="97" x2="160" y2="75" stroke="#00d4ff" stroke-width="1.2"/>
+                        <!-- 连接弧 -->
+                        <path d="M85 86 Q120 75 155 91" stroke="rgba(0,212,255,0.3)" stroke-width="0.8" fill="none"/>
+                        <text x="120" y="145" text-anchor="middle" class="label-text">和声</text>
+                    </g>
+
+                    <!-- 第5层：问号 -->
+                    <g class="svg-layer" data-step="5">
+                        <circle cx="120" cy="45" r="28" stroke="#ffd700" stroke-width="1.5" fill="rgba(255,215,0,0.04)" class="mystery-ring"/>
+                        <circle cx="120" cy="45" r="35" stroke="rgba(255,215,0,0.2)" stroke-width="0.5" fill="none" class="mystery-ring"/>
+                        <text x="120" y="55" text-anchor="middle" class="mystery-text">？</text>
+                        <text x="120" y="25" text-anchor="middle" fill="rgba(255,215,0,0.5)" font-size="9" font-family="monospace">UNKNOWN</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 右：天坛祈年殿 -->
+        <div class="col">
+            <div class="col-title">ARCHITECTURE</div>
+            <div class="svg-wrap">
+                <svg viewBox="0 0 240 400" fill="none">
+                    <!-- 第1层：基座 -->
+                    <g class="svg-layer" data-step="1">
+                        <rect x="35" y="355" width="170" height="10" rx="2" class="warm-stroke" stroke-width="1.2" fill="rgba(255,165,0,0.03)"/>
+                        <rect x="45" y="342" width="150" height="10" rx="2" class="warm-stroke" stroke-width="1.2" fill="rgba(255,165,0,0.03)"/>
+                        <rect x="55" y="329" width="130" height="10" rx="2" class="warm-stroke" stroke-width="1.2" fill="rgba(255,165,0,0.03)"/>
+                        <text x="120" y="385" text-anchor="middle" class="label-text-warm">三层汉白玉基座</text>
+                    </g>
+
+                    <!-- 第2层：立柱 -->
+                    <g class="svg-layer" data-step="2">
+                        <line x1="70" y1="190" x2="70" y2="329" class="warm-stroke" stroke-width="2"/>
+                        <line x1="90" y1="190" x2="90" y2="329" class="warm-stroke" stroke-width="1.5"/>
+                        <line x1="108" y1="190" x2="108" y2="329" class="warm-stroke" stroke-width="1.2" opacity="0.7"/>
+                        <line x1="120" y1="190" x2="120" y2="329" class="warm-stroke" stroke-width="1.5"/>
+                        <line x1="132" y1="190" x2="132" y2="329" class="warm-stroke" stroke-width="1.2" opacity="0.7"/>
+                        <line x1="150" y1="190" x2="150" y2="329" class="warm-stroke" stroke-width="1.5"/>
+                        <line x1="170" y1="190" x2="170" y2="329" class="warm-stroke" stroke-width="2"/>
+                        <!-- 横梁 -->
+                        <line x1="65" y1="190" x2="175" y2="190" stroke="rgba(255,165,0,0.4)" stroke-width="1"/>
+                        <text x="120" y="205" text-anchor="middle" class="label-text-warm">二十八根金柱</text>
+                    </g>
+
+                    <!-- 第3层：三重檐 -->
+                    <g class="svg-layer" data-step="3">
+                        <path d="M48 190 L120 162 L192 190" class="warm-stroke" stroke-width="2" fill="rgba(255,165,0,0.03)"/>
+                        <path d="M60 162 L120 130 L180 162" class="warm-stroke" stroke-width="1.8" fill="rgba(255,165,0,0.03)"/>
+                        <path d="M74 130 L120 95 L166 130" class="warm-stroke" stroke-width="1.5" fill="rgba(255,165,0,0.03)"/>
+                        <!-- 翘角 -->
+                        <path d="M48 190 Q42 187 40 183" stroke="rgba(255,165,0,0.6)" stroke-width="1.2" fill="none"/>
+                        <path d="M192 190 Q198 187 200 183" stroke="rgba(255,165,0,0.6)" stroke-width="1.2" fill="none"/>
+                        <path d="M60 162 Q55 159 53 155" stroke="rgba(255,165,0,0.5)" stroke-width="1" fill="none"/>
+                        <path d="M180 162 Q185 159 187 155" stroke="rgba(255,165,0,0.5)" stroke-width="1" fill="none"/>
+                        <text x="120" y="118" text-anchor="middle" class="label-text-warm">三重檐攒尖顶</text>
+                    </g>
+
+                    <!-- 第4层：斗拱+宝顶 -->
+                    <g class="svg-layer" data-step="4">
+                        <rect x="63" y="185" width="10" height="4" rx="1" fill="rgba(255,165,0,0.4)"/>
+                        <rect x="83" y="185" width="10" height="4" rx="1" fill="rgba(255,165,0,0.4)"/>
+                        <rect x="107" y="185" width="10" height="4" rx="1" fill="rgba(255,165,0,0.4)"/>
+                        <rect x="130" y="185" width="10" height="4" rx="1" fill="rgba(255,165,0,0.4)"/>
+                        <rect x="152" y="185" width="10" height="4" rx="1" fill="rgba(255,165,0,0.4)"/>
+                        <rect x="170" y="185" width="10" height="4" rx="1" fill="rgba(255,165,0,0.4)"/>
+                        <!-- 宝顶 -->
+                        <line x1="120" y1="95" x2="120" y2="62" class="warm-stroke" stroke-width="2"/>
+                        <circle cx="120" cy="56" r="7" stroke="rgba(255,165,0,0.7)" stroke-width="1.5" fill="rgba(255,165,0,0.1)"/>
+                        <circle cx="120" cy="56" r="3" fill="rgba(255,165,0,0.4)"/>
+                        <text x="120" y="50" text-anchor="middle" class="label-text-warm" style="font-size:9px">斗拱 · 宝顶</text>
+                    </g>
+
+                    <!-- 第5层：彩绘 -->
+                    <g class="svg-layer" data-step="5">
+                        <rect x="68" y="220" width="4" height="100" fill="rgba(0,255,136,0.15)" rx="1"/>
+                        <rect x="108" y="220" width="4" height="100" fill="rgba(0,255,136,0.15)" rx="1"/>
+                        <rect x="148" y="220" width="4" height="100" fill="rgba(0,255,136,0.15)" rx="1"/>
+                        <rect x="168" y="220" width="4" height="100" fill="rgba(0,255,136,0.15)" rx="1"/>
+                        <path d="M48 190 L120 162 L192 190" stroke="rgba(0,255,136,0.3)" stroke-width="2" fill="rgba(0,255,136,0.03)"/>
+                        <text x="120" y="398" text-anchor="middle" class="check-text">✓ 和玺彩绘 · 皇家规制</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-bar">
+        <span>SIM_MODE: STRUCTURAL_ANALYSIS</span>
+        <span id="stepIndicator">STEP: --/5</span>
+        <span>STATUS: READY</span>
+    </div>
+
+    <script>
+        const topTexts = [
+            '[ 驱动力 ] 系统的能量来源',
+            '[ 骨  架 ] 整体的结构支撑',
+            '[ 表  达 ] 功能的外在呈现',
+            '[ 平  衡 ] 系统的稳定保障',
+            '[ ？？？ ] 决定体验的最终差异'
+        ];
+        const topEl = document.getElementById('topText');
+        const stepEl = document.getElementById('stepIndicator');
+        const blackout = document.getElementById('blackout');
+
+        function showStep(step) {
+            topEl.classList.remove('show');
+            setTimeout(() => {
+                topEl.textContent = topTexts[step - 1];
+                topEl.classList.add('show');
+            }, 200);
+            stepEl.textContent = `STEP: ${String(step).padStart(2,'0')}/05`;
+            document.querySelectorAll(`.svg-layer[data-step="${step}"]`).forEach((el, i) => {
+                setTimeout(() => el.classList.add('show'), i * 200);
+            });
+        }
+
+        function startAnimation() {
+            document.getElementById('playBtn').classList.add('hide');
+            setTimeout(() => showStep(1), 500);
+            setTimeout(() => showStep(2), 5500);
+            setTimeout(() => showStep(3), 10500);
+            setTimeout(() => showStep(4), 15500);
+            setTimeout(() => showStep(5), 20500);
+            setTimeout(() => blackout.classList.add('show'), 28500);
+        }
+    </script>
+</body>
+</html>
