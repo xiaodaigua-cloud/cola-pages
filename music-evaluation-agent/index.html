@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 音乐评分 Agent</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg-deep: #0f0c0a;
+    --bg-surface: #1a1512;
+    --bg-card: #211c17;
+    --bg-card-hover: #2c241d;
+    --accent-rose: #c9a0a0;
+    --accent-gold: #d4a853;
+    --accent-warm-purple: #9a7bb5;
+    --accent-copper: #c07850;
+    --accent-sage: #8a9a7b;
+    --accent-blush: #e8b4b4;
+    --accent-warm-blue: #7b8fb5;
+    --text-primary: #f0ebe4;
+    --text-secondary: #a89e93;
+    --text-muted: #7a7068;
+    --border-subtle: rgba(201, 160, 160, 0.1);
+    --border-active: rgba(212, 168, 83, 0.35);
+    --glow-warm: rgba(212, 168, 83, 0.15);
+    --glow-rose: rgba(201, 160, 160, 0.12);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .bg-orbs {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bg-orbs .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+  }
+  .bg-orbs .orb1 { width: 600px; height: 600px; background: rgba(201, 160, 160, 0.12); top: -200px; left: -100px; animation: orbFloat 20s ease-in-out infinite; }
+  .bg-orbs .orb2 { width: 500px; height: 500px; background: rgba(212, 168, 83, 0.08); bottom: -150px; right: -100px; animation: orbFloat 25s ease-in-out infinite reverse; }
+  .bg-orbs .orb3 { width: 350px; height: 350px; background: rgba(154, 123, 181, 0.08); top: 40%; left: 60%; animation: orbFloat 18s ease-in-out infinite; }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -40px) scale(1.05); }
+    66% { transform: translate(-20px, 30px) scale(0.97); }
+  }
+
+  .app-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  header .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, rgba(212,168,83,0.15), rgba(201,160,160,0.1));
+    border: 1px solid var(--border-active);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--accent-gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  header h1 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-gold) 50%, var(--accent-rose) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+  header p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 768px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius);
+    padding: 28px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .card:hover {
+    border-color: var(--border-active);
+    box-shadow: 0 0 40px var(--glow-warm);
+  }
+  .card-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title .icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .upload-zone {
+    border: 2px dashed rgba(212, 168, 83, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(212, 168, 83, 0.03);
+    position: relative;
+    overflow: hidden;
+  }
+  .upload-zone:hover {
+    background: rgba(212, 168, 83, 0.06);
+    border-color: var(--accent-gold);
+  }
+  .upload-zone.dragover {
+    background: rgba(212, 168, 83, 0.1);
+    border-color: var(--accent-gold);
+    transform: scale(1.02);
+  }
+  .upload-zone .upload-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+  .upload-zone h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .upload-zone p {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .upload-zone input { display: none; }
+
+  .file-info {
+    display: none;
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: var(--bg-surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+  }
+  .file-info.visible { display: flex; align-items: center; gap: 14px; }
+  .file-info .file-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--accent-warm-purple), var(--accent-gold));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .file-info .file-meta { flex: 1; min-width: 0; }
+  .file-info .file-name {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .file-info .file-size {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .music-direction {
+    margin-top: 20px;
+  }
+  .music-direction label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .direction-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .direction-btn {
+    padding: 8px 16px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .direction-btn:hover {
+    border-color: var(--accent-gold);
+    color: var(--text-primary);
+  }
+  .direction-btn.active {
+    background: linear-gradient(135deg, rgba(212,168,83,0.15), rgba(201,160,160,0.1));
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    font-weight: 500;
+  }
+
+  .evaluate-btn {
+    width: 100%;
+    margin-top: 24px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent-warm-purple), var(--accent-gold));
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+  }
+  .evaluate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(212,168,83,0.3);
+  }
+  .evaluate-btn:active { transform: translateY(0); }
+  .evaluate-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .evaluate-btn .spinner {
+    display: none;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+  }
+  .evaluate-btn.loading .btn-text { display: none; }
+  .evaluate-btn.loading .spinner { display: inline-block; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .radar-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 420px;
+    min-height: 280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #radarCanvas {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+  }
+  #radarCanvas:active { cursor: grabbing; }
+
+  .score-overview {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .score-overview.visible { display: grid; }
+
+  .score-card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--border-subtle);
+    transition: all 0.3s;
+  }
+  .score-card:hover {
+    border-color: var(--border-active);
+  }
+  .score-card .label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .score-card .value {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .score-card .hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+
+  .dimension-scores {
+    display: none;
+    gap: 16px;
+  }
+  .dimension-scores.visible { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+
+  .dim-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .dim-card:hover {
+    border-color: var(--border-active);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px var(--glow-warm);
+  }
+  .dim-card .dim-bar {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 3px;
+    border-radius: 0 3px 0 0;
+    transition: width 1s ease-out;
+  }
+  .dim-card .dim-name {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .dim-card .dim-score {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .dim-card .dim-advice {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+
+  .player-section {
+    display: none;
+  }
+  .player-section.visible { display: block; }
+
+  .audio-player {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+  }
+  .player-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .play-btn {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--accent-warm-purple), var(--accent-gold));
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .play-btn:hover { transform: scale(1.08); box-shadow: 0 4px 20px rgba(212,168,83,0.35); }
+
+  .progress-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(212, 168, 83, 0.12);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-warm-purple), var(--accent-gold));
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+  .time-display {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .waveform {
+    width: 100%;
+    height: 60px;
+    margin-top: 8px;
+  }
+
+  .narrative-panel {
+    display: none;
+    margin-top: 24px;
+  }
+  .narrative-panel.visible { display: block; }
+
+  .narrative-card {
+    background: linear-gradient(135deg, rgba(212,168,83,0.06), rgba(201,160,160,0.04));
+    border: 1px solid var(--border-active);
+    border-radius: var(--radius);
+    padding: 24px;
+    position: relative;
+  }
+  .narrative-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-gold), var(--accent-rose), var(--accent-warm-purple));
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .narrative-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .narrative-header .n-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose));
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .narrative-header span {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent-gold);
+  }
+  .narrative-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .n-step {
+    display: flex;
+    gap: 14px;
+    padding: 14px;
+    background: rgba(15,12,10,0.6);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent-gold);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .n-step:hover { background: rgba(212,168,83,0.05); }
+  .n-step.active { border-left-color: var(--accent-rose); background: rgba(201,160,160,0.06); }
+  .n-step .step-num {
+    width: 24px; height: 24px;
+    background: var(--bg-card);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-gold);
+    flex-shrink: 0;
+  }
+  .n-step.active .step-num {
+    background: var(--accent-rose);
+    color: var(--bg-deep);
+  }
+  .n-step .step-content { flex: 1; }
+  .n-step .step-speaker {
+    font-size: 12px;
+    color: var(--accent-gold);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .n-step.active .step-speaker { color: var(--accent-rose); }
+  .n-step .step-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .history-panel {
+    margin-top: 32px;
+  }
+  .history-panel .card-title { margin-bottom: 16px; }
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .history-item:hover {
+    border-color: var(--border-active);
+    background: var(--bg-card);
+  }
+  .history-item .h-score {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .history-item .h-info { flex: 1; }
+  .history-item .h-name { font-size: 14px; font-weight: 500; }
+  .history-item .h-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .history-item .h-direction {
+    font-size: 11px;
+    padding: 4px 10px;
+    background: rgba(212,168,83,0.1);
+    border-radius: 12px;
+    color: var(--accent-gold);
+  }
+
+  .comparison-badge {
+    display: none;
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, rgba(212,168,83,0.08), rgba(201,160,160,0.06));
+    border: 1px solid rgba(212,168,83,0.25);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--accent-gold);
+  }
+  .comparison-badge.visible { display: block; }
+  .comparison-badge strong { color: var(--accent-rose); }
+
+  .toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    padding: 14px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-active);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    z-index: 1000;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+  .toast.show { transform: translateX(0); }
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<div class="app-container">
+  <header>
+    <div class="badge">AI-Powered Music Evaluator</div>
+    <h1>AI 音乐评分 Agent</h1>
+    <p>上传你的 AI 生成音乐作品，获取多维度专业评价与改进建议。支持不同音乐方向的差异化评估。</p>
+  </header>
+
+  <div class="main-grid">
+    <!-- Left: Upload & Config -->
+    <div class="card">
+      <div class="card-title">
+        <div class="icon" style="background:linear-gradient(135deg,var(--accent-warm-purple),var(--accent-gold));">
+          <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2zM21 16c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
+        </div>
+        作品上传
+      </div>
+
+      <div class="upload-zone" id="uploadZone">
+        <div class="upload-icon">
+          <svg width="40" height="40" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4 4 4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        </div>
+        <h3>拖放 MP3 文件到此处</h3>
+        <p>或点击选择文件 · 仅支持 MP3 格式</p>
+        <input type="file" id="fileInput" accept=".mp3,audio/mpeg">
+      </div>
+
+      <div class="file-info" id="fileInfo">
+        <div class="file-icon">
+          <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55C7.79 13 6 14.79 6 17s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </div>
+        <div class="file-meta">
+          <div class="file-name" id="fileName">-</div>
+          <div class="file-size" id="fileSize">-</div>
+        </div>
+      </div>
+
+      <div class="music-direction">
+        <label>音乐方向（影响评分权重）</label>
+        <div class="direction-options">
+          <button class="direction-btn active" data-dir="classical">古典</button>
+          <button class="direction-btn" data-dir="pop">流行</button>
+          <button class="direction-btn" data-dir="electronic">电子</button>
+          <button class="direction-btn" data-dir="jazz">爵士</button>
+          <button class="direction-btn" data-dir="folk">民族</button>
+          <button class="direction-btn" data-dir="film">影视配乐</button>
+        </div>
+      </div>
+
+      <button class="evaluate-btn" id="evaluateBtn" disabled>
+        <span class="btn-text">开始评分</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+
+    <!-- Right: Radar Chart -->
+    <div class="card">
+      <div class="card-title">
+        <div class="icon" style="background:linear-gradient(135deg,var(--accent-gold),var(--accent-rose));">
+          <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        多维评价图谱
+      </div>
+
+      <div class="radar-container" id="radarContainer">
+        <canvas id="radarCanvas"></canvas>
+      </div>
+
+      <div class="score-overview" id="scoreOverview">
+        <div class="score-card">
+          <div class="label">综合评分</div>
+          <div class="value" id="totalScore" style="color:var(--accent-gold)">--</div>
+          <div class="hint">满分 100</div>
+        </div>
+        <div class="score-card">
+          <div class="label">等级</div>
+          <div class="value" id="gradeLevel" style="color:var(--accent-rose)">--</div>
+          <div class="hint">评估等级</div>
+        </div>
+        <div class="score-card">
+          <div class="label">关键建议</div>
+          <div class="value" id="keyAdvice" style="font-size:16px;color:var(--accent-copper)">--</div>
+          <div class="hint">最需改进</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dimension Scores -->
+    <div class="card full-width">
+      <div class="card-title">
+        <div class="icon" style="background:linear-gradient(135deg,var(--accent-rose),var(--accent-warm-purple));">
+          <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+        </div>
+        维度评分与建议
+      </div>
+      <div class="dimension-scores" id="dimensionScores"></div>
+    </div>
+
+    <!-- Audio Player -->
+    <div class="card full-width player-section" id="playerSection">
+      <div class="card-title">
+        <div class="icon" style="background:linear-gradient(135deg,var(--accent-sage),var(--accent-warm-blue));">
+          <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
+        </div>
+        作品播放
+      </div>
+      <div class="audio-player">
+        <div class="player-controls">
+          <button class="play-btn" id="playBtn">
+            <svg width="18" height="18" fill="white" viewBox="0 0 24 24" id="playIcon"><polygon points="5,3 19,12 5,21"/></svg>
+            <svg width="18" height="18" fill="white" viewBox="0 0 24 24" id="pauseIcon" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          </button>
+          <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display">
+              <span id="currentTime">0:00</span>
+              <span id="totalTime">0:00</span>
+            </div>
+          </div>
+        </div>
+        <canvas class="waveform" id="waveformCanvas"></canvas>
+      </div>
+
+      <div class="comparison-badge" id="comparisonBadge"></div>
+    </div>
+
+    <!-- Narrative Panel -->
+    <div class="card full-width narrative-panel" id="narrativePanel">
+      <div class="card-title">
+        <div class="icon" style="background:linear-gradient(135deg,var(--accent-gold),var(--accent-rose));">
+          <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        </div>
+        教学叙事引导
+      </div>
+      <div class="narrative-card">
+        <div class="narrative-header">
+          <div class="n-icon">
+            <svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </div>
+          <span>课堂话术引导</span>
+        </div>
+        <div class="narrative-steps" id="narrativeSteps"></div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="card full-width history-panel">
+      <div class="card-title">
+        <div class="icon" style="background:linear-gradient(135deg,var(--accent-warm-blue),var(--accent-sage));">
+          <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        </div>
+        评分历史
+      </div>
+      <div class="history-list" id="historyList">
+        <div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">
+          暂无评分记录，上传作品开始评价
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== State ==========
+const state = {
+  file: null,
+  audioBuffer: null,
+  audioElement: null,
+  audioContext: null,
+  analyser: null,
+  isPlaying: false,
+  direction: 'classical',
+  scores: null,
+  history: [],
+  radarAngle: 0,
+  radarTilt: 0.35,
+  isDragging: false,
+  lastMouse: { x: 0, y: 0 },
+  animFrame: null,
+  pulsePhase: 0,
+  radarReady: false,
+};
+
+// ========== Dimensions — warm palette ==========
+const DIMENSIONS = [
+  { key: 'melody',     name: '旋律性',     color: '#d4a853', icon: 'M' },
+  { key: 'harmony',    name: '和声丰富度', color: '#9a7bb5', icon: 'H' },
+  { key: 'rhythm',     name: '节奏复杂度', color: '#c07850', icon: 'R' },
+  { key: 'timbre',     name: '音色多样性', color: '#c9a0a0', icon: 'T' },
+  { key: 'dynamics',   name: '动态对比',   color: '#e8b4b4', icon: 'D' },
+  { key: 'structure',  name: '结构完整性', color: '#8a9a7b', icon: 'S' },
+];
+
+const DIRECTION_WEIGHTS = {
+  classical:  { melody: 1.2, harmony: 1.3, rhythm: 0.9, timbre: 0.9, dynamics: 1.1, structure: 1.2 },
+  pop:        { melody: 1.3, harmony: 0.9, rhythm: 1.1, timbre: 0.8, dynamics: 0.9, structure: 1.0 },
+  electronic: { melody: 0.8, harmony: 0.9, rhythm: 1.3, timbre: 1.3, dynamics: 1.1, structure: 0.9 },
+  jazz:       { melody: 1.1, harmony: 1.3, rhythm: 1.2, timbre: 1.0, dynamics: 1.1, structure: 0.9 },
+  folk:       { melody: 1.3, harmony: 0.8, rhythm: 0.9, timbre: 1.1, dynamics: 0.9, structure: 1.0 },
+  film:       { melody: 1.0, harmony: 1.1, rhythm: 0.9, timbre: 1.2, dynamics: 1.3, structure: 1.2 },
+};
+
+const DIRECTION_LABELS = {
+  classical: '古典', pop: '流行', electronic: '电子', jazz: '爵士', folk: '民族', film: '影视配乐'
+};
+
+const ADVICE_DB = {
+  melody: {
+    low: '旋律线条缺乏方向感，建议在提示词中明确指定旋律走向（如"上行渐强"）和主题动机的重复与发展方式。',
+    mid: '旋律有一定记忆点但发展不足，尝试在提示词中加入"对比乐段"和"主题变奏"的描述。',
+    high: '旋律线条清晰且富有表现力，可进一步探索装饰音与即兴华彩段落的提示词描述。'
+  },
+  harmony: {
+    low: '和声过于单一，建议在提示词中指定和弦进行（如 I-vi-IV-V）或明确"丰富和声织体"、"添加副属和弦"等。',
+    mid: '和声有基本框架但色彩变化不够，尝试要求"离调转调"、"和弦外音"或"爵士和声色彩"。',
+    high: '和声丰富且逻辑通顺，可继续深化调性布局与和声节奏的提示词控制。'
+  },
+  rhythm: {
+    low: '节奏型过于简单，建议在提示词中指定具体节奏型（如"切分节奏"、"附点"）和速度变化。',
+    mid: '节奏有变化但缺乏张力，尝试加入"节奏加速"、"渐慢"或"复合节拍"的提示词描述。',
+    high: '节奏层次丰富，可进一步探索多声部节奏对位与速度修辞的提示词。'
+  },
+  timbre: {
+    low: '音色使用过于单一，这是当前最常见的AI音乐短板。建议在提示词中明确指定多种乐器和音色搭配策略。',
+    mid: '音色有一定变化但融合度不足，尝试描述"音色渐变"、"混合音色"或指定具体乐器组合。',
+    high: '音色搭配合理且富有创意，可继续探索非传统乐器与电子音色的提示词描述。'
+  },
+  dynamics: {
+    low: '力度变化平淡，建议在提示词中明确"渐强"、"渐弱"、"突强"等力度标记，以及力度与情绪的关联描述。',
+    mid: '力度有基本对比但缺少过程感，尝试加入"加速度渐强"或"力度层级递进"的提示词。',
+    high: '动态层次丰富且自然，可进一步细化力度曲线与情绪转折点的提示词控制。'
+  },
+  structure: {
+    low: '结构松散缺乏逻辑，建议在提示词中描述曲式结构（如"A-B-A"、"奏鸣曲式"）和段落功能。',
+    mid: '结构基本完整但段落过渡生硬，尝试加入"桥段"、"过渡句"或"渐变式转段"的提示词描述。',
+    high: '结构严谨且富有张力布局，可继续探索多乐章或叙事性结构的提示词控制。'
+  }
+};
+
+// ========== Upload ==========
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const fileInfo = document.getElementById('fileInfo');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const evaluateBtn = document.getElementById('evaluateBtn');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  if (!file.name.toLowerCase().endsWith('.mp3') && file.type !== 'audio/mpeg') {
+    showToast('请上传 MP3 格式的音频文件');
+    return;
+  }
+  state.file = file;
+  fileName.textContent = file.name;
+  fileSize.textContent = formatSize(file.size);
+  fileInfo.classList.add('visible');
+  evaluateBtn.disabled = false;
+
+  // Setup audio
+  if (state.audioElement) {
+    state.audioElement.pause();
+    state.isPlaying = false;
+  }
+  const url = URL.createObjectURL(file);
+  state.audioElement = new Audio(url);
+  state.audioElement.addEventListener('loadedmetadata', () => {
+    document.getElementById('totalTime').textContent = formatTime(state.audioElement.duration);
+  });
+  state.audioElement.addEventListener('timeupdate', updateProgress);
+  state.audioElement.addEventListener('ended', () => {
+    state.isPlaying = false;
+    updatePlayButton();
+  });
+
+  // Decode for waveform
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    state.audioContext = ac;
+    ac.decodeAudioData(e.target.result, (buffer) => {
+      state.audioBuffer = buffer;
+      drawWaveform(buffer);
+    });
+  };
+  reader.readAsArrayBuffer(file);
+
+  showToast('文件上传成功，选择音乐方向后点击评分');
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function formatTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+// ========== Direction ==========
+document.querySelectorAll('.direction-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.direction-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.direction = btn.dataset.dir;
+  });
+});
+
+// ========== Evaluate ==========
+evaluateBtn.addEventListener('click', startEvaluation);
+
+function startEvaluation() {
+  if (!state.file) return;
+  evaluateBtn.classList.add('loading');
+  evaluateBtn.disabled = true;
+
+  // Simulate AI evaluation with realistic delay
+  setTimeout(() => {
+    const scores = generateScores(state.direction);
+    state.scores = scores;
+
+    // Add to history
+    state.history.push({
+      name: state.file.name,
+      direction: state.direction,
+      scores: { ...scores },
+      timestamp: new Date().toLocaleTimeString(),
+      total: scores.total
+    });
+
+    renderResults(scores);
+    evaluateBtn.classList.remove('loading');
+    evaluateBtn.disabled = false;
+
+    // Auto show player & narrative
+    document.getElementById('playerSection').classList.add('visible');
+    document.getElementById('narrativePanel').classList.add('visible');
+
+    // Comparison if multiple
+    if (state.history.length >= 2) {
+      const prev = state.history[state.history.length - 2];
+      const diff = scores.total - prev.total;
+      const badge = document.getElementById('comparisonBadge');
+      badge.classList.add('visible');
+      if (diff > 0) {
+        badge.innerHTML = `与上次作品对比：综合评分提升 <strong>+${diff} 分</strong>，提示词调整效果显著`;
+      } else if (diff < 0) {
+        badge.innerHTML = `与上次作品对比：综合评分下降 <strong>${diff} 分</strong>，建议重新审视提示词策略`;
+      } else {
+        badge.innerHTML = `与上次作品对比：综合评分持平，不同维度各有优劣`;
+      }
+    }
+
+    renderHistory();
+    showToast('评分完成！综合得分 ' + scores.total + ' 分');
+
+    // Start radar animation
+    startRadarAnimation();
+  }, 2000 + Math.random() * 1000);
+}
+
+function generateScores(direction) {
+  const weights = DIRECTION_WEIGHTS[direction];
+  const raw = {};
+
+  DIMENSIONS.forEach(dim => {
+    let base = 30 + Math.random() * 55;
+    base += (weights[dim.key] - 1) * 10;
+    raw[dim.key] = Math.round(Math.min(95, Math.max(15, base)));
+  });
+
+  let totalWeight = 0;
+  let weightedSum = 0;
+  DIMENSIONS.forEach(dim => {
+    const w = weights[dim.key];
+    weightedSum += raw[dim.key] * w;
+    totalWeight += w;
+  });
+  const total = Math.round(weightedSum / totalWeight);
+
+  return { ...raw, total };
+}
+
+function getGrade(score) {
+  if (score >= 90) return 'A+';
+  if (score >= 80) return 'A';
+  if (score >= 70) return 'B+';
+  if (score >= 60) return 'B';
+  if (score >= 50) return 'C';
+  if (score >= 40) return 'D';
+  return 'F';
+}
+
+function getAdviceLevel(score) {
+  if (score < 40) return 'low';
+  if (score < 70) return 'mid';
+  return 'high';
+}
+
+function getWeakestDimension(scores) {
+  let min = 100, key = '';
+  DIMENSIONS.forEach(dim => {
+    if (scores[dim.key] < min) { min = scores[dim.key]; key = dim.key; }
+  });
+  return key;
+}
+
+// ========== Render Results ==========
+function renderResults(scores) {
+  document.getElementById('scoreOverview').classList.add('visible');
+  document.getElementById('totalScore').textContent = scores.total;
+  document.getElementById('gradeLevel').textContent = getGrade(scores.total);
+  const weakest = getWeakestDimension(scores);
+  const weakestDim = DIMENSIONS.find(d => d.key === weakest);
+  document.getElementById('keyAdvice').textContent = weakestDim.name;
+
+  const container = document.getElementById('dimensionScores');
+  container.innerHTML = '';
+  container.classList.add('visible');
+
+  DIMENSIONS.forEach((dim, i) => {
+    const score = scores[dim.key];
+    const level = getAdviceLevel(score);
+    const advice = ADVICE_DB[dim.key][level];
+
+    const card = document.createElement('div');
+    card.className = 'dim-card';
+    card.innerHTML = `
+      <div class="dim-name">${dim.name}</div>
+      <div class="dim-score" style="color:${dim.color}">${score}</div>
+      <div class="dim-advice">${advice}</div>
+      <div class="dim-bar" style="background:${dim.color};width:0%"></div>
+    `;
+    container.appendChild(card);
+
+    setTimeout(() => {
+      card.querySelector('.dim-bar').style.width = score + '%';
+    }, 100 + i * 100);
+  });
+
+  renderNarrative(scores);
+}
+
+// ========== Radar Chart (3D) ==========
+const radarCanvas = document.getElementById('radarCanvas');
+const rCtx = radarCanvas.getContext('2d');
+
+function resizeRadar() {
+  const container = document.getElementById('radarContainer');
+  const rect = container.getBoundingClientRect();
+  if (rect.width < 10 || rect.height < 10) return; // not ready yet
+  const dpr = window.devicePixelRatio || 1;
+  radarCanvas.width = rect.width * dpr;
+  radarCanvas.height = rect.height * dpr;
+  radarCanvas.style.width = rect.width + 'px';
+  radarCanvas.style.height = rect.height + 'px';
+  rCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  state.radarReady = true;
+}
+
+// Delayed init — ensure DOM is fully laid out
+function initRadar() {
+  resizeRadar();
+  if (!state.radarReady) {
+    // Retry if container not yet sized
+    requestAnimationFrame(initRadar);
+    return;
+  }
+  drawRadar3D();
+}
+
+window.addEventListener('resize', () => {
+  resizeRadar();
+  drawRadar3D();
+});
+
+// 3D rotation via mouse
+radarCanvas.addEventListener('mousedown', (e) => {
+  state.isDragging = true;
+  state.lastMouse = { x: e.clientX, y: e.clientY };
+});
+window.addEventListener('mousemove', (e) => {
+  if (!state.isDragging) return;
+  const dx = e.clientX - state.lastMouse.x;
+  const dy = e.clientY - state.lastMouse.y;
+  state.radarAngle += dx * 0.005;
+  state.radarTilt = Math.max(0.1, Math.min(0.8, state.radarTilt + dy * 0.003));
+  state.lastMouse = { x: e.clientX, y: e.clientY };
+});
+window.addEventListener('mouseup', () => { state.isDragging = false; });
+
+// Touch support
+radarCanvas.addEventListener('touchstart', (e) => {
+  state.isDragging = true;
+  state.lastMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, { passive: true });
+radarCanvas.addEventListener('touchmove', (e) => {
+  if (!state.isDragging) return;
+  const dx = e.touches[0].clientX - state.lastMouse.x;
+  const dy = e.touches[0].clientY - state.lastMouse.y;
+  state.radarAngle += dx * 0.005;
+  state.radarTilt = Math.max(0.1, Math.min(0.8, state.radarTilt + dy * 0.003));
+  state.lastMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, { passive: true });
+radarCanvas.addEventListener('touchend', () => { state.isDragging = false; });
+
+function startRadarAnimation() {
+  if (state.animFrame) cancelAnimationFrame(state.animFrame);
+  resizeRadar(); // ensure sized before animating
+  function animate() {
+    state.pulsePhase += 0.02;
+    if (!state.isDragging) {
+      state.radarAngle += 0.003;
+    }
+    drawRadar3D();
+    state.animFrame = requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+function drawRadar3D() {
+  if (!state.radarReady) return;
+
+  const w = radarCanvas.width / (window.devicePixelRatio || 1);
+  const h = radarCanvas.height / (window.devicePixelRatio || 1);
+
+  if (w < 10 || h < 10) return; // safety check
+
+  const cx = w / 2;
+  const cy = h / 2;
+  const maxR = Math.min(w, h) * 0.32;
+
+  rCtx.clearRect(0, 0, w, h);
+
+  const n = DIMENSIONS.length;
+  const angleStep = (Math.PI * 2) / n;
+  const tilt = state.radarTilt;
+  const rotation = state.radarAngle;
+
+  function transform(angle, radius) {
+    const a = angle + rotation;
+    const x = Math.cos(a) * radius;
+    const y = Math.sin(a) * radius * tilt;
+    return { x: cx + x, y: cy + y };
+  }
+
+  // Draw grid rings — warm tones
+  for (let ring = 1; ring <= 5; ring++) {
+    const r = maxR * (ring / 5);
+    rCtx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const p = transform(i * angleStep, r);
+      if (i === 0) rCtx.moveTo(p.x, p.y);
+      else rCtx.lineTo(p.x, p.y);
+    }
+    rCtx.closePath();
+    const alpha = 0.06 + ring * 0.025;
+    rCtx.strokeStyle = `rgba(212, 168, 83, ${alpha})`;
+    rCtx.lineWidth = 0.5;
+    rCtx.stroke();
+  }
+
+  // Draw axis lines
+  for (let i = 0; i < n; i++) {
+    const p = transform(i * angleStep, maxR);
+    rCtx.beginPath();
+    rCtx.moveTo(cx, cy);
+    rCtx.lineTo(p.x, p.y);
+    rCtx.strokeStyle = 'rgba(201, 160, 160, 0.12)';
+    rCtx.lineWidth = 0.5;
+    rCtx.stroke();
+  }
+
+  // Draw data polygon
+  if (state.scores) {
+    const pulse = Math.sin(state.pulsePhase) * 2;
+
+    // Data shape
+    rCtx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const idx = i % n;
+      const score = state.scores[DIMENSIONS[idx].key] / 100;
+      const r = maxR * score + pulse;
+      const p = transform(idx * angleStep, r);
+      if (i === 0) rCtx.moveTo(p.x, p.y);
+      else rCtx.lineTo(p.x, p.y);
+    }
+    rCtx.closePath();
+
+    // Warm gradient fill
+    const grad = rCtx.createRadialGradient(cx, cy, 0, cx, cy, maxR);
+    grad.addColorStop(0, 'rgba(212, 168, 83, 0.2)');
+    grad.addColorStop(0.5, 'rgba(201, 160, 160, 0.12)');
+    grad.addColorStop(1, 'rgba(154, 123, 181, 0.06)');
+    rCtx.fillStyle = grad;
+    rCtx.fill();
+
+    // Stroke
+    rCtx.strokeStyle = 'rgba(212, 168, 83, 0.6)';
+    rCtx.lineWidth = 2;
+    rCtx.stroke();
+
+    // Draw data points & labels
+    for (let i = 0; i < n; i++) {
+      const score = state.scores[DIMENSIONS[i].key] / 100;
+      const r = maxR * score + pulse;
+      const p = transform(i * angleStep, r);
+
+      // Point glow
+      const pGrad = rCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 14);
+      pGrad.addColorStop(0, DIMENSIONS[i].color + '66');
+      pGrad.addColorStop(1, DIMENSIONS[i].color + '00');
+      rCtx.fillStyle = pGrad;
+      rCtx.beginPath();
+      rCtx.arc(p.x, p.y, 14, 0, Math.PI * 2);
+      rCtx.fill();
+
+      // Point
+      rCtx.beginPath();
+      rCtx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      rCtx.fillStyle = DIMENSIONS[i].color;
+      rCtx.fill();
+
+      // Label
+      const labelR = maxR + 26;
+      const lp = transform(i * angleStep, labelR);
+      rCtx.font = '500 12px "Noto Sans SC", sans-serif';
+      rCtx.fillStyle = DIMENSIONS[i].color;
+      rCtx.textAlign = 'center';
+      rCtx.textBaseline = 'middle';
+      rCtx.fillText(DIMENSIONS[i].name, lp.x, lp.y);
+
+      // Score label
+      const scoreR = maxR * score + pulse + 18;
+      const sp = transform(i * angleStep, scoreR);
+      rCtx.font = '700 13px "Noto Serif SC", serif';
+      rCtx.fillStyle = '#f0ebe4';
+      rCtx.fillText(state.scores[DIMENSIONS[i].key], sp.x, sp.y);
+    }
+
+    // History overlay
+    if (state.history.length >= 2) {
+      const prevScores = state.history[state.history.length - 2].scores;
+      rCtx.beginPath();
+      for (let i = 0; i <= n; i++) {
+        const idx = i % n;
+        const score = prevScores[DIMENSIONS[idx].key] / 100;
+        const r = maxR * score;
+        const p = transform(idx * angleStep, r);
+        if (i === 0) rCtx.moveTo(p.x, p.y);
+        else rCtx.lineTo(p.x, p.y);
+      }
+      rCtx.closePath();
+      rCtx.setLineDash([4, 4]);
+      rCtx.strokeStyle = 'rgba(232, 180, 180, 0.4)';
+      rCtx.lineWidth = 1.5;
+      rCtx.stroke();
+      rCtx.setLineDash([]);
+    }
+  } else {
+    // Empty state — decorative placeholder
+    // Draw a subtle "breathing" hexagon
+    const t = Date.now() * 0.001;
+    const breathe = 0.85 + Math.sin(t) * 0.05;
+    const emptyR = maxR * breathe;
+
+    rCtx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const p = transform(i * angleStep, emptyR);
+      if (i === 0) rCtx.moveTo(p.x, p.y);
+      else rCtx.lineTo(p.x, p.y);
+    }
+    rCtx.closePath();
+    rCtx.strokeStyle = 'rgba(212, 168, 83, 0.15)';
+    rCtx.lineWidth = 1;
+    rCtx.stroke();
+
+    const grad = rCtx.createRadialGradient(cx, cy, 0, cx, cy, emptyR);
+    grad.addColorStop(0, 'rgba(212, 168, 83, 0.04)');
+    grad.addColorStop(1, 'rgba(201, 160, 160, 0.01)');
+    rCtx.fillStyle = grad;
+    rCtx.fill();
+
+    rCtx.font = '400 14px "Noto Sans SC", sans-serif';
+    rCtx.fillStyle = 'rgba(168, 158, 147, 0.5)';
+    rCtx.textAlign = 'center';
+    rCtx.fillText('上传作品后显示评价图谱', cx, cy);
+  }
+}
+
+// ========== Audio Player ==========
+const playBtn = document.getElementById('playBtn');
+const playIcon = document.getElementById('playIcon');
+const pauseIcon = document.getElementById('pauseIcon');
+const progressBar = document.getElementById('progressBar');
+
+playBtn.addEventListener('click', togglePlay);
+
+function togglePlay() {
+  if (!state.audioElement) return;
+  if (state.isPlaying) {
+    state.audioElement.pause();
+  } else {
+    state.audioElement.play();
+    startWaveformAnimation();
+  }
+  state.isPlaying = !state.isPlaying;
+  updatePlayButton();
+}
+
+function updatePlayButton() {
+  playIcon.style.display = state.isPlaying ? 'none' : 'block';
+  pauseIcon.style.display = state.isPlaying ? 'block' : 'none';
+}
+
+function updateProgress() {
+  if (!state.audioElement) return;
+  const pct = (state.audioElement.currentTime / state.audioElement.duration) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('currentTime').textContent = formatTime(state.audioElement.currentTime);
+}
+
+progressBar.addEventListener('click', (e) => {
+  if (!state.audioElement) return;
+  const rect = progressBar.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  state.audioElement.currentTime = pct * state.audioElement.duration;
+});
+
+// ========== Waveform ==========
+const waveCanvas = document.getElementById('waveformCanvas');
+const wCtx = waveCanvas.getContext('2d');
+
+function resizeWaveform() {
+  const rect = waveCanvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  waveCanvas.width = rect.width * dpr;
+  waveCanvas.height = 60 * dpr;
+  waveCanvas.style.width = rect.width + 'px';
+  waveCanvas.style.height = '60px';
+  wCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function drawWaveform(buffer) {
+  resizeWaveform();
+  const w = waveCanvas.width / (window.devicePixelRatio || 1);
+  const h = 60;
+  const data = buffer.getChannelData(0);
+  const step = Math.ceil(data.length / w);
+
+  wCtx.clearRect(0, 0, w, h);
+
+  for (let i = 0; i < w; i++) {
+    let min = 1.0, max = -1.0;
+    for (let j = 0; j < step; j++) {
+      const datum = data[i * step + j] || 0;
+      if (datum < min) min = datum;
+      if (datum > max) max = datum;
+    }
+    const barH = Math.max(2, (max - min) * h * 0.45);
+    const y = (h - barH) / 2;
+
+    const grad = wCtx.createLinearGradient(0, y, 0, y + barH);
+    grad.addColorStop(0, 'rgba(212, 168, 83, 0.5)');
+    grad.addColorStop(1, 'rgba(201, 160, 160, 0.3)');
+    wCtx.fillStyle = grad;
+    wCtx.fillRect(i, y, 1, barH);
+  }
+}
+
+function startWaveformAnimation() {
+  if (!state.audioContext) {
+    state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (!state.analyser && state.audioElement) {
+    try {
+      const source = state.audioContext.createMediaElementSource(state.audioElement);
+      state.analyser = state.audioContext.createAnalyser();
+      state.analyser.fftSize = 256;
+      source.connect(state.analyser);
+      state.analyser.connect(state.audioContext.destination);
+    } catch(e) { /* already connected */ }
+  }
+
+  function animateWave() {
+    if (!state.isPlaying || !state.analyser) return;
+    resizeWaveform();
+    const w = waveCanvas.width / (window.devicePixelRatio || 1);
+    const h = 60;
+    const bufLen = state.analyser.frequencyBinCount;
+    const dataArr = new Uint8Array(bufLen);
+    state.analyser.getByteFrequencyData(dataArr);
+
+    wCtx.clearRect(0, 0, w, h);
+    const barW = Math.max(2, w / bufLen * 2.5);
+    const gap = 1;
+
+    for (let i = 0; i < bufLen; i++) {
+      const barH = (dataArr[i] / 255) * h * 0.8;
+      const x = i * (barW + gap);
+      if (x > w) break;
+
+      // Warm hue range: 25 (amber) to 340 (rose)
+      const hue = 25 + (i / bufLen) * 45;
+      wCtx.fillStyle = `hsla(${hue}, 55%, 58%, 0.7)`;
+      wCtx.fillRect(x, h - barH, barW, barH);
+    }
+    requestAnimationFrame(animateWave);
+  }
+  animateWave();
+}
+
+// ========== Narrative ==========
+function renderNarrative(scores) {
+  const steps = document.getElementById('narrativeSteps');
+  const weakest = getWeakestDimension(scores);
+  const weakestDim = DIMENSIONS.find(d => d.key === weakest);
+
+  const narratives = [
+    {
+      speaker: '助教老师',
+      text: `同学们，我们首先以西方的七声音阶和节奏型进行结合，生成了第一版音乐。让我们来听听 AI 给出的评分反馈——综合评分 ${scores.total} 分。`
+    },
+    {
+      speaker: 'AI 评分反馈',
+      text: `本次作品在"${weakestDim.name}"维度得分最低（${scores[weakest.key]} 分），${ADVICE_DB[weakest.key][getAdviceLevel(scores[weakest.key])]}`
+    },
+    {
+      speaker: '子夏',
+      text: scores.total < 60
+        ? `第一轮得到的 AI 评价分数只有 ${scores.total} 分。这说明我们在创作中对人声以及伴奏的对位处理还存在一些问题，所以需要对提示词进行调整。`
+        : `AI 给出了 ${scores.total} 分的评价，其中"${weakestDim.name}"是最需要改进的方向。让我们看看如何通过提示词优化来突破这个瓶颈。`
+    },
+    {
+      speaker: '雯玺',
+      text: scores.dynamics < 50
+        ? `经过助教老师的调整，我们意识到之前感觉上想要爆发的那个点，其实是可以用加速度和渐强奏来处理的——这正是提示词中"力度变化"描述不够具体导致的。`
+        : `我们调整了提示词中关于"${weakestDim.name}"的描述，加入了更精确的音乐术语。目前完成的作品片段是这样的——`
+    }
+  ];
+
+  steps.innerHTML = '';
+  narratives.forEach((n, i) => {
+    const step = document.createElement('div');
+    step.className = 'n-step' + (i === 0 ? ' active' : '');
+    step.innerHTML = `
+      <div class="step-num">${i + 1}</div>
+      <div class="step-content">
+        <div class="step-speaker">${n.speaker}</div>
+        <div class="step-text">${n.text}</div>
+      </div>
+    `;
+    step.addEventListener('click', () => {
+      document.querySelectorAll('.n-step').forEach(s => s.classList.remove('active'));
+      step.classList.add('active');
+    });
+    steps.appendChild(step);
+  });
+}
+
+// ========== History ==========
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (state.history.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">暂无评分记录</div>';
+    return;
+  }
+  list.innerHTML = '';
+  state.history.slice().reverse().forEach((item, i) => {
+    const grade = getGrade(item.total);
+    const gradeColor = item.total >= 70 ? 'var(--accent-sage)' : item.total >= 50 ? 'var(--accent-gold)' : 'var(--accent-copper)';
+    const el = document.createElement('div');
+    el.className = 'history-item';
+    el.innerHTML = `
+      <div class="h-score" style="background:${gradeColor}22;color:${gradeColor}">${item.total}</div>
+      <div class="h-info">
+        <div class="h-name">${item.name}</div>
+        <div class="h-meta">${item.timestamp} · ${grade} 级</div>
+      </div>
+      <div class="h-direction">${DIRECTION_LABELS[item.direction]}</div>
+    `;
+    el.addEventListener('click', () => {
+      state.scores = item.scores;
+      renderResults(item.scores);
+      startRadarAnimation();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    list.appendChild(el);
+  });
+}
+
+// ========== Toast ==========
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ========== Init ==========
+// Delayed init to ensure canvas container has proper dimensions
+setTimeout(() => {
+  initRadar();
+  // Also start a gentle idle animation for the empty state
+  function idleAnimate() {
+    if (!state.scores && state.radarReady) {
+      drawRadar3D();
+    }
+    requestAnimationFrame(idleAnimate);
+  }
+  idleAnimate();
+}, 100);
+</script>
+</body>
+</html>
