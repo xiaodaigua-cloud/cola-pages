@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 应用开发教学引导</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0d0d1a;
+    --surface: #13132b;
+    --surface-2: #1a1a38;
+    --border: rgba(120, 100, 220, 0.2);
+    --border-glow: rgba(140, 110, 255, 0.4);
+
+    --ink: #e8e4ff;
+    --ink-2: #a89fd8;
+    --ink-3: #6b5fa0;
+
+    --violet: #8b5cf6;
+    --violet-bright: #a78bfa;
+    --indigo: #6366f1;
+    --blue: #3b82f6;
+    --cyan: #06b6d4;
+    --rose: #f43f5e;
+    --amber: #f59e0b;
+    --emerald: #10b981;
+
+    --step-1: #7c3aed;
+    --step-2: #4f46e5;
+    --step-3: #0ea5e9;
+    --step-4: #059669;
+
+    --radius: 14px;
+    --radius-sm: 8px;
+    --font-serif: 'Noto Serif SC', Georgia, serif;
+    --font-sans: 'Noto Sans SC', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Background nebula ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 90%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 30% at 60% 40%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Layout ── */
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .header-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--violet-bright);
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  .header-eyebrow::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--violet-bright);
+    animation: pulse-dot 2s ease infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #e8e4ff 0%, #a78bfa 40%, #818cf8 70%, #67e8f9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 14px;
+  }
+
+  .header-sub {
+    color: var(--ink-2);
+    font-size: 1.0rem;
+    font-weight: 300;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ── Flow overview ── */
+  .flow-overview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 52px;
+  }
+
+  @media (max-width: 640px) {
+    .flow-overview { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .flow-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flow-step::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--step-color, #8b5cf6), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .flow-step:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(100, 70, 200, 0.2);
+  }
+
+  .flow-step:hover::after { opacity: 0.08; }
+
+  .flow-step.active {
+    border-color: var(--step-color, var(--violet));
+    box-shadow: 0 0 0 1px var(--step-color, var(--violet)), 0 8px 24px rgba(100, 70, 200, 0.3);
+  }
+
+  .flow-step-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--step-color, var(--violet-bright));
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+
+  .flow-step-icon {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .flow-step-label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  /* ── Section header ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    margin-top: 52px;
+  }
+
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-3);
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ── Platform callout ── */
+  .platform-callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--violet);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .platform-callout-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+
+  .platform-callout-content h4 {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--violet-bright);
+    margin-bottom: 4px;
+  }
+
+  .platform-callout-content p {
+    font-size: 0.875rem;
+    color: var(--ink-2);
+  }
+
+  .platform-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .platform-tag {
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: var(--violet-bright);
+    font-weight: 500;
+  }
+
+  /* ── Prompt cards ── */
+  .prompt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+  }
+
+  .prompt-card:hover {
+    box-shadow: 0 8px 32px rgba(60, 40, 120, 0.3);
+  }
+
+  .prompt-card-header {
+    padding: 18px 22px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .prompt-round-badge {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+    margin-top: 1px;
+  }
+
+  .prompt-card-meta {
+    flex: 1;
+  }
+
+  .prompt-card-round {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    opacity: 0.65;
+    margin-bottom: 3px;
+  }
+
+  .prompt-card-title {
+    font-weight: 600;
+    font-size: 1.0rem;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .prompt-card-desc {
+    font-size: 0.82rem;
+    color: var(--ink-2);
+    margin-top: 4px;
+  }
+
+  .prompt-toggle {
+    font-size: 1rem;
+    color: var(--ink-3);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .prompt-card.open .prompt-toggle {
+    transform: rotate(180deg);
+  }
+
+  .prompt-body {
+    display: none;
+    padding: 0 22px 20px;
+  }
+
+  .prompt-card.open .prompt-body {
+    display: block;
+  }
+
+  /* ── Tags row ── */
+  .prompt-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 14px 0 16px;
+  }
+
+  .tag {
+    font-size: 0.72rem;
+    padding: 3px 9px;
+    border-radius: 100px;
+    font-weight: 500;
+  }
+
+  .tag-audience { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.25); }
+  .tag-tech { background: rgba(6, 182, 212, 0.12); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.2); }
+  .tag-output { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.2); }
+  .tag-visual { background: rgba(245, 158, 11, 0.12); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.2); }
+  .tag-fix { background: rgba(244, 63, 94, 0.12); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.2); }
+
+  /* ── Prompt text block ── */
+  .prompt-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 8px;
+  }
+
+  .prompt-block {
+    background: #0a0a18;
+    border: 1px solid rgba(100, 80, 200, 0.2);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: #c9c0f0;
+    position: relative;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 6px;
+    color: var(--violet-bright);
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font-sans);
+  }
+
+  .copy-btn:hover {
+    background: rgba(139, 92, 246, 0.35);
+    border-color: rgba(139, 92, 246, 0.5);
+  }
+
+  .copy-btn.copied {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #6ee7b7;
+  }
+
+  /* ── Prompt highlights ── */
+  .prompt-highlight {
+    color: #f9a8d4;
+    font-weight: 500;
+  }
+
+  .prompt-comment {
+    color: #4c4880;
+  }
+
+  .prompt-key {
+    color: #93c5fd;
+  }
+
+  /* ── Step notes ── */
+  .step-notes {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .step-note {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.83rem;
+    color: var(--ink-2);
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .step-note-icon { flex-shrink: 0; font-size: 0.9rem; margin-top: 1px; }
+
+  /* ── Output table ── */
+  .output-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.865rem;
+    margin-top: 8px;
+  }
+
+  .output-table th {
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 0 12px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .output-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(120, 100, 220, 0.08);
+    vertical-align: top;
+  }
+
+  .output-table tr:last-child td { border-bottom: none; }
+
+  .output-table tr:hover td {
+    background: rgba(139, 92, 246, 0.04);
+  }
+
+  .file-name {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--cyan);
+    background: rgba(6, 182, 212, 0.08);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .output-desc { color: var(--ink-2); }
+
+  /* ── Recording tips ── */
+  .rec-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .rec-grid { grid-template-columns: 1fr; }
+  }
+
+  .rec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+
+  .rec-card-step {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+
+  .rec-card-icon { font-size: 1.4rem; margin-bottom: 8px; display: block; }
+
+  .rec-card-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .rec-card-desc {
+    font-size: 0.8rem;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  /* ── Progress tracker ── */
+  .progress-bar-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+
+  .progress-bar-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .progress-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .progress-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  .progress-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--ink-3);
+    transition: all 0.3s;
+  }
+
+  .progress-node.done .progress-dot {
+    background: var(--emerald);
+    border-color: var(--emerald);
+    color: white;
+  }
+
+  .progress-node.active .progress-dot {
+    background: var(--violet);
+    border-color: var(--violet);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.25);
+  }
+
+  .progress-node-label {
+    font-size: 0.68rem;
+    color: var(--ink-3);
+    text-align: center;
+    max-width: 64px;
+    line-height: 1.3;
+  }
+
+  .progress-node.active .progress-node-label { color: var(--violet-bright); }
+  .progress-node.done .progress-node-label { color: var(--emerald); }
+
+  .progress-connector {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 22px;
+    transition: background 0.5s;
+  }
+
+  .progress-connector.filled {
+    background: linear-gradient(90deg, var(--emerald), var(--violet));
+  }
+
+  /* ── Scale key ── */
+  .scale-key {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 8px 0 16px;
+  }
+
+  .scale-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+  }
+
+  .scale-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--ink-3);
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .prompt-card, .platform-callout, .flow-step {
+    animation: fadeInUp 0.5s ease both;
+  }
+
+  .flow-step:nth-child(1) { animation-delay: 0.05s; }
+  .flow-step:nth-child(2) { animation-delay: 0.1s; }
+  .flow-step:nth-child(3) { animation-delay: 0.15s; }
+  .flow-step:nth-child(4) { animation-delay: 0.2s; }
+
+  .prompt-card:nth-child(1) { animation-delay: 0.1s; }
+  .prompt-card:nth-child(2) { animation-delay: 0.15s; }
+  .prompt-card:nth-child(3) { animation-delay: 0.2s; }
+  .prompt-card:nth-child(4) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-eyebrow">AI 辅助应用开发 · 教学演示</div>
+    <h1>用 AI 构建五声音阶<br>互动应用</h1>
+    <p class="header-sub">跟随四轮对话，从零到一生成一个可运行的教育互动应用</p>
+  </header>
+
+  <!-- ── Progress tracker ── -->
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-title">
+      <span>开发进度</span>
+      <span id="progress-label" style="color: var(--violet-bright);">准备开始</span>
+    </div>
+    <div class="progress-steps">
+      <div class="progress-node" data-step="0" onclick="setProgress(0)">
+        <div class="progress-dot">1</div>
+        <div class="progress-node-label">初版生成</div>
+      </div>
+      <div class="progress-connector" id="conn-0"></div>
+      <div class="progress-node" data-step="1" onclick="setProgress(1)">
+        <div class="progress-dot">2</div>
+        <div class="progress-node-label">加入手势</div>
+      </div>
+      <div class="progress-connector" id="conn-1"></div>
+      <div class="progress-node" data-step="2" onclick="setProgress(2)">
+        <div class="progress-dot">3</div>
+        <div class="progress-node-label">交互细化</div>
+      </div>
+      <div class="progress-connector" id="conn-2"></div>
+      <div class="progress-node" data-step="3" onclick="setProgress(3)">
+        <div class="progress-dot">4</div>
+        <div class="progress-node-label">图片修正</div>
+      </div>
+      <div class="progress-connector" id="conn-3"></div>
+      <div class="progress-node" data-step="4" onclick="setProgress(4)">
+        <div class="progress-dot">✓</div>
+        <div class="progress-node-label">发布上线</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Flow overview ── -->
+  <div class="flow-overview">
+    <div class="flow-step" style="--step-color: var(--step-1);">
+      <div class="flow-step-num">STEP 01</div>
+      <span class="flow-step-icon">✍️</span>
+      <div class="flow-step-label">描述需求<br>AI 生成初版</div>
+    </div>
+    <div class="flow-step" style="--step-color: var(--step-2);">
+      <div class="flow-step-num">STEP 02</div>
+      <span class="flow-step-icon">🔍</span>
+      <div class="flow-step-label">预览效果<br>发现问题</div>
+    </div>
+    <div class="flow-step" style="--step-color: var(--step-3);">
+      <div class="flow-step-num">STEP 03</div>
+      <span class="flow-step-icon">🔄</span>
+      <div class="flow-step-label">逐项反馈<br>AI 迭代修改</div>
+    </div>
+    <div class="flow-step" style="--step-color: var(--step-4);">
+      <div class="flow-step-num">STEP 04</div>
+      <span class="flow-step-icon">🚀</span>
+      <div class="flow-step-label">本地测试<br>发布上线</div>
+    </div>
+  </div>
+
+  <!-- ── Section: Platform ── -->
+  <div class="section-header">
+    <span class="section-num">00</span>
+    <h2 class="section-title">准备工作</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="platform-callout">
+    <div class="platform-callout-icon">🖥️</div>
+    <div class="platform-callout-content">
+      <h4>推荐平台</h4>
+      <p>使用 AI 对话平台，将提示词输入对话框，AI 会直接生成可运行的 HTML 代码文件。</p>
+      <div class="platform-list">
+        <span class="platform-tag">Cola AI</span>
+        <span class="platform-tag">Claude</span>
+        <span class="platform-tag">ChatGPT</span>
+        <span class="platform-tag">其他支持代码生成的平台</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section: Prompts ── -->
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">四轮提示词</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <p style="font-size: 0.875rem; color: var(--ink-2); margin-bottom: 24px;">点击卡片展开完整提示词，点击「复制」按钮可一键复制到对话框中使用。</p>
+
+  <!-- 五声音阶参考 -->
+  <div style="margin-bottom: 20px;">
+    <div class="scale-key">
+      <div class="scale-chip" style="background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); color: #fca5a5;">
+        <div class="scale-dot" style="background: #ef4444;"></div>宫 (do)
+      </div>
+      <div class="scale-chip" style="background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.25); color: #fcd34d;">
+        <div class="scale-dot" style="background: #f59e0b;"></div>商 (re)
+      </div>
+      <div class="scale-chip" style="background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.25); color: #6ee7b7;">
+        <div class="scale-dot" style="background: #10b981;"></div>角 (mi)
+      </div>
+      <div class="scale-chip" style="background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.25); color: #93c5fd;">
+        <div class="scale-dot" style="background: #3b82f6;"></div>徵 (sol)
+      </div>
+      <div class="scale-chip" style="background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.25); color: #c4b5fd;">
+        <div class="scale-dot" style="background: #8b5cf6;"></div>羽 (la)
+      </div>
+    </div>
+  </div>
+
+  <!-- Round 1 -->
+  <div class="prompt-card open" id="card-1">
+    <div class="prompt-card-header" onclick="toggleCard('card-1')">
+      <div class="prompt-round-badge" style="background: linear-gradient(135deg, #7c3aed, #4f46e5);">R1</div>
+      <div class="prompt-card-meta">
+        <div class="prompt-card-round" style="color: #a78bfa;">第一轮 · 生成初版</div>
+        <div class="prompt-card-title">完整需求描述 → 获得可运行的 HTML 应用</div>
+        <div class="prompt-card-desc">把受众、功能、界面、技术要求一次说清楚</div>
+      </div>
+      <div class="prompt-toggle">▾</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-tags">
+        <span class="tag tag-audience">受众：3-8岁</span>
+        <span class="tag tag-audience">自闭症谱系</span>
+        <span class="tag tag-tech">Web Audio API</span>
+        <span class="tag tag-output">单 HTML 文件</span>
+        <span class="tag tag-visual">横屏布局</span>
+      </div>
+      <div class="prompt-label">提示词</div>
+      <div class="prompt-block" id="prompt-1">请为自闭症谱系儿童制作一个五声音阶互动 HTML 应用，要求：
+
+1. 受众：自闭症谱系儿童（3-8岁），注意力短、需要强视觉引导
+2. 音阶体系：宫商角徵羽（do re mi sol la），对应五种颜色
+3. 交互流程分三步递进：
+   - 第一步「逐音认知」：展示每个音对应的卡通形象动作，
+     孩子自由点击任意音，点哪个就展示哪个
+   - 第二步「听音模仿」：系统播放一个音，给出动作提示，
+     孩子凭提示找到对应按钮
+   - 第三步「自由按奏」：孩子随意按，系统记录并可回放完整旋律
+4. 界面要求：横屏布局，左边大面积展示引导图，右边彩色大按钮
+5. 视觉风格：色彩鲜明、圆角、大按钮（适合触屏操作）、有进度提示
+6. 音频：使用 Web Audio API 生成对应频率的三角波音色
+7. 输出：单个 HTML 文件，可直接在浏览器打开
+        <button class="copy-btn" onclick="copyPrompt('prompt-1', this)">复制</button></div>
+      <div class="step-notes">
+        <div class="step-note">
+          <span class="step-note-icon">💡</span>
+          <span>把受众特点写进去（注意力短、触屏操作）能让 AI 自动调整界面风格</span>
+        </div>
+        <div class="step-note">
+          <span class="step-note-icon">⚡</span>
+          <span>要求「单 HTML 文件」是关键——直接双击打开，无需配置服务器</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round 2 -->
+  <div class="prompt-card" id="card-2">
+    <div class="prompt-card-header" onclick="toggleCard('card-2')">
+      <div class="prompt-round-badge" style="background: linear-gradient(135deg, #4f46e5, #0ea5e9);">R2</div>
+      <div class="prompt-card-meta">
+        <div class="prompt-card-round" style="color: #818cf8;">第二轮 · 加入柯达伊手势</div>
+        <div class="prompt-card-title">卡通熊 + 五种手势图片 → 增强视觉引导</div>
+        <div class="prompt-card-desc">先生成 5 张 AI 图片，再嵌入应用</div>
+      </div>
+      <div class="prompt-toggle">▾</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-tags">
+        <span class="tag tag-visual">柯达伊手势</span>
+        <span class="tag tag-visual">卡通熊形象</span>
+        <span class="tag tag-tech">AI 图片生成</span>
+        <span class="tag tag-tech">图片嵌入</span>
+      </div>
+      <div class="prompt-label">提示词</div>
+      <div class="prompt-block" id="prompt-2">第一步左边放一只大卡通熊形象，做柯达伊手势动作：
+
+- do：握拳
+- re：双手放胸前，手腕向上翘，手指并拢朝上，手心朝前
+- mi：三指张开
+- sol：手臂打开，五指并拢，手心朝外
+- la：五指完全张开
+
+用 AI 生成 5 张不同手势的卡通熊图片，嵌入应用中，
+点哪个音就切换到哪个熊的图片。
+        <button class="copy-btn" onclick="copyPrompt('prompt-2', this)">复制</button></div>
+      <div class="step-notes">
+        <div class="step-note">
+          <span class="step-note-icon">🎨</span>
+          <span>图片生成和代码修改可以分两步做：先用 AI 生图，再告诉 AI 把图片路径替换进去</span>
+        </div>
+        <div class="step-note">
+          <span class="step-note-icon">💡</span>
+          <span>柯达伊手势是国际通用的音乐教学法，每个音有标准手势——孩子通过身体记忆音高</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round 3 -->
+  <div class="prompt-card" id="card-3">
+    <div class="prompt-card-header" onclick="toggleCard('card-3')">
+      <div class="prompt-round-badge" style="background: linear-gradient(135deg, #0ea5e9, #059669);">R3</div>
+      <div class="prompt-card-meta">
+        <div class="prompt-card-round" style="color: #67e8f9;">第三轮 · 交互逻辑修正</div>
+        <div class="prompt-card-title">自由探索模式 → 去掉「自动跳转下一步」</div>
+        <div class="prompt-card-desc">发现问题后，精准描述你要的行为</div>
+      </div>
+      <div class="prompt-toggle">▾</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-tags">
+        <span class="tag tag-fix">交互修正</span>
+        <span class="tag tag-fix">自由探索</span>
+      </div>
+      <div class="prompt-label">提示词</div>
+      <div class="prompt-block" id="prompt-3">第一步改成自由探索模式：
+按哪个音就展示那个音的熊，不要自动跳到下一个。
+        <button class="copy-btn" onclick="copyPrompt('prompt-3', this)">复制</button></div>
+      <div class="step-notes">
+        <div class="step-note">
+          <span class="step-note-icon">🔑</span>
+          <span>修正提示词要「描述行为」不是「说感受」：说「按哪个音就展示哪个」比「感觉怪怪的」精准得多</span>
+        </div>
+        <div class="step-note">
+          <span class="step-note-icon">⚡</span>
+          <span>短而精准的修改指令效果往往比长段描述更好</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round 4 -->
+  <div class="prompt-card" id="card-4">
+    <div class="prompt-card-header" onclick="toggleCard('card-4')">
+      <div class="prompt-round-badge" style="background: linear-gradient(135deg, #059669, #0891b2);">R4</div>
+      <div class="prompt-card-meta">
+        <div class="prompt-card-round" style="color: #6ee7b7;">第四轮 · 图片手势修正</div>
+        <div class="prompt-card-title">Re 和 Sol 手势重新生成 → 方向细节校准</div>
+        <div class="prompt-card-desc">图片不对就重新描述，AI 重新生图替换</div>
+      </div>
+      <div class="prompt-toggle">▾</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-tags">
+        <span class="tag tag-fix">图片重生成</span>
+        <span class="tag tag-fix">手势方向</span>
+        <span class="tag tag-visual">Re / Sol</span>
+      </div>
+      <div class="prompt-label">Re 的修正提示词</div>
+      <div class="prompt-block" id="prompt-4a" style="margin-bottom: 14px;">Re 的熊：双手放胸前，手腕翘起，手指并拢朝上，
+手心朝前，两只手方向一致都向上。
+        <button class="copy-btn" onclick="copyPrompt('prompt-4a', this)">复制</button></div>
+      <div class="prompt-label">Sol 的修正提示词</div>
+      <div class="prompt-block" id="prompt-4b">Sol 的熊：手臂打开向两侧伸展，五指伸直并拢不分开，手心朝外。
+        <button class="copy-btn" onclick="copyPrompt('prompt-4b', this)">复制</button></div>
+      <div class="step-notes">
+        <div class="step-note">
+          <span class="step-note-icon">🔍</span>
+          <span>AI 对方向性描述（朝上/朝前/朝外）很敏感，多加一个细节往往就能得到正确结果</span>
+        </div>
+        <div class="step-note">
+          <span class="step-note-icon">🔁</span>
+          <span>图片修正可能需要 2-3 次迭代，每次只修改不对的地方，其他保持不变</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section: Output ── -->
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">最终产出物</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="prompt-card" style="animation-delay: 0.3s;">
+    <div style="padding: 4px 8px;">
+      <table class="output-table">
+        <thead>
+          <tr>
+            <th>文件</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="file-name">index.html</span></td>
+            <td class="output-desc">应用库首页，展示完整应用矩阵（5 个应用卡片）</td>
+          </tr>
+          <tr>
+            <td><span class="file-name">game.html</span></td>
+            <td class="output-desc">三步递进的五声音阶互动应用主体</td>
+          </tr>
+          <tr>
+            <td><span class="file-name">bear-do.png</span> ... <span class="file-name">bear-la.png</span></td>
+            <td class="output-desc">5 张 AI 生成的卡通熊柯达伊手势图</td>
+          </tr>
+          <tr>
+            <td><span class="file-name">线上地址</span></td>
+            <td class="output-desc">发布到 GitHub Pages / 其他静态托管，生成可分享链接</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Section: Recording ── -->
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">录制建议</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="rec-grid">
+    <div class="rec-card">
+      <div class="rec-card-step">SCENE 01</div>
+      <span class="rec-card-icon">🖥️</span>
+      <div class="rec-card-title">屏幕录制：初版生成</div>
+      <div class="rec-card-desc">录制学生在对话框输入第一轮提示词 → AI 生成代码 → 浏览器预览效果</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-card-step">SCENE 02</div>
+      <span class="rec-card-icon">✏️</span>
+      <div class="rec-card-title">屏幕录制：发现问题迭代</div>
+      <div class="rec-card-desc">发现手势不对 → 输入修改提示词 → AI 重新生图 → 替换图片</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-card-step">SCENE 03</div>
+      <span class="rec-card-icon">📱</span>
+      <div class="rec-card-title">真机演示：最终效果</div>
+      <div class="rec-card-desc">平板打开最终版应用，演示三步交互流程（逐音认知 → 听音模仿 → 自由按奏）</div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <p>「AI 是工具，创作是你的」— 提示词越精准，结果越接近你的想象</p>
+  </div>
+
+</div>
+
+<script>
+  // Toggle prompt card
+  function toggleCard(id) {
+    const card = document.getElementById(id);
+    card.classList.toggle('open');
+  }
+
+  // Copy prompt text
+  function copyPrompt(id, btn) {
+    const block = document.getElementById(id);
+    // Get text content excluding the button
+    let text = '';
+    block.childNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) text += node.textContent;
+    });
+    text = text.trim();
+
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '已复制 ✓';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '复制';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Progress tracker
+  const labels = ['正在进行：初版生成', '正在进行：加入手势', '正在进行：交互细化', '正在进行：图片修正', '✅ 全部完成！'];
+
+  function setProgress(step) {
+    const nodes = document.querySelectorAll('.progress-node');
+    const connectors = document.querySelectorAll('.progress-connector');
+
+    nodes.forEach((node, i) => {
+      node.classList.remove('done', 'active');
+      if (i < step) node.classList.add('done');
+      else if (i === step) node.classList.add('active');
+    });
+
+    connectors.forEach((c, i) => {
+      c.classList.toggle('filled', i < step);
+    });
+
+    document.getElementById('progress-label').textContent = labels[step];
+
+    // scroll to corresponding card
+    const cardMap = { 0: 'card-1', 1: 'card-2', 2: 'card-3', 3: 'card-4' };
+    if (cardMap[step]) {
+      const card = document.getElementById(cardMap[step]);
+      card.classList.add('open');
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // Initialize first node as active
+  setProgress(0);
+</script>
+</body>
+</html>
