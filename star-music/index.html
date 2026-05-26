@@ -2,320 +2,110 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>星星乐 · 五声音阶互动</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星星乐 · 个性化特殊教育应用库</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; overflow: hidden; }
 body {
   font-family: -apple-system, 'PingFang SC', sans-serif;
   background: linear-gradient(135deg, #E8F5E9 0%, #FFF8E1 30%, #E3F2FD 70%, #FCE4EC 100%);
-  display: flex; flex-direction: column;
+  min-height: 100vh; padding: 40px 24px;
 }
-
-.top-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 24px; background: rgba(255,255,255,0.7);
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+.header {
+  text-align: center; margin-bottom: 40px;
 }
-.top-bar h1 { font-size: 22px; color: #5B4A3F; }
-.progress { display: flex; align-items: center; gap: 6px; }
-.pdot { width: 28px; height: 28px; border-radius: 50%; background: #E0E0E0; color: #999;
-  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
-.pdot.active { background: #FF9F43; color: white; }
-.pdot.done { background: #66BB6A; color: white; }
-.pline { width: 16px; height: 2px; background: #E0E0E0; }
-.pline.done { background: #66BB6A; }
-
-.main {
-  flex: 1; display: flex; align-items: stretch; padding: 16px 24px; gap: 20px; overflow: hidden;
+.header h1 {
+  font-size: 28px; color: #5B4A3F;
+  background: linear-gradient(135deg, #FF9F43, #FF6B6B);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-
-/* Bear panel */
-.bear-panel {
-  flex: 0 0 35%; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.6); border-radius: 24px; padding: 16px;
+.header p {
+  margin-top: 8px; font-size: 16px; color: #8B7355;
 }
-.bear-panel img {
-  max-width: 90%; max-height: 60%; object-fit: contain; border-radius: 16px;
+.grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px; max-width: 1000px; margin: 0 auto;
 }
-.bear-sign-text {
-  margin-top: 12px; font-size: 22px; font-weight: 700; color: #5B4A3F;
-  text-align: center; line-height: 1.4;
+.card {
+  background: rgba(255,255,255,0.85); border-radius: 20px;
+  padding: 28px 24px; text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 2px solid transparent;
+  transition: all 0.3s;
+  position: relative; overflow: hidden;
 }
-.bear-note-name {
-  font-size: 52px; font-weight: 800; margin-top: 4px;
+.card.active {
+  border-color: #FF9F43;
+  cursor: pointer;
 }
-
-/* Control panel */
-.control-panel {
-  flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px;
+.card.active:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(255,159,67,0.2);
 }
-.instruction {
-  background: rgba(255,255,255,0.8); border-radius: 16px;
-  padding: 12px 18px; text-align: center;
-  font-size: 20px; color: #5B4A3F; line-height: 1.5;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+.card.locked {
+  opacity: 0.7;
 }
-
-.bells-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-.bell-btn {
-  width: 90px; height: 90px; border-radius: 50%; border: none;
-  cursor: pointer; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  font-weight: 700; color: white;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-  transition: transform 0.12s;
-  -webkit-tap-highlight-color: transparent; user-select: none;
+.card-icon {
+  font-size: 48px; margin-bottom: 12px;
 }
-.bell-btn:active, .bell-btn.pressed { transform: scale(0.85) !important; }
-.bell-btn .bn { font-size: 24px; }
-.bell-btn .bl { font-size: 13px; opacity: 0.9; }
-.bell-btn.b-do { background: linear-gradient(135deg, #FF8A80, #E53935); }
-.bell-btn.b-re { background: linear-gradient(135deg, #FFD180, #F57C00); }
-.bell-btn.b-mi { background: linear-gradient(135deg, #FFF59D, #F9A825); color: #5B4A3F; }
-.bell-btn.b-sol { background: linear-gradient(135deg, #A5D6A7, #2E7D32); }
-.bell-btn.b-la { background: linear-gradient(135deg, #90CAF9, #1565C0); }
-
-.bell-btn.glow {
-  animation: glow 1s ease-in-out infinite;
-  box-shadow: 0 0 24px rgba(255,200,0,0.8), 0 4px 14px rgba(0,0,0,0.15);
+.card-title {
+  font-size: 18px; font-weight: 700; color: #5B4A3F;
+  margin-bottom: 8px;
 }
-@keyframes glow { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-.bell-btn:disabled { opacity: 0.25; animation: none !important; cursor: default; }
-
-.feedback {
-  min-height: 40px; padding: 8px 14px; border-radius: 12px;
-  font-size: 18px; font-weight: 600; text-align: center;
-  display: flex; align-items: center; justify-content: center;
+.card-status {
+  display: inline-block; padding: 4px 12px; border-radius: 20px;
+  font-size: 13px; font-weight: 600;
 }
-.feedback.correct { background: rgba(200,240,200,0.8); color: #2E7D32; }
-.feedback.wrong { background: rgba(255,240,220,0.8); color: #E65100; }
-.feedback.info { background: rgba(220,235,255,0.8); color: #1565C0; }
-
-.stars { display: flex; gap: 6px; justify-content: center; }
-.star { font-size: 28px; opacity: 0.2; transition: all 0.3s; }
-.star.earned { opacity: 1; transform: scale(1.2); }
-
-.action-btn {
-  padding: 12px 28px; border-radius: 28px; border: none;
-  background: linear-gradient(135deg, #FF9F43, #FF6B6B); color: white;
-  font-size: 17px; font-weight: 600; cursor: pointer; align-self: center;
-  box-shadow: 0 4px 14px rgba(255,107,107,0.3);
+.card-status.online {
+  background: linear-gradient(135deg, #66BB6A, #43A047);
+  color: white;
 }
-.action-btn:active { transform: scale(0.95); }
-.action-btn:disabled { opacity: 0.3; }
-
-.record-display {
-  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
-  padding: 10px; background: rgba(255,255,255,0.5); border-radius: 14px; min-height: 50px;
+.card-status.dev {
+  background: #E0E0E0; color: #999;
 }
-.record-dot {
-  width: 32px; height: 32px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; color: white; font-weight: 600;
-  animation: pop 0.2s ease-out;
+.card .badge {
+  position: absolute; top: 12px; right: 12px;
+  background: #FF9F43; color: white;
+  font-size: 11px; font-weight: 700;
+  padding: 3px 8px; border-radius: 10px;
 }
-@keyframes pop { 0%{transform:scale(0)} 100%{transform:scale(1)} }
-
-.completion { text-align:center; padding:20px; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-.completion h2 { font-size:32px; color:#5B4A3F; margin:12px 0; }
-.completion p { font-size:18px; color:#8B7355; }
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <h1>⭐ 星星乐 · 五声音阶互动 ⭐</h1>
-  <div class="progress">
-    <div class="pdot active" id="p1">1</div><div class="pline" id="pl1"></div>
-    <div class="pdot" id="p2">2</div><div class="pline" id="pl2"></div>
-    <div class="pdot" id="p3">3</div>
+<div class="header">
+  <h1>⭐ 星星乐 · 个性化特殊教育应用库 ⭐</h1>
+  <p>面向特殊儿童的音乐感知与互动训练应用</p>
+</div>
+
+<div class="grid">
+  <div class="card active" onclick="window.location.href='game.html'">
+    <div class="badge">可体验</div>
+    <div class="card-icon">🎹</div>
+    <div class="card-title">星星乐 · 五声音阶互动</div>
+    <span class="card-status online">已上线</span>
+  </div>
+  <div class="card locked">
+    <div class="card-icon">🥁</div>
+    <div class="card-title">节奏跟打 · 虫儿飞</div>
+    <span class="card-status dev">开发中</span>
+  </div>
+  <div class="card locked">
+    <div class="card-icon">🎚️</div>
+    <div class="card-title">力度感知 · 轻重游戏</div>
+    <span class="card-status dev">开发中</span>
+  </div>
+  <div class="card locked">
+    <div class="card-icon">⏱️</div>
+    <div class="card-title">速度辨听 · 快慢挑战</div>
+    <span class="card-status dev">开发中</span>
+  </div>
+  <div class="card locked">
+    <div class="card-icon">🎻</div>
+    <div class="card-title">音色辨辨看 · 中西乐器</div>
+    <span class="card-status dev">开发中</span>
   </div>
 </div>
 
-<div class="main" id="mainArea"></div>
-
-<script>
-let audioCtx = null;
-function ensureAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-}
-
-const NOTES = [
-  { name:'do', label:'宫', freq:523.25, btnCls:'b-do', color:'#E53935', sign:'握拳', img:'bear-do.png' },
-  { name:'re', label:'商', freq:587.33, btnCls:'b-re', color:'#F57C00', sign:'两指微伸', img:'bear-re.png' },
-  { name:'mi', label:'角', freq:659.25, btnCls:'b-mi', color:'#F9A825', sign:'三指张开', img:'bear-mi.png' },
-  { name:'sol', label:'徵', freq:783.99, btnCls:'b-sol', color:'#2E7D32', sign:'手臂打开·五指并拢', img:'bear-sol.png' },
-  { name:'la', label:'羽', freq:880.00, btnCls:'b-la', color:'#1565C0', sign:'五指完全张开', img:'bear-la.png' },
-];
-
-function playNote(idx, dur=0.5) {
-  ensureAudio();
-  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-  o.type = 'triangle'; o.frequency.value = NOTES[idx].freq;
-  g.gain.setValueAtTime(0.45, audioCtx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start(); o.stop(audioCtx.currentTime + dur + 0.05);
-}
-
-let step=1, s1idx=0, s2target=-1, s2round=0, freeRec=[], streak=0, hintOn=true;
-
-function updateProg() {
-  for(let i=1;i<=3;i++){
-    document.getElementById('p'+i).className='pdot'+(i<step?' done':i===step?' active':'');
-    if(i>1) document.getElementById('pl'+(i-1)).className='pline'+(i<=step?' done':'');
-  }
-}
-function goStep(n){step=n;render();}
-function render(){updateProg();const a=document.getElementById('mainArea');
-  if(step===1)renderS1(a);else if(step===2)renderS2(a);else if(step===3)renderS3(a);else renderDone(a);}
-
-function showFB(id,msg,t){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.className='feedback '+(t||'');}
-function animP(id){const e=document.getElementById(id);if(!e)return;e.classList.add('pressed');setTimeout(()=>e.classList.remove('pressed'),150);}
-function adjust(){if(streak>=4)hintOn=false;else if(streak<=0)hintOn=true;}
-
-// ===== Step 1: 认音 =====
-function renderS1(a){
-  const n=NOTES[0];
-  a.innerHTML=`
-    <div class="bear-panel" id="bearP">
-      <img src="${n.img}" id="bearImg" alt="小熊做动作">
-      <div class="bear-sign-text" id="bearTxt">${n.sign}</div>
-      <div class="bear-note-name" id="bearName" style="color:${n.color}">${n.name}</div>
-    </div>
-    <div class="control-panel">
-      <div class="instruction">👆 按任意一个音，看小熊跟着做动作</div>
-      <div class="bells-row" id="br1"></div>
-      <div class="feedback info" id="fb1">按按看！每个音都有不同的动作</div>
-      <div class="stars" id="st1">${'<span class="star">⭐</span>'.repeat(5)}</div>
-      <button class="action-btn" id="nb1">下一步 →</button>
-    </div>`;
-  document.getElementById('nb1').onclick=()=>goStep(2);
-  makeBells('br1',pressS1,-1);
-}
-let s1visited=new Set();
-function pressS1(idx){
-  ensureAudio();playNote(idx);animP('br1_'+idx);
-  // Show this note's bear
-  const n=NOTES[idx];
-  document.getElementById('bearImg').src=n.img;
-  document.getElementById('bearTxt').textContent=n.sign;
-  document.getElementById('bearName').style.color=n.color;
-  document.getElementById('bearName').textContent=n.name;
-  showFB('fb1','🎵 '+n.name+' — '+n.label+'！跟小熊一起做','correct');
-  s1visited.add(idx);
-  const ss=document.querySelectorAll('#st1 .star');
-  if(s1visited.size<=ss.length) ss[s1visited.size-1].classList.add('earned');
-}
-
-// ===== Step 2: 听音（1个音+熊动作提示） =====
-function renderS2(a){
-  s2round=0;
-  a.innerHTML=`
-    <div class="bear-panel" id="bearP2">
-      <div style="font-size:64px;opacity:0.3">🐻</div>
-      <div class="bear-sign-text" id="bt2">准备听音...</div>
-    </div>
-    <div class="control-panel">
-      <div class="instruction">👂 听一个音，看小熊的动作，找到它！</div>
-      <div class="bells-row" id="br2"></div>
-      <div class="feedback info" id="fb2">准备好了...</div>
-      <div class="stars" id="st2">${'<span class="star">⭐</span>'.repeat(5)}</div>
-      <button class="action-btn" id="rb2">🔊 再听一次</button>
-    </div>`;
-  document.getElementById('rb2').onclick=playS2;
-  makeBells('br2',pressS2,-1);
-  setBellsDisabled('br2',true);
-  setTimeout(playS2,600);
-}
-function playS2(){
-  s2target=Math.floor(Math.random()*5);
-  setBellsDisabled('br2',true);setGlow('br2',-1);
-  showFB('fb2','🎵 听...','info');
-  const bp=document.getElementById('bearP2');
-  bp.innerHTML='<div style="font-size:64px;opacity:0.3">🐻</div><div class="bear-sign-text" id="bt2">听...</div>';
-  setTimeout(()=>{
-    playNote(s2target,0.6);
-    setTimeout(()=>{
-      const n=NOTES[s2target];
-      bp.innerHTML=`<img src="${n.img}" style="max-width:90%;max-height:60%;object-fit:contain;border-radius:16px;">
-        <div class="bear-sign-text" id="bt2">${hintOn?n.sign:'哪个音？'}</div>`;
-      setBellsDisabled('br2',false);
-      showFB('fb2',hintOn?'看小熊的动作，找到这个音！':'按按看！','info');
-    },700);
-  },300);
-}
-function pressS2(idx){
-  playNote(idx);animP('br2_'+idx);
-  if(idx===s2target){
-    streak++;s2round++;
-    showFB('fb2','✅ 对了！'+NOTES[idx].name+'（'+NOTES[idx].label+'）','correct');
-    const ss=document.querySelectorAll('#st2 .star');if(s2round<=ss.length)ss[s2round-1].classList.add('earned');
-    if(s2round>=5){showFB('fb2','🌟 太厉害了！进入自由创作！','correct');setBellsDisabled('br2',true);setTimeout(()=>goStep(3),1500);}
-    else{setBellsDisabled('br2',true);setTimeout(playS2,1200);}
-  } else {
-    streak=0;showFB('fb2','这是 '+NOTES[idx].name+'，再听一次','wrong');
-    setBellsDisabled('br2',true);setTimeout(playS2,1500);
-  }
-  adjust();
-}
-
-// ===== Step 3: 自由按奏 =====
-function renderS3(a){
-  freeRec=[];
-  a.innerHTML=`
-    <div class="bear-panel">
-      <img src="bear-mi.png" style="max-width:80%;max-height:50%;object-fit:contain;border-radius:16px;opacity:0.6;">
-      <div class="bear-sign-text">🎨 自由创作时间！</div>
-    </div>
-    <div class="control-panel">
-      <div class="instruction">🎨 随便按，创作你自己的音乐！</div>
-      <div class="record-display" id="rec3"></div>
-      <div class="bells-row" id="br3"></div>
-      <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;">
-        <button class="action-btn" id="pb3" disabled>▶️ 播放</button>
-        <button class="action-btn" id="cb3" style="background:linear-gradient(135deg,#90CAF9,#42A5F5)">🔄 重来</button>
-      </div>
-      <button class="action-btn" id="db3" style="background:linear-gradient(135deg,#7BC67E,#43A047);margin-top:8px;">🎉 完成！</button>
-    </div>`;
-  document.getElementById('pb3').onclick=()=>{if(freeRec.length)freeRec.forEach((n,i)=>setTimeout(()=>playNote(n,0.38),i*380));};
-  document.getElementById('cb3').onclick=()=>{freeRec=[];document.getElementById('rec3').innerHTML='';document.getElementById('pb3').disabled=true;};
-  document.getElementById('db3').onclick=()=>goStep(4);
-  makeBells('br3',pressS3,-1);
-}
-function pressS3(idx){
-  playNote(idx);animP('br3_'+idx);freeRec.push(idx);
-  const d=document.createElement('div');d.className='record-dot';d.style.background=NOTES[idx].color;d.textContent=NOTES[idx].name;
-  document.getElementById('rec3').appendChild(d);
-  document.getElementById('pb3').disabled=false;
-}
-
-// Done
-function renderDone(a){
-  a.innerHTML=`<div class="completion"><div style="font-size:72px">🌟</div><h2>太棒了！</h2><p>今天的音乐之旅完成啦！<br>下次再来玩 🎵</p><button class="action-btn" style="margin-top:20px" onclick="step=1;streak=0;hintOn=true;s2round=0;render();">🔄 再玩一次</button></div>`;
-}
-
-// Shared
-function makeBells(cid,onClick,glowIdx){
-  const c=document.getElementById(cid);
-  NOTES.forEach((n,i)=>{
-    const b=document.createElement('button');
-    b.className='bell-btn '+n.btnCls+(i===glowIdx?' glow':'');
-    b.id=cid+'_'+i;
-    b.innerHTML=`<span class="bn">${n.name}</span><span class="bl">${n.label}</span>`;
-    b.addEventListener('touchstart',e=>{e.preventDefault();onClick(i);},{passive:false});
-    b.addEventListener('mousedown',e=>{e.preventDefault();onClick(i);});
-    c.appendChild(b);
-  });
-}
-function setGlow(cid,idx){NOTES.forEach((_,i)=>{const e=document.getElementById(cid+'_'+i);if(e)e.classList.toggle('glow',i===idx);});}
-function setBellsDisabled(cid,d){NOTES.forEach((_,i)=>{const e=document.getElementById(cid+'_'+i);if(e){e.disabled=d;e.style.pointerEvents=d?'none':'auto';}});}
-
-render();
-</script>
 </body>
 </html>
