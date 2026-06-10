@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鲁璐 · 箜篌艺术</title>
+<style>
+  :root {
+    --gold: #B8860B;
+    --gold-light: #DAA520;
+    --gold-pale: #F5E6C8;
+    --ink: #1a1a1a;
+    --ink-light: #333;
+    --paper: #FEFDF8;
+    --paper-warm: #FBF7EF;
+    --muted: #8A7E6C;
+    --border-soft: rgba(184, 134, 11, 0.2);
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== Header / Hero ===== */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(160deg, #2c2418 0%, #1a1612 40%, #0d0b09 100%);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 90%;
+    height: 200%;
+    background: radial-gradient(ellipse, rgba(184,134,11,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    padding: 60px 48px;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  .avatar-wrap {
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .avatar {
+    width: 340px;
+    height: 460px;
+    object-fit: cover;
+    object-position: center 20%;
+    border-radius: 4px;
+    filter: grayscale(10%);
+    transition: filter 0.6s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0 80px rgba(184,134,11,0.08);
+  }
+
+  .avatar:hover { filter: grayscale(0%); }
+
+  .avatar-frame {
+    position: absolute;
+    inset: -12px;
+    border: 1px solid rgba(218,165,32,0.25);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+  .avatar-frame::before {
+    content: '';
+    position: absolute;
+    top: -6px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+  }
+
+  .hero-text {
+    flex: 1;
+  }
+
+  .hero-label {
+    font-size: 13px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 16px;
+    opacity: 0.85;
+  }
+
+  .hero-name {
+    font-size: 56px;
+    font-weight: 200;
+    color: #fff;
+    letter-spacing: 14px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .hero-title {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 300;
+    letter-spacing: 2px;
+    margin-bottom: 36px;
+  }
+
+  /* Three key lines */
+  .key-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .key-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: 15px;
+    color: rgba(255,255,255,0.78);
+    line-height: 1.75;
+    font-weight: 300;
+    animation: fadeInUp 0.8s ease forwards;
+    opacity: 0;
+  }
+  .key-line:nth-child(1) { animation-delay: 0.3s; }
+  .key-line:nth-child(2) { animation-delay: 0.5s; }
+  .key-line:nth-child(3) { animation-delay: 0.7s; }
+
+  .key-num {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: #111;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 3px;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Scroll indicator ===== */
+  .scroll-hint {
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.3);
+    font-size: 11px;
+    letter-spacing: 3px;
+    animation: bounce 2s ease infinite;
+  }
+  .scroll-hint svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%     { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ===== Sections ===== */
+  .main-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 28px 120px;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .section-header h2 {
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 8px;
+    color: var(--ink);
+    position: relative;
+    display: inline-block;
+  }
+  .section-header h2::after {
+    content: '';
+    display: block;
+    width: 36px; height: 1px;
+    background: var(--gold);
+    margin: 14px auto 0;
+  }
+
+  /* ===== Accordion ===== */
+  .accordion { display: flex; flex-direction: column; gap: 12px; }
+
+  .acc-item {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .acc-item:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+  .acc-item.open { box-shadow: var(--shadow-lg); }
+
+  .acc-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 28px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.25s;
+    gap: 16px;
+  }
+  .acc-head:hover { background: var(--paper-warm); }
+
+  .acc-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .acc-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .acc-icon.icon-art   { background: linear-gradient(135deg,#fef3e2,#fde4c8); }
+  .acc-icon.icon-stage { background: linear-gradient(135deg,#e8f0fe,#d2e3fc); }
+  .acc-icon.icon-museum{ background: linear-gradient(135deg,#e6f4ea,#ccebd6); }
+  .acc-icon.icon-edu  { background: linear-gradient(135deg,#fce4ec,#f8bbd9); }
+  .acc-icon.icon-honor{ background: linear-gradient(135deg,#fff8e1,#ffecb3); }
+
+  .acc-title {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: 1px;
+  }
+  .acc-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .acc-arrow {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--paper-warm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.35s cubic-bezier(.4,0,.2,1), background 0.25s;
+  }
+  .acc-item.open .acc-arrow {
+    transform: rotate(180deg);
+    background: var(--gold-pale);
+  }
+  .acc-arrow svg {
+    width: 14px; height: 14px;
+    fill: var(--muted);
+    transition: fill 0.25s;
+  }
+  .acc-item.open .acc-arrow svg { fill: var(--gold); }
+
+  /* Content area */
+  .acc-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(.4,0,.2,1),
+                padding 0.45s ease,
+                opacity 0.35s ease;
+    opacity: 0;
+  }
+  .acc-body-inner {
+    padding: 0 28px 28px;
+    border-top: 1px solid var(--border-soft);
+    padding-top: 22px;
+  }
+
+  .acc-item.open .acc-body {
+    opacity: 1;
+  }
+
+  .acc-body p {
+    font-size: 14.5px;
+    color: var(--ink-light);
+    line-height: 2;
+    margin-bottom: 12px;
+    text-align: justify;
+  }
+  .acc-body p:last-child { margin-bottom: 0; }
+
+  .acc-img-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .acc-img-row img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 6px;
+    transition: transform 0.3s ease, opacity 0.3s;
+    opacity: 0.92;
+  }
+  .acc-img-row img:hover {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+
+  /* Tag list */
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .tag {
+    font-size: 12px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    background: var(--paper-warm);
+    color: var(--ink-light);
+    border: 1px solid var(--border-soft);
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    text-align: center;
+    padding: 48px 28px;
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 1px;
+    border-top: 1px solid var(--border-soft);
+    background: var(--paper-warm);
+  }
+  footer span { color: var(--gold); }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 768px) {
+    .hero-inner {
+      flex-direction: column;
+      text-align: center;
+      padding: 40px 24px;
+      gap: 36px;
+    }
+    .avatar { width: 260px; height: 350px; }
+    .hero-name { font-size: 40px; letter-spacing: 8px; }
+    .key-lines { align-items: center; }
+    .key-line { font-size: 14px; }
+    .acc-head { padding: 18px 20px; }
+    .acc-body-inner { padding: 0 20px 20px; padding-top: 18px; }
+    .main-content { padding: 52px 20px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== Hero ========== -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="avatar-wrap">
+      <img class="avatar" src="lulu_imgs/image1.jpeg" alt="鲁璐">
+      <div class="avatar-frame"></div>
+    </div>
+    <div class="hero-text">
+      <p class="hero-label">Konghou Artist</p>
+      <h1 class="hero-name">鲁 璐</h1>
+      <p class="hero-title">箜篌演奏家 &middot; 国家一级演奏员</p>
+      <div class="key-lines">
+        <div class="key-line"><span class="key-num">1</span><span>国家一级演奏员，国家"万人计划"青年拔尖人才，箜篌艺术当代传承与创新的代表性人物</span></div>
+        <div class="key-line"><span class="key-num">2</span><span>亮相国事舞台——曾在 APEC 峰会、建国70周年阅兵彩车、联合国文明对话等重大场合奏响中国声音</span></div>
+        <div class="key-line"><span class="key-num">3</span><span>构建非遗新范式——创建全国首个箜篌博物馆，培养全国师资逾千人，推动古乐箜篌在新时代创造性复兴</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    <span>EXPLORE</span>
+  </div>
+</section>
+
+<!-- ========== Main Content ========== -->
+<main class="main-content">
+
+  <div class="section-header">
+    <h2>详 细 简 历</h2>
+  </div>
+
+  <div class="accordion">
+
+    <!-- Item 1: 艺术身份 -->
+    <div class="acc-item open">
+      <div class="acc-head" onclick="toggleAcc(this)">
+        <div class="acc-title-wrap">
+          <div class="acc-icon icon-art">&#127926;</div>
+          <div>
+            <div class="acc-title">艺术身份与学术地位</div>
+            <div class="acc-subtitle">Identity &amp; Academia</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></div>
+      </div>
+      <div class="acc-body" style="max-height:800px;">
+        <div class="acc-body-inner">
+          <p>鲁璐，河南师范大学教授、硕士研究生导师，国家一级演奏员，入选国家"万人计划"青年拔尖人才。作为中国当代箜篌艺术的领军人物之一，她长期致力于这一古老乐器的抢救性挖掘、学术研究与实践创新。</p>
+          <p>她以演奏家身份活跃于国内外舞台，同时深耕学术领域，在音乐学、民族器乐研究等方面发表多项成果。其艺术实践横跨舞台表演、博物馆建设、教育体系构建及文化产业推进等多个维度，形成了独具特色的"四位一体"发展路径。</p>
+          <div class="tag-list">
+            <span class="tag">国家一级演奏员</span>
+            <span class="tag">万人计划青年拔尖人才</span>
+            <span class="tag">河南师范大学教授</span>
+            <span class="tag">硕士研究生导师</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 2: 国事演出 -->
+    <div class="acc-item">
+      <div class="acc-head" onclick="toggleAcc(this)">
+        <div class="acc-title-wrap">
+          <div class="acc-icon icon-stage">&#127900;</div>
+          <div>
+            <div class="acc-title">国事舞台与重要演出</div>
+            <div class="acc-subtitle">State Performances</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></div>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          <p>鲁璐多次代表中国参与重大国事活动及国际文化交流演出。2014年APEC峰会期间，她在水立方为各国领导人配偶献演箜篌，将这件沉寂千年的乐器重新带回世界舞台的聚光灯下。</p>
+          <p>2019年国庆70周年庆典中，她作为文化界代表登上群众游行彩车，接受党和国家领导人检阅，成为箜篌艺术走向国家级荣誉殿堂的重要标志。</p>
+          <p>此外，她还曾在联合国文明对话大会、中非合作论坛等国际场合进行专场演出，并多次赴海外举办音乐会和讲座，向世界讲述箜篌背后的中华文明故事。</p>
+          <div class="acc-img-row">
+            <img src="lulu_imgs/image2.jpeg" alt="APEC活动合影">
+            <img src="lulu_imgs/image3.png" alt="活动现场">
+            <img src="lulu_imgs/image4.jpeg" alt="赠琴仪式">
+          </div>
+          <div class="tag-list">
+            <span class="tag">APEC峰会演出</span>
+            <span class="tag">建国70周年阅兵彩车</span>
+            <span class="tag">联合国文明对话</span>
+            <span class="tag">中非论坛赠琴</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 3: 博物馆 -->
+    <div class="acc-item">
+      <div class="acc-head" onclick="toggleAcc(this)">
+        <div class="acc-title-wrap">
+          <div class="acc-icon icon-museum">&#127964;</div>
+          <div>
+            <div class="acc-title">创建箜篌博物馆</div>
+            <div class="acc-subtitle">Museum &amp; Heritage</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></div>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          <p>鲁璐主导创建了<strong>全国首个箜篌专题博物馆</strong>，填补了国内该领域的空白。博物馆系统收藏了历代箜篌实物、文献资料、乐谱手稿等珍贵文物，通过数字化展示与传统陈列相结合的方式，全面呈现了箜篌从汉代兴起至近代复兴的完整历史脉络。</p>
+          <p>博物馆不仅是一座静态的文化场馆，更是集保护、展示、研究、教育于一体的综合性平台。在她的推动下，博物馆定期举办公益体验课、非遗进校园等活动，让更多公众尤其是青少年有机会近距离接触和了解这一古老乐器。</p>
+          <div class="tag-list">
+            <span class="tag">全国首个箜篌博物馆</span>
+            <span class="tag">非遗保护</span>
+            <span class="tag">数字化展示</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 4: 教育传承 -->
+    <div class="acc-item">
+      <div class="acc-head" onclick="toggleAcc(this)">
+        <div class="acc-title-wrap">
+          <div class="acc-icon icon-edu">&#127891;</div>
+          <div>
+            <div class="acc-title">教育传承与人才培养</div>
+            <div class="acc-subtitle">Education &amp; Legacy</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></div>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          <p>在教育领域，鲁璐开创性地构建了系统化的箜篌师资培训体系。截至目前，已累计培养来自全国各地的专业师资逾千人，这些学员遍布各省市院校、文化馆站和培训机构，形成了一张覆盖全国的箜篌教学网络。</p>
+          <p>她还主持编写了多部箜篌教程教材，规范了从入门到高级的教学标准，为这门古老技艺的现代教学奠定了理论基础。同时，她积极推动箜篌进入高校专业课程设置和中小学美育课堂，拓展了传统音乐的受众面和传承渠道。</p>
+          <div class="tag-list">
+            <span class="tag">师资培训逾千人</span>
+            <span class="tag">教材编写</span>
+            <span class="tag">高校课程建设</span>
+            <span class="tag">美育进校园</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 5: 荣誉成就 -->
+    <div class="acc-item">
+      <div class="acc-head" onclick="toggleAcc(this)">
+        <div class="acc-title-wrap">
+          <div class="acc-icon icon-honor">&#127942;</div>
+          <div>
+            <div class="acc-title">主要荣誉与社会影响</div>
+            <div class="acc-subtitle">Honors &amp; Impact</div>
+          </div>
+        </div>
+        <div class="acc-arrow"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></div>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          <p>凭借在箜篌艺术领域的突出贡献，鲁璐先后获得多项国家和省部级荣誉称号及奖项，包括国家高层次人才特殊支持计划（"万人计划"）青年拔尖人才、省级学术技术带头人等。</p>
+          <p>她的艺术实践被新华社、中央电视台、《人民日报》等主流媒体广泛报道，被誉为"让千年古乐重获新生的使者"。在社会影响力方面，她积极运用新媒体平台传播箜篌文化，全网相关内容播放量数以亿计，有效提升了公众对这一非遗项目的认知度和认同感。</p>
+          <div class="tag-list">
+            <span class="tag">万人计划青年拔尖人才</span>
+            <span class="tag">央视报道</span>
+            <span class="tag">新华社专访</span>
+            <span class="tag">人民日报报道</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.accordion -->
+
+</main>
+
+<!-- ========== Footer ========== -->
+<footer>
+  <p>&copy; 2026 鲁璐 · 箜篌艺术 &mdash; <span>Konghou Heritage</span></p>
+</footer>
+
+<script>
+function toggleAcc(head) {
+  const item = head.parentElement;
+  const body = item.querySelector('.acc-body');
+  const wasOpen = item.classList.contains('open');
+
+  // Close all
+  document.querySelectorAll('.acc-item.open').forEach(el => {
+    el.classList.remove('open');
+    el.querySelector('.acc-body').style.maxHeight = '0';
+  });
+
+  // Open clicked if it wasn't already
+  if (!wasOpen) {
+    item.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 80 + 'px';
+  }
+}
+
+// Open first by default
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.acc-item.open .acc-body').forEach(b => {
+    b.style.maxHeight = b.scrollHeight + 80 + 'px';
+  });
+});
+</script>
+
+</body>
+</html>
