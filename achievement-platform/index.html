@@ -48,16 +48,136 @@
         .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
         .nav-link { position: relative; }
-        .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: #e5b040; transition: width 0.3s; }
+        .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: var(--after-width, 0); height: 2px; background: #e5b040; transition: width 0.3s; }
         .nav-link:hover::after { width: 100%; }
+        .nav-link.text-gold-400::after { width: 100%; }
+
+        /* 鼠标追随·樂 */
+        #cursor-follow {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 2rem;
+            font-family: 'KaiTi', 'STKaiti', serif;
+            background: linear-gradient(135deg, #e5b040 0%, #faf0d4 40%, #d4982e 70%, #e5b040 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.35;
+            transition: transform 0.15s ease-out, opacity 0.3s ease;
+            animation: cursor-shimmer 3s linear infinite;
+            transform: translate(-50%, -50%) rotate(-8deg);
+            text-shadow: 0 0 20px rgba(229, 176, 64, 0.3);
+            filter: blur(0.3px);
+        }
+        @keyframes cursor-shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
         .framework-core { animation: pulse-soft 3s ease-in-out infinite; }
         @keyframes pulse-soft { 0%, 100% { box-shadow: 0 0 20px rgba(229,176,64,0.3); } 50% { box-shadow: 0 0 40px rgba(229,176,64,0.5); } }
+
+        /* Glassmorphism */
+        .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.12); }
+        .glass-light { background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
+
+        /* 流光装饰动画 */
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(3deg); } }
+        @keyframes glow-drift { 0% { transform: translate(0, 0); opacity: 0.2; } 50% { transform: translate(30px, -20px); opacity: 0.35; } 100% { transform: translate(0, 0); opacity: 0.2; } }
+        @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes float-slow { 0%, 100% { transform: translateY(0) translateX(0); } 25% { transform: translateY(-15px) translateX(10px); } 50% { transform: translateY(-5px) translateX(-8px); } 75% { transform: translateY(-20px) translateX(5px); } }
+        @keyframes drift-left { 0%, 100% { transform: translateX(0) translateY(0); opacity: 0.15; } 50% { transform: translateX(-40px) translateY(-15px); opacity: 0.25; } }
+        @keyframes drift-right { 0%, 100% { transform: translateX(0) translateY(0); opacity: 0.12; } 50% { transform: translateX(35px) translateY(-20px); opacity: 0.28; } }
+        @keyframes note-float { 0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.2; } 33% { transform: translateY(-25px) rotate(5deg); opacity: 0.3; } 66% { transform: translateY(-10px) rotate(-3deg); opacity: 0.15; } }
+
+        .glow-orb { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
+        .shimmer-line { height: 2px; background: linear-gradient(90deg, transparent, rgba(229,176,64,0.4), rgba(139,92,246,0.3), transparent); background-size: 200% 100%; animation: shimmer 4s linear infinite; }
+        .floating-note { position: absolute; pointer-events: none; font-size: 1.2rem; opacity: 0.2; animation: note-float 6s ease-in-out infinite; }
+
+        /* 视频样式 */
+        .video-card { border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); transition: transform 0.3s ease, border-color 0.3s ease; }
+        .video-card:hover { transform: scale(1.03); border-color: rgba(229,176,64,0.5); }
+        .video-card video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* 标题渐变光泽 */
+        .title-gradient { background: linear-gradient(135deg, #ffffff 0%, #e5b040 50%, #ffffff 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 5s linear infinite; }
+
+        /* 团队成员卡片 */
+        .member-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .member-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+
+        /* 成员姓名链接 */
+        .member-name-link { color: inherit; text-decoration: none; transition: color 0.2s, text-decoration 0.2s; }
+        .member-name-link:hover { color: #3d5faf; text-decoration: underline; }
+
+        /* 5视频布局 */
+        .video-layout-5 {
+            display: grid;
+            grid-template-columns: 32fr 35fr 32fr;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        .video-side-stack { display: flex; flex-direction: column; gap: 0.75rem; }
+        .video-center-main { }
+        @media (max-width: 1023px) {
+            .video-layout-5 {
+                grid-template-columns: 1fr;
+            }
+            .video-side-stack {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+        }
+
+        /* AI工具卡片渐变边框 */
+        .ai-tool-card { position: relative; border-radius: 1rem; overflow: hidden; transition: transform 0.3s ease; }
+        .ai-tool-card:hover { transform: scale(1.03); }
+        .ai-tool-card::before { content: ''; position: absolute; inset: 0; border-radius: 1rem; padding: 2px; background: var(--card-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+
+        /* AI助手浮动按钮 */
+        @keyframes ai-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes ai-glow-pulse { 0%, 100% { box-shadow: 0 0 12px rgba(139,92,246,0.4); } 50% { box-shadow: 0 0 24px rgba(139,92,246,0.7); } }
+        .ai-fab { animation: ai-float 3s ease-in-out infinite, ai-glow-pulse 3s ease-in-out infinite; transition: transform 0.2s ease; }
+        .ai-fab:hover { transform: scale(1.1); }
+        .ai-chat-window { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,0.85); }
+
+        /* 横向循环滚动展示栏 */
+        .scroll-gallery {
+            background: linear-gradient(180deg, #f0f7ff 0%, #e8f4fd 100%);
+            overflow: hidden;
+            padding: 12px 0;
+        }
+        .scroll-track {
+            display: flex;
+            gap: 12px;
+            animation: scroll-left 60s linear infinite;
+            width: max-content;
+        }
+        .scroll-track:hover {
+            animation-play-state: paused;
+        }
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .scroll-track img {
+            height: 120px;
+            width: auto;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
+<!-- 鼠标追随的“樂” -->
+<div id="cursor-follow">樂</div>
 
-<!-- ========== 顶部导航栏 ========== -->
-<nav class="fixed top-0 left-0 right-0 z-50 bg-navy-950/95 backdrop-blur-md border-b border-navy-700/50">
+<!-- ========== 顶部导航栏（毛玻璃） ========== -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-navy-950/80 backdrop-blur-xl border-b border-navy-700/30">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <div class="flex-shrink-0">
@@ -66,6 +186,7 @@
             <!-- Desktop Nav -->
             <div class="hidden md:flex items-center space-x-6">
                 <a href="#overview" class="nav-link text-gray-200 hover:text-gold-400 text-sm font-medium transition-colors">成果总览</a>
+                <a href="#ai-tools" class="nav-link text-gray-200 hover:text-gold-400 text-sm font-medium transition-colors">AI工具</a>
                 <a href="#platforms" class="nav-link text-gray-200 hover:text-gold-400 text-sm font-medium transition-colors">核心平台</a>
                 <a href="#ai-resources" class="nav-link text-gray-200 hover:text-gold-400 text-sm font-medium transition-colors">AI应用</a>
                 <a href="#team" class="nav-link text-gray-200 hover:text-gold-400 text-sm font-medium transition-colors">团队成员</a>
@@ -82,36 +203,93 @@
         </div>
     </div>
     <!-- Mobile Nav -->
-    <div id="mobile-menu" class="hidden md:hidden bg-navy-950/98 border-t border-navy-700/50">
+    <div id="mobile-menu" class="hidden md:hidden bg-navy-950/95 backdrop-blur-xl border-t border-navy-700/30">
         <div class="px-4 py-3 space-y-2">
-            <a href="#overview" class="block text-gray-200 hover:text-gold-400 text-sm py-2">成果总览</a>
-            <a href="#platforms" class="block text-gray-200 hover:text-gold-400 text-sm py-2">核心平台</a>
-            <a href="#ai-resources" class="block text-gray-200 hover:text-gold-400 text-sm py-2">AI应用</a>
-            <a href="#team" class="block text-gray-200 hover:text-gold-400 text-sm py-2">团队成员</a>
-            <a href="#practice" class="block text-gray-200 hover:text-gold-400 text-sm py-2">教学实践</a>
-            <a href="#impact" class="block text-gray-200 hover:text-gold-400 text-sm py-2">推广成效</a>
-            <a href="#students" class="block text-gray-200 hover:text-gold-400 text-sm py-2">学生培养</a>
+            <a href="#overview" class="mobile-nav-link block text-gray-200 hover:text-gold-400 text-sm py-2">成果总览</a>
+            <a href="#ai-tools" class="mobile-nav-link block text-gray-200 hover:text-gold-400 text-sm py-2">AI工具</a>
+            <a href="#platforms" class="mobile-nav-link block text-gray-200 hover:text-gold-400 text-sm py-2">核心平台</a>
+            <a href="#ai-resources" class="mobile-nav-link block text-gray-200 hover:text-gold-400 text-sm py-2">AI应用</a>
+            <a href="#team" class="mobile-nav-link block text-gray-200 hover:text-gold-400 text-sm py-2">团队成员</a>
+            <a href="#practice" class="mobile-nav-link block text-gray-200 hover:text-gold-400 text-sm py-2">教学实践</a>
+            <a href="#impact" class="mobile-nav-link block text-gray-200 hover:text-gold-400 text-sm py-2">推广成效</a>
+            <a href="#students" class="mobile-nav-link block text-gray-200 hover:text-gold-400 text-sm py-2">学生培养</a>
         </div>
     </div>
 </nav>
 
 <!-- ========== 1. 首页/成果总览 ========== -->
-<section id="overview" class="gradient-bg pt-24 pb-20 min-h-screen flex items-center">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+<section id="overview" class="gradient-bg pt-24 pb-20 min-h-screen flex items-center relative overflow-hidden">
+    <!-- 流光背景光斑 -->
+    <div class="glow-orb w-96 h-96 bg-purple-500/20 top-10 -left-20" style="animation: drift-right 12s ease-in-out infinite;"></div>
+    <div class="glow-orb w-80 h-80 bg-gold-400/15 top-1/3 right-0" style="animation: drift-left 15s ease-in-out infinite;"></div>
+    <div class="glow-orb w-72 h-72 bg-blue-400/15 bottom-20 left-1/4" style="animation: glow-drift 10s ease-in-out infinite;"></div>
+    <div class="glow-orb w-64 h-64 bg-purple-400/10 bottom-10 right-1/4" style="animation: drift-right 18s ease-in-out infinite;"></div>
+    <div class="glow-orb w-48 h-48 bg-gold-300/12 top-1/2 left-1/2" style="animation: drift-left 14s ease-in-out infinite;"></div>
+
+    <!-- 漂浮音符装饰 -->
+    <span class="floating-note text-gold-400/30 top-32 left-[10%]" style="animation-delay: 0s; animation-duration: 7s;">♪</span>
+    <span class="floating-note text-purple-300/25 top-48 right-[15%]" style="animation-delay: 2s; animation-duration: 8s;">♫</span>
+    <span class="floating-note text-blue-300/20 bottom-32 left-[20%]" style="animation-delay: 1s; animation-duration: 9s;">♩</span>
+    <span class="floating-note text-gold-300/25 bottom-48 right-[25%]" style="animation-delay: 3s; animation-duration: 6s;">♬</span>
+    <span class="floating-note text-purple-200/20 top-[60%] left-[5%]" style="animation-delay: 4s; animation-duration: 10s;">♪</span>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
         <!-- 标题区 -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold title-gradient mb-4 leading-tight">
                 从时空解码到多模态创智
             </h1>
             <p class="text-xl sm:text-2xl text-navy-200 mb-6">
                 产教融合视域下研究生美育范式重构与实践
             </p>
             <div class="flex flex-wrap justify-center gap-3 mb-4">
-                <span class="px-4 py-1.5 bg-navy-700/60 border border-navy-500/40 rounded-full text-sm text-gold-300">艺术学-13</span>
-                <span class="px-4 py-1.5 bg-navy-700/60 border border-navy-500/40 rounded-full text-sm text-gold-300">强化AI运用-04</span>
-                <span class="px-4 py-1.5 bg-navy-700/60 border border-navy-500/40 rounded-full text-sm text-gold-300">研究生+本科贯通</span>
+                <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">艺术学</span>
+                <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">强化AI运用</span>
+                <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">研究生+本科贯通</span>
             </div>
-            <p class="text-navy-300 text-sm">成果实践时间：2024年1月 — 2026年3月</p>
+        </div>
+
+        <!-- 五个视频布局：左2小+中1大+右2小 -->
+        <div class="mb-14 relative">
+            <!-- 音频开关按钮 -->
+            <button id="audio-toggle" class="absolute top-3 right-3 z-20 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white text-lg transition-all cursor-pointer" title="切换音频">🔇</button>
+            <div class="video-layout-5 max-w-6xl mx-auto">
+                <!-- 左侧2个小视频 -->
+                <div class="video-side-stack">
+                    <div class="video-card aspect-video">
+                        <video autoplay muted loop playsinline>
+                            <source src="videos/video1.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="video-card aspect-video">
+                        <video autoplay muted loop playsinline>
+                            <source src="videos/video2.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+                <!-- 中间大视频 -->
+                <div class="video-center-main">
+                    <h2 class="text-lg sm:text-xl font-bold text-center mb-3" style="background: linear-gradient(135deg, #e5b040 0%, #faf0d4 40%, #e5b040 70%, #d4982e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">编钟礼乐 · 服务大国外交</h2>
+                    <div class="video-card aspect-video shadow-2xl shadow-gold-400/10" style="border-color: rgba(229,176,64,0.3);">
+                        <video id="main-video" autoplay loop playsinline>
+                            <source src="videos/video3.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+                <!-- 右侧2个小视频 -->
+                <div class="video-side-stack">
+                    <div class="video-card aspect-video">
+                        <video autoplay muted loop playsinline>
+                            <source src="videos/video4.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="video-card aspect-video">
+                        <video autoplay muted loop playsinline>
+                            <source src="videos/video5-vmus.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 一核双翼三阶 框架图 -->
@@ -121,7 +299,7 @@
                 <div class="flex items-center justify-center gap-4 sm:gap-8 mb-8">
                     <!-- 左翼 -->
                     <div class="flex flex-col items-center">
-                        <div class="w-32 sm:w-40 h-20 sm:h-24 bg-navy-700/50 border-2 border-blue-400/60 rounded-xl flex items-center justify-center text-center px-3">
+                        <div class="w-32 sm:w-40 h-20 sm:h-24 glass rounded-xl flex items-center justify-center text-center px-3 border-blue-400/30">
                             <div>
                                 <i data-lucide="building-2" class="w-5 h-5 text-blue-300 mx-auto mb-1"></i>
                                 <span class="text-blue-200 text-xs sm:text-sm font-medium">产教融合</span>
@@ -131,7 +309,7 @@
                     </div>
                     <!-- 核心 -->
                     <div class="flex flex-col items-center">
-                        <div class="framework-core w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-gold-500/30 to-gold-700/30 border-3 border-gold-400 flex items-center justify-center text-center">
+                        <div class="framework-core w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-gold-500/30 to-gold-700/30 border-2 border-gold-400 flex items-center justify-center text-center">
                             <div>
                                 <i data-lucide="heart" class="w-6 h-6 text-gold-400 mx-auto mb-1"></i>
                                 <span class="text-gold-300 text-sm sm:text-base font-bold">文化自信</span>
@@ -141,7 +319,7 @@
                     </div>
                     <!-- 右翼 -->
                     <div class="flex flex-col items-center">
-                        <div class="w-32 sm:w-40 h-20 sm:h-24 bg-navy-700/50 border-2 border-purple-400/60 rounded-xl flex items-center justify-center text-center px-3">
+                        <div class="w-32 sm:w-40 h-20 sm:h-24 glass rounded-xl flex items-center justify-center text-center px-3 border-purple-400/30">
                             <div>
                                 <i data-lucide="cpu" class="w-5 h-5 text-purple-300 mx-auto mb-1"></i>
                                 <span class="text-purple-200 text-xs sm:text-sm font-medium">数智赋能</span>
@@ -155,19 +333,19 @@
                 <!-- 三阶 -->
                 <div class="flex flex-wrap justify-center gap-3 sm:gap-6">
                     <div class="flex items-center gap-2 sm:gap-4">
-                        <div class="px-4 py-3 bg-navy-700/50 border border-emerald-400/50 rounded-lg text-center">
+                        <div class="px-4 py-3 glass rounded-lg text-center border-emerald-400/30">
                             <i data-lucide="eye" class="w-5 h-5 text-emerald-300 mx-auto mb-1"></i>
                             <span class="text-emerald-200 text-xs sm:text-sm font-medium block">沉浸感知</span>
                             <span class="text-navy-400 text-xs">第一阶</span>
                         </div>
                         <i data-lucide="arrow-right" class="w-5 h-5 text-navy-400 hidden sm:block"></i>
-                        <div class="px-4 py-3 bg-navy-700/50 border border-amber-400/50 rounded-lg text-center">
+                        <div class="px-4 py-3 glass rounded-lg text-center border-amber-400/30">
                             <i data-lucide="zap" class="w-5 h-5 text-amber-300 mx-auto mb-1"></i>
                             <span class="text-amber-200 text-xs sm:text-sm font-medium block">跨界创智</span>
                             <span class="text-navy-400 text-xs">第二阶</span>
                         </div>
                         <i data-lucide="arrow-right" class="w-5 h-5 text-navy-400 hidden sm:block"></i>
-                        <div class="px-4 py-3 bg-navy-700/50 border border-rose-400/50 rounded-lg text-center">
+                        <div class="px-4 py-3 glass rounded-lg text-center border-rose-400/30">
                             <i data-lucide="rocket" class="w-5 h-5 text-rose-300 mx-auto mb-1"></i>
                             <span class="text-rose-200 text-xs sm:text-sm font-medium block">真实转化</span>
                             <span class="text-navy-400 text-xs">第三阶</span>
@@ -179,27 +357,27 @@
 
         <!-- 核心数据条 -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl mx-auto">
-            <div class="text-center p-4 bg-navy-800/40 rounded-xl border border-navy-600/30">
+            <div class="text-center p-4 glass rounded-xl">
                 <div class="text-2xl sm:text-3xl font-bold text-gold-400">15</div>
                 <div class="text-navy-300 text-xs sm:text-sm mt-1">人团队</div>
             </div>
-            <div class="text-center p-4 bg-navy-800/40 rounded-xl border border-navy-600/30">
+            <div class="text-center p-4 glass rounded-xl">
                 <div class="text-2xl sm:text-3xl font-bold text-gold-400">5</div>
                 <div class="text-navy-300 text-xs sm:text-sm mt-1">所合作高校</div>
             </div>
-            <div class="text-center p-4 bg-navy-800/40 rounded-xl border border-navy-600/30">
+            <div class="text-center p-4 glass rounded-xl">
                 <div class="text-2xl sm:text-3xl font-bold text-gold-400">3</div>
                 <div class="text-navy-300 text-xs sm:text-sm mt-1">大平台</div>
             </div>
-            <div class="text-center p-4 bg-navy-800/40 rounded-xl border border-navy-600/30">
+            <div class="text-center p-4 glass rounded-xl">
                 <div class="text-2xl sm:text-3xl font-bold text-gold-400">7</div>
                 <div class="text-navy-300 text-xs sm:text-sm mt-1">所推广院校</div>
             </div>
-            <div class="text-center p-4 bg-navy-800/40 rounded-xl border border-navy-600/30">
+            <div class="text-center p-4 glass rounded-xl">
                 <div class="text-2xl sm:text-3xl font-bold text-gold-400">1.6万+</div>
                 <div class="text-navy-300 text-xs sm:text-sm mt-1">覆盖人次</div>
             </div>
-            <div class="text-center p-4 bg-navy-800/40 rounded-xl border border-navy-600/30">
+            <div class="text-center p-4 glass rounded-xl">
                 <div class="text-2xl sm:text-3xl font-bold text-gold-400">2年</div>
                 <div class="text-navy-300 text-xs sm:text-sm mt-1">实践检验</div>
             </div>
@@ -207,9 +385,244 @@
     </div>
 </section>
 
+<!-- 流光分隔线 -->
+<div class="shimmer-line w-full"></div>
+
+<!-- ========== AI赋能美育工具库 ========== -->
+<section id="ai-tools" class="py-20 bg-white relative overflow-hidden">
+    <span class="floating-note text-gold-300/15 top-16 left-[8%]" style="animation-delay: 0.5s; animation-duration: 9s;">✧</span>
+    <span class="floating-note text-purple-300/12 bottom-20 right-[6%]" style="animation-delay: 2s; animation-duration: 8s;">♫</span>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center mb-14">
+            <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">AI赋能美育工具库</h2>
+            <p class="text-gray-600 text-lg">人工智能驱动的美育教学全链条工具生态</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <!-- 1. 重磅首推 -->
+            <div class="ai-tool-card glass-light rounded-2xl p-6" style="--card-gradient: linear-gradient(135deg, #e5b040, #f4dfa8, #e5b040);">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-2xl">🌟</span>
+                    <h3 class="text-lg font-bold text-navy-900">重磅首推</h3>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">前沿AI大模型与创新平台，引领美育智能化教学变革</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="px-3 py-1 bg-gold-50 text-gold-800 text-xs rounded-full border border-gold-200">Gemini 3系列</span>
+                    <span class="px-3 py-1 bg-gold-50 text-gold-800 text-xs rounded-full border border-gold-200">Google AI Studio</span>
+                    <span class="px-3 py-1 bg-gold-50 text-gold-800 text-xs rounded-full border border-gold-200">NotebookLM</span>
+                    <span class="px-3 py-1 bg-gold-50 text-gold-800 text-xs rounded-full border border-gold-200">DeepSeek</span>
+                </div>
+                <button onclick="toggleToolList('tools-featured')" class="inline-flex items-center gap-1 text-gold-700 hover:text-gold-900 text-sm font-medium transition-colors">
+                    查看工具 <span id="tools-featured-arrow">→</span>
+                </button>
+                <div id="tools-featured" class="tool-expand-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease;">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-gold-200/50">
+                        <div class="p-3 bg-white/70 rounded-lg border border-gold-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">Gemini</h5>
+                            <p class="text-gray-500 text-xs mt-1">Google最新多模态AI，支持文本/图像/音频/视频理解与生成</p>
+                            <a href="https://gemini.google.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-gold-600 hover:text-gold-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-gold-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">DeepSeek</h5>
+                            <p class="text-gray-500 text-xs mt-1">国产开源大模型，擅长深度思考和复杂推理</p>
+                            <a href="https://chat.deepseek.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-gold-600 hover:text-gold-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-gold-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">NotebookLM</h5>
+                            <p class="text-gray-500 text-xs mt-1">Google AI笔记工具，自动总结和问答</p>
+                            <a href="https://notebooklm.google.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-gold-600 hover:text-gold-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-gold-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">豆包</h5>
+                            <p class="text-gray-500 text-xs mt-1">字节跳动AI助手，支持多模态创作</p>
+                            <a href="https://www.doubao.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-gold-600 hover:text-gold-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-gold-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">Kimi</h5>
+                            <p class="text-gray-500 text-xs mt-1">月之暗面长文本AI助手</p>
+                            <a href="https://kimi.moonshot.cn/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-gold-600 hover:text-gold-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-gold-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">通义千问</h5>
+                            <p class="text-gray-500 text-xs mt-1">阿里云大模型，支持文本/代码/图像</p>
+                            <a href="https://tongyi.aliyun.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-gold-600 hover:text-gold-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 艺术创作 -->
+            <div class="ai-tool-card glass-light rounded-2xl p-6" style="--card-gradient: linear-gradient(135deg, #8b5cf6, #c4b5fd, #8b5cf6);">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-2xl">🎨</span>
+                    <h3 class="text-lg font-bold text-navy-900">艺术创作</h3>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">AI驱动的多模态艺术创作工具，激发跨界创意表达</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="px-3 py-1 bg-purple-50 text-purple-800 text-xs rounded-full border border-purple-200">AI音乐创作</span>
+                    <span class="px-3 py-1 bg-purple-50 text-purple-800 text-xs rounded-full border border-purple-200">AI绘画生成</span>
+                    <span class="px-3 py-1 bg-purple-50 text-purple-800 text-xs rounded-full border border-purple-200">数字人</span>
+                    <span class="px-3 py-1 bg-purple-50 text-purple-800 text-xs rounded-full border border-purple-200">多媒体创作</span>
+                    <span class="px-3 py-1 bg-purple-50 text-purple-800 text-xs rounded-full border border-purple-200">智能编曲</span>
+                </div>
+                <button onclick="toggleToolList('tools-art')" class="inline-flex items-center gap-1 text-purple-700 hover:text-purple-900 text-sm font-medium transition-colors">
+                    查看工具 <span id="tools-art-arrow">→</span>
+                </button>
+                <div id="tools-art" class="tool-expand-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease;">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-purple-200/50">
+                        <div class="p-3 bg-white/70 rounded-lg border border-purple-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">Suno</h5>
+                            <p class="text-gray-500 text-xs mt-1">AI音乐创作平台，文字生成歌曲</p>
+                            <a href="https://suno.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-purple-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">可灵AI</h5>
+                            <p class="text-gray-500 text-xs mt-1">快手AI视频生成工具</p>
+                            <a href="https://klingai.kuaishou.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-purple-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">即梦AI</h5>
+                            <p class="text-gray-500 text-xs mt-1">字节跳动AI图像视频生成</p>
+                            <a href="https://jimeng.jianying.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-purple-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">Midjourney</h5>
+                            <p class="text-gray-500 text-xs mt-1">顶级AI绘画工具</p>
+                            <a href="https://www.midjourney.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-purple-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">网易天音</h5>
+                            <p class="text-gray-500 text-xs mt-1">网易AI音乐创作平台</p>
+                            <a href="https://tianyin.163.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-purple-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">堆友AI</h5>
+                            <p class="text-gray-500 text-xs mt-1">阿里AI设计创作平台</p>
+                            <a href="https://d.design/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 办公提效 -->
+            <div class="ai-tool-card glass-light rounded-2xl p-6" style="--card-gradient: linear-gradient(135deg, #3b82f6, #93c5fd, #3b82f6);">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-2xl">⚡</span>
+                    <h3 class="text-lg font-bold text-navy-900">办公提效</h3>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">智能化教学管理与学术生产力工具</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="px-3 py-1 bg-blue-50 text-blue-800 text-xs rounded-full border border-blue-200">多维表格助手</span>
+                    <span class="px-3 py-1 bg-blue-50 text-blue-800 text-xs rounded-full border border-blue-200">AI课件生成</span>
+                    <span class="px-3 py-1 bg-blue-50 text-blue-800 text-xs rounded-full border border-blue-200">知识库管理</span>
+                    <span class="px-3 py-1 bg-blue-50 text-blue-800 text-xs rounded-full border border-blue-200">智能文档处理</span>
+                </div>
+                <button onclick="toggleToolList('tools-office')" class="inline-flex items-center gap-1 text-blue-700 hover:text-blue-900 text-sm font-medium transition-colors">
+                    查看工具 <span id="tools-office-arrow">→</span>
+                </button>
+                <div id="tools-office" class="tool-expand-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease;">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-blue-200/50">
+                        <div class="p-3 bg-white/70 rounded-lg border border-blue-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">飞书多维表格</h5>
+                            <p class="text-gray-500 text-xs mt-1">智能数据管理与协作</p>
+                            <a href="https://www.feishu.cn/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-blue-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">WPS AI</h5>
+                            <p class="text-gray-500 text-xs mt-1">金山AI文档/表格/PPT助手</p>
+                            <a href="https://ai.wps.cn/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-blue-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">讯飞星火</h5>
+                            <p class="text-gray-500 text-xs mt-1">科大讯飞大模型，语音转写+文档处理</p>
+                            <a href="https://xinghuo.xfyun.cn/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-blue-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">AiPPT</h5>
+                            <p class="text-gray-500 text-xs mt-1">AI一键生成专业PPT</p>
+                            <a href="https://www.aippt.cn/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-blue-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">Gamma</h5>
+                            <p class="text-gray-500 text-xs mt-1">AI演示文稿生成</p>
+                            <a href="https://gamma.app/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-blue-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">秘塔AI搜索</h5>
+                            <p class="text-gray-500 text-xs mt-1">无广告AI搜索引擎</p>
+                            <a href="https://metaso.cn/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 教学科研 -->
+            <div class="ai-tool-card glass-light rounded-2xl p-6" style="--card-gradient: linear-gradient(135deg, #10b981, #6ee7b7, #10b981);">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-2xl">📊</span>
+                    <h3 class="text-lg font-bold text-navy-900">教学科研</h3>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">学术研究与教学设计的AI赋能工具</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-800 text-xs rounded-full border border-emerald-200">匠邦AI教学编程</span>
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-800 text-xs rounded-full border border-emerald-200">青港学术</span>
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-800 text-xs rounded-full border border-emerald-200">飞像老师</span>
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-800 text-xs rounded-full border border-emerald-200">展火科研助手</span>
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-800 text-xs rounded-full border border-emerald-200">清华OpenMaic</span>
+                </div>
+                <button onclick="toggleToolList('tools-research')" class="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 text-sm font-medium transition-colors">
+                    查看工具 <span id="tools-research-arrow">→</span>
+                </button>
+                <div id="tools-research" class="tool-expand-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease;">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-emerald-200/50">
+                        <div class="p-3 bg-white/70 rounded-lg border border-emerald-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">匠邦AI</h5>
+                            <p class="text-gray-500 text-xs mt-1">AI辅助教学设计与课件编程</p>
+                            <a href="https://www.jiangbang.ai/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-emerald-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">学术版GPT</h5>
+                            <p class="text-gray-500 text-xs mt-1">学术论文辅助写作</p>
+                            <a href="https://scholar.google.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-emerald-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">知网研学</h5>
+                            <p class="text-gray-500 text-xs mt-1">CNKI学术文献管理与阅读</p>
+                            <a href="https://x.cnki.net/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-emerald-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">Consensus</h5>
+                            <p class="text-gray-500 text-xs mt-1">AI学术搜索引擎</p>
+                            <a href="https://consensus.app/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-emerald-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">draw.io</h5>
+                            <p class="text-gray-500 text-xs mt-1">在线流程图/思维导图</p>
+                            <a href="https://www.drawio.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-emerald-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">ECharts</h5>
+                            <p class="text-gray-500 text-xs mt-1">数据可视化图表库</p>
+                            <a href="https://echarts.apache.org/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 流光分隔线 -->
+<div class="shimmer-line w-full"></div>
+
 <!-- ========== 2. 三大核心平台 ========== -->
-<section id="platforms" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="platforms" class="py-20 bg-gray-50 relative overflow-hidden">
+    <!-- 装饰光点 -->
+    <span class="floating-note text-purple-300/15 top-20 right-[8%]" style="animation-delay: 1s; animation-duration: 9s;">✦</span>
+    <span class="floating-note text-gold-400/15 bottom-16 left-[12%]" style="animation-delay: 2.5s; animation-duration: 7s;">♪</span>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">三大核心平台</h2>
             <p class="text-gray-600 text-lg">课程独创平台——技术驱动的音乐教育创新基座</p>
@@ -229,7 +642,7 @@
                         <span class="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">全球平台</span>
                         <span class="px-2.5 py-1 bg-green-50 text-green-700 text-xs rounded-full">已上线</span>
                     </div>
-                    <a href="https://www.vmus.net/" target="_blank" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
+                    <a href="https://www.vmus.net/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
                         访问平台 <i data-lucide="external-link" class="w-4 h-4"></i>
                     </a>
                 </div>
@@ -242,13 +655,13 @@
                         <i data-lucide="glasses" class="w-7 h-7 text-purple-600"></i>
                     </div>
                     <h3 class="text-xl font-bold text-navy-900 mb-3">融智系列虚拟仿真实验</h3>
-                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">沉浸式虚拟仿真实验平台，提供非遗曲艺与音乐表演的VR/AR交互体验，已获3项计算机软件著作权</p>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">沉浸式虚拟仿真实验平台，提供非遗曲艺与音乐表演的VR/AR交互体验，已获多项计算机软件著作权</p>
                     <div class="flex flex-wrap gap-2 mb-5">
                         <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-xs rounded-full">虚拟仿真</span>
                         <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-xs rounded-full">VR/AR</span>
                         <span class="px-2.5 py-1 bg-green-50 text-green-700 text-xs rounded-full">已上线</span>
                     </div>
-                    <a href="https://myvr.htu.edu.cn/MusicTown/MusicAI/home.html" target="_blank" class="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors">
+                    <a href="https://myvr.htu.edu.cn/MusicTown/MusicAI/home.html" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors">
                         访问平台 <i data-lucide="external-link" class="w-4 h-4"></i>
                     </a>
                 </div>
@@ -267,7 +680,7 @@
                         <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full">可视化</span>
                         <span class="px-2.5 py-1 bg-green-50 text-green-700 text-xs rounded-full">已上线</span>
                     </div>
-                    <a href="https://demo.vmus.net" target="_blank" class="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-800 text-sm font-medium transition-colors">
+                    <a href="https://demo.vmus.net" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-800 text-sm font-medium transition-colors">
                         访问平台 <i data-lucide="external-link" class="w-4 h-4"></i>
                     </a>
                 </div>
@@ -276,9 +689,15 @@
     </div>
 </section>
 
+<!-- 流光分隔线 -->
+<div class="shimmer-line w-full"></div>
+
 <!-- ========== 3. AI应用与教学资源 ========== -->
-<section id="ai-resources" class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="ai-resources" class="py-20 bg-white relative overflow-hidden">
+    <span class="floating-note text-blue-300/15 top-24 left-[6%]" style="animation-delay: 0.5s; animation-duration: 8s;">♫</span>
+    <span class="floating-note text-gold-300/12 bottom-20 right-[10%]" style="animation-delay: 3s; animation-duration: 11s;">✧</span>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">AI赋能教学资源</h2>
             <p class="text-gray-600 text-lg">人工智能驱动的协同教学与智能评价体系</p>
@@ -291,7 +710,7 @@
                 智慧教育平台
             </h3>
             <div class="grid sm:grid-cols-2 gap-4">
-                <a href="https://www.xueyinonline.com/detail/243594640" target="_blank" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-gold-400 transition-colors">
+                <a href="https://www.xueyinonline.com/detail/243594640" target="_blank" onclick="window.open(this.href);return false;" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-gold-400 transition-colors">
                     <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i data-lucide="book-open" class="w-5 h-5 text-gold-600"></i>
                     </div>
@@ -301,7 +720,7 @@
                     </div>
                     <i data-lucide="external-link" class="w-4 h-4 text-gray-400 ml-auto flex-shrink-0"></i>
                 </a>
-                <a href="https://cnmooc.sjtu.cn" target="_blank" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-gold-400 transition-colors">
+                <a href="https://cnmooc.sjtu.cn" target="_blank" onclick="window.open(this.href);return false;" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-gold-400 transition-colors">
                     <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i data-lucide="monitor-play" class="w-5 h-5 text-gold-600"></i>
                     </div>
@@ -321,7 +740,7 @@
                 AI协同教学资源
             </h3>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <a href="https://aimusicapp-38jlam84.manus.space/" target="_blank" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-purple-400 transition-colors">
+                <a href="https://aimusicapp-38jlam84.manus.space/" target="_blank" onclick="window.open(this.href);return false;" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-purple-400 transition-colors">
                     <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i data-lucide="music" class="w-5 h-5 text-purple-600"></i>
                     </div>
@@ -330,7 +749,7 @@
                     </div>
                     <i data-lucide="external-link" class="w-4 h-4 text-gray-400 ml-auto flex-shrink-0"></i>
                 </a>
-                <a href="https://www.coze.cn/template/agent/7436703249849368588" target="_blank" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-purple-400 transition-colors">
+                <a href="https://www.coze.cn/template/agent/7436703249849368588" target="_blank" onclick="window.open(this.href);return false;" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-purple-400 transition-colors">
                     <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i data-lucide="book-image" class="w-5 h-5 text-purple-600"></i>
                     </div>
@@ -339,7 +758,7 @@
                     </div>
                     <i data-lucide="external-link" class="w-4 h-4 text-gray-400 ml-auto flex-shrink-0"></i>
                 </a>
-                <a href="https://xiaodaigua-cloud.github.io/cola-pages/star-music/" target="_blank" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-purple-400 transition-colors">
+                <a href="https://xiaodaigua-cloud.github.io/cola-pages/star-music/" target="_blank" onclick="window.open(this.href);return false;" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-purple-400 transition-colors">
                     <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i data-lucide="star" class="w-5 h-5 text-purple-600"></i>
                     </div>
@@ -359,7 +778,7 @@
                 双回路智能评价
             </h3>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <a href="https://aimusiceval-ixfjpmz2.manus.space" target="_blank" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-emerald-400 transition-colors">
+                <a href="https://aimusiceval-ixfjpmz2.manus.space" target="_blank" onclick="window.open(this.href);return false;" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-emerald-400 transition-colors">
                     <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i data-lucide="file-check" class="w-5 h-5 text-emerald-600"></i>
                     </div>
@@ -368,7 +787,7 @@
                     </div>
                     <i data-lucide="external-link" class="w-4 h-4 text-gray-400 ml-auto flex-shrink-0"></i>
                 </a>
-                <a href="https://xiaodaigua-cloud.github.io/cola-pages/ai-music-review/" target="_blank" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-emerald-400 transition-colors">
+                <a href="https://xiaodaigua-cloud.github.io/cola-pages/ai-music-review/" target="_blank" onclick="window.open(this.href);return false;" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-emerald-400 transition-colors">
                     <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i data-lucide="bot" class="w-5 h-5 text-emerald-600"></i>
                     </div>
@@ -377,7 +796,7 @@
                     </div>
                     <i data-lucide="external-link" class="w-4 h-4 text-gray-400 ml-auto flex-shrink-0"></i>
                 </a>
-                <a href="https://aimusicpent-cs5vmjtv.manus.space" target="_blank" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-emerald-400 transition-colors">
+                <a href="https://aimusicpent-cs5vmjtv.manus.space" target="_blank" onclick="window.open(this.href);return false;" class="card-hover flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-emerald-400 transition-colors">
                     <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i data-lucide="layers" class="w-5 h-5 text-emerald-600"></i>
                     </div>
@@ -391,263 +810,441 @@
     </div>
 </section>
 
-<!-- ========== 4. 团队成员 ========== -->
-<section id="team" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<!-- 流光分隔线 -->
+<div class="shimmer-line w-full"></div>
+
+<!-- ========== 4. 团队成员（按学科分组） ========== -->
+<section id="team" class="py-20 bg-gray-50 relative overflow-hidden">
+    <span class="floating-note text-purple-300/12 top-32 right-[5%]" style="animation-delay: 1.5s; animation-duration: 10s;">♩</span>
+    <span class="floating-note text-gold-300/15 bottom-24 left-[8%]" style="animation-delay: 0s; animation-duration: 8s;">♬</span>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">成果团队</h2>
             <p class="text-gray-600 text-lg">跨学科、跨院校的15人协同创新团队</p>
         </div>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <!-- Member 1 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-navy-700 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">薛</span>
+
+        <!-- 艺术学组 -->
+        <div class="mb-14">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="palette" class="w-5 h-5 text-white"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-navy-900">薛碧芸</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">副教授 · 河南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">项目主持人，全局设计+AI平台开发</p>
+                    <h3 class="text-xl font-bold text-navy-900">艺术学</h3>
+                    <p class="text-gray-500 text-sm">11人</p>
+                </div>
+                <div class="flex-1 h-px bg-gradient-to-r from-purple-200 to-transparent ml-4"></div>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- 薛碧芸 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/薛碧芸.jpg" alt="薛碧芸" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://www.htu.edu.cn/yyxy/2023/0916/c20503a283803/page.htm" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">薛碧芸</a></h4>
+                        <p class="text-gray-500 text-xs">副教授 · 河南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">项目主持人，全局设计+AI平台开发</p>
+                    </div>
+                </div>
+                <!-- 李幼平 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/李幼平.jpg" alt="李幼平" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://yyxx.whcm.edu.cn/info/1091/4430.htm" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">李幼平</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 武汉音乐学院</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">国社科重大首席，编钟/世界记忆名录</p>
+                    </div>
+                </div>
+                <!-- 余惠承 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/余惠承.jpg" alt="余惠承" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm">余惠承</h4>
+                        <p class="text-gray-500 text-xs">教授 · 武汉音乐学院</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">国务院津贴，国家艺术基金巡演</p>
+                    </div>
+                </div>
+                <!-- 鲁璐 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/鲁璐.jpg" alt="鲁璐" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://72a23d593c37465a88502cda055aec9a.app.codebuddy.work/" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">鲁璐</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 河南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">国家万人计划，箜篌非遗活化+产教融合</p>
+                    </div>
+                </div>
+                <!-- 王海英 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/王海英.jpg" alt="王海英" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://module.scnu.edu.cn/article-14956-71-1.html" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">王海英</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 华南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">国社科艺术学重点项目主持人、国家一流课程负责人</p>
+                    </div>
+                </div>
+                <!-- 刘妍 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/刘妍.jpg" alt="刘妍" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://module.scnu.edu.cn/article-14956-76-1.html" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">刘妍</a></h4>
+                        <p class="text-gray-500 text-xs">副教授 · 华南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">国社科艺术学重点项目核心成员、国家一流课程教学团队成员</p>
+                    </div>
+                </div>
+                <!-- 杨健 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/杨健.jpg" alt="杨健" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://www.shcmusic.edu.cn/2017/0323/c1636a22962/page.htm" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">杨健</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 上海音乐学院</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">长江学者，Vmus平台原创开发者</p>
+                    </div>
+                </div>
+                <!-- 别松梅 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/别松梅.jpg" alt="别松梅" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://www.htu.edu.cn/yyxy/2023/0914/c20502a283400/page.htm" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">别松梅</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 河南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">国家一流课程，声乐教学+文化自信</p>
+                    </div>
+                </div>
+                <!-- 罗强 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/罗强.jpg" alt="罗强" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://www.htu.edu.cn/yyxy/2025/1021/c20507a358577/page.htm" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">罗强</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 河南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">国家教学成果奖获得者，产教融合+VR</p>
+                    </div>
+                </div>
+                <!-- 吴波 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/吴波.jpg" alt="吴波" class="w-full h-full object-cover object-[20%]">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm">吴波</h4>
+                        <p class="text-gray-500 text-xs">讲师 · 郑州大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">跨校推广验证</p>
+                    </div>
+                </div>
+                <!-- 李佳格 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/李佳格.jpg" alt="李佳格" class="w-full h-full object-cover object-[20%]">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://www.htu.edu.cn/meishu/2025/0219/c3852a336105/page.htm" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">李佳格</a></h4>
+                        <p class="text-gray-500 text-xs">讲师 · 河南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">执行与资料整合</p>
+                    </div>
                 </div>
             </div>
-            <!-- Member 2 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-navy-700 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">孟</span>
+        </div>
+
+        <!-- 教育学组 -->
+        <div>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="book-open" class="w-5 h-5 text-white"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-navy-900">孟萌</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">副教授 · 河南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">教育理论支撑，课程设计</p>
+                    <h3 class="text-xl font-bold text-navy-900">教育学</h3>
+                    <p class="text-gray-500 text-sm">4人</p>
                 </div>
+                <div class="flex-1 h-px bg-gradient-to-r from-emerald-200 to-transparent ml-4"></div>
             </div>
-            <!-- Member 3 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-gold-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">鲁</span>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- 王红 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/王红.jpg" alt="王红" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="http://cte.scnu.edu.cn/shiziduiwu/zhuanrenjiaoshi/" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">王红</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 华南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">国家教学成果一等奖</p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">鲁璐</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 河南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">国家万人计划，箜篌非遗活化+产教融合</p>
+                <!-- 宋晔 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/宋晔.jpg" alt="宋晔" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://www.htu.edu.cn/_s3/2022/0711/c13035a247829/page.psp" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">宋晔</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 河南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">副校长，教育理论+VR+数字教材</p>
+                    </div>
                 </div>
-            </div>
-            <!-- Member 4 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-gold-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">别</span>
+                <!-- 孟萌 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/孟萌.jpg" alt="孟萌" class="w-full h-full object-cover object-top" style="transform: scale(0.85);">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm">孟萌</h4>
+                        <p class="text-gray-500 text-xs">副教授 · 河南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">教育专业博士，小学教育·教育评价</p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">别松梅</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 河南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">国家一流课程，声乐教学+文化自信</p>
-                </div>
-            </div>
-            <!-- Member 5 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-navy-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">吴</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">吴波</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">讲师 · 郑州大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">跨校推广验证</p>
-                </div>
-            </div>
-            <!-- Member 6 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-navy-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">王</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">王海英</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 华南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">教师教育理论</p>
-                </div>
-            </div>
-            <!-- Member 7 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-navy-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">王</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">王红</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 华南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">"输出为本"范式理论+AI评价</p>
-                </div>
-            </div>
-            <!-- Member 8 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-gold-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">杨</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">杨健</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 上海音乐学院</p>
-                    <p class="text-gray-600 text-sm mt-1.5">长江学者，Vmus平台原创开发者</p>
-                </div>
-            </div>
-            <!-- Member 9 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-gold-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">罗</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">罗强</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 河南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">国家教学成果奖获得者，产教融合+VR</p>
-                </div>
-            </div>
-            <!-- Member 10 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-navy-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">牛</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">牛宇帆</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">讲师 · 河南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">教育数据分析</p>
-                </div>
-            </div>
-            <!-- Member 11 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-gold-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">宋</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">宋晔</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 河南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">副校长，教育理论+VR+数字教材</p>
-                </div>
-            </div>
-            <!-- Member 12 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-navy-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">翟</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">翟海法</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 河南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">材料学院，跨学科技术支撑</p>
-                </div>
-            </div>
-            <!-- Member 13 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-gold-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">李</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">李幼平</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 武汉音乐学院</p>
-                    <p class="text-gray-600 text-sm mt-1.5">国社科重大首席，编钟/世界记忆名录</p>
-                </div>
-            </div>
-            <!-- Member 14 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-gold-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">余</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">余惠承</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">教授 · 武汉音乐学院</p>
-                    <p class="text-gray-600 text-sm mt-1.5">国务院津贴，国家艺术基金巡演</p>
-                </div>
-            </div>
-            <!-- Member 15 -->
-            <div class="card-hover flex items-start gap-4 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <div class="w-12 h-12 rounded-full bg-navy-600 flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-sm">李</span>
-                </div>
-                <div>
-                    <h4 class="font-bold text-navy-900">李佳格</h4>
-                    <p class="text-gray-500 text-xs mt-0.5">讲师 · 河南师范大学</p>
-                    <p class="text-gray-600 text-sm mt-1.5">资料整合与事务执行</p>
+                <!-- 牛宇帆 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/牛宇帆.jpg" alt="牛宇帆" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://www.htu.edu.cn/tjb/2023/1106/c17365a289374/page.htm" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">牛宇帆</a></h4>
+                        <p class="text-gray-500 text-xs">讲师 · 河南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">教育数据分析</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- 流光分隔线 -->
+<div class="shimmer-line w-full"></div>
+
 <!-- ========== 5. 教学实践与视频 ========== -->
-<section id="practice" class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="practice" class="py-20 bg-white relative overflow-hidden">
+    <span class="floating-note text-gold-300/15 top-16 left-[15%]" style="animation-delay: 2s; animation-duration: 9s;">♪</span>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">教学实践与成果展示</h2>
             <p class="text-gray-600 text-lg">视频及其他补充支撑材料</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- 教学实录 -->
-            <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="aspect-video bg-navy-100 flex items-center justify-center">
-                    <div class="text-center">
-                        <i data-lucide="video" class="w-10 h-10 text-navy-300 mx-auto mb-2"></i>
-                        <span class="text-navy-400 text-sm">视频待补充</span>
+            <!-- 教学实录（2个并排） -->
+            <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden sm:col-span-2 lg:col-span-2">
+                <div class="grid md:grid-cols-2 gap-0">
+                    <div>
+                        <div class="aspect-video">
+                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                <source src="videos/video1.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-semibold text-navy-900 text-sm">教学实录</h4>
+                            <p class="text-gray-500 text-xs mt-1">课堂教学实录与平台介绍</p>
+                        </div>
                     </div>
-                </div>
-                <div class="p-4">
-                    <h4 class="font-semibold text-navy-900 text-sm">教学实录</h4>
-                    <p class="text-gray-500 text-xs mt-1">课堂教学片段</p>
+                    <div>
+                        <div class="aspect-video">
+                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                <source src="videos/weike-henanzhui.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-semibold text-navy-900 text-sm">微课·虚拟仿真中的河南坠子</h4>
+                            <p class="text-gray-500 text-xs mt-1">数字化再现焦裕禄精神</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- 鲁璐·箜篌 -->
-            <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="aspect-video bg-navy-100 flex items-center justify-center">
-                    <div class="text-center">
-                        <i data-lucide="video" class="w-10 h-10 text-navy-300 mx-auto mb-2"></i>
-                        <span class="text-navy-400 text-sm">视频待补充</span>
+            <!-- 鲁璐·箜篌艺术核心成果 -->
+            <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden sm:col-span-2 lg:col-span-2">
+                <div class="grid md:grid-cols-2 gap-0">
+                    <div class="p-5">
+                        <h4 class="font-bold text-navy-900 text-base mb-3 flex items-center gap-2">
+                            <span class="text-lg">🎵</span> 鲁璐·箜篌艺术核心成果
+                        </h4>
+                        <ul class="space-y-2.5">
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🌍</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">联合国首演</span>
+                                    <p class="text-gray-500 text-xs">2025年联合国“文明对话国际日”，《美美与共》登联合国总部舞台</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">📺</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">央视经典咏流传</span>
+                                    <p class="text-gray-500 text-xs">与白举纲演绎《李凭箜篌引》，古今融合</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🇨🇳</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">国庆70周年</span>
+                                    <p class="text-gray-500 text-xs">登“中华文化”彩车，自主设计“九天凤凰”箜篌</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🏛️</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">久鼎箜篌博物馆</span>
+                                    <p class="text-gray-500 text-xs">中国首家箜篌非遗专题博物馆，近200款古代箜篌复原品</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🛤️</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">丝路箜篌寻根之旅</span>
+                                    <p class="text-gray-500 text-xs">新疆且末箜篌教学基地建设</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🎵</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">央视风华国乐</span>
+                                    <p class="text-gray-500 text-xs">《丝路箜篌》《龙文》等专题演奏</p>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                </div>
-                <div class="p-4">
-                    <h4 class="font-semibold text-navy-900 text-sm">鲁璐·箜篌艺术</h4>
-                    <p class="text-gray-500 text-xs mt-1">联合国演出 / 央视 / 巡演</p>
+                    <div class="p-3 bg-gradient-to-br from-navy-50 to-purple-50 flex items-center justify-center">
+                        <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
+                            <source src="videos/lulu-demo.mp4" type="video/mp4">
+                        </video>
+                    </div>
                 </div>
             </div>
-            <!-- 余惠承·古诗词 -->
-            <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="aspect-video bg-navy-100 flex items-center justify-center">
-                    <div class="text-center">
-                        <i data-lucide="video" class="w-10 h-10 text-navy-300 mx-auto mb-2"></i>
-                        <span class="text-navy-400 text-sm">视频待补充</span>
+            <!-- 余惠承·古诗词艺术歌曲核心成果 -->
+            <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden sm:col-span-2 lg:col-span-2">
+                <div class="grid md:grid-cols-2 gap-0">
+                    <div class="p-5">
+                        <h4 class="font-bold text-navy-900 text-base mb-3 flex items-center gap-2">
+                            <span class="text-lg">🎤</span> 余惠承·古诗词艺术歌曲核心成果
+                        </h4>
+                        <ul class="space-y-2.5">
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🎤</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">央视CCTV-3《天天把歌唱》</span>
+                                    <p class="text-gray-500 text-xs">《思故乡》《幸福歌》专场演唱</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🎼</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">国家艺术基金巡演</span>
+                                    <p class="text-gray-500 text-xs">古诗词艺术歌曲全国21场推广交流</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🔥</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">《凤求凰》网络点击量破159亿</span>
+                                    <p class="text-gray-500 text-xs">被俄罗斯等国音乐院校列为教学曲目</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">📝</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">中国艺术报评论</span>
+                                    <p class="text-gray-500 text-xs">《蝶恋花·槛菊愁烟兰泣露》获专业深度评析</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🎵</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">代表作品</span>
+                                    <p class="text-gray-500 text-xs">《白头吟》《凤求凰》《锦瑟》《声声慢》《木兰花令》等</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sm flex-shrink-0">🌐</span>
+                                <div>
+                                    <span class="font-medium text-navy-900 text-xs">国际影响</span>
+                                    <p class="text-gray-500 text-xs">美国、加拿大、法国举办个人独唱音乐会</p>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                </div>
-                <div class="p-4">
-                    <h4 class="font-semibold text-navy-900 text-sm">余惠承·古诗词艺术歌曲</h4>
-                    <p class="text-gray-500 text-xs mt-1">国家艺术基金巡演 / CCTV</p>
+                    <div class="aspect-video">
+                        <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <source src="videos/yuhc-demo.mp4" type="video/mp4">
+                        </video>
+                    </div>
                 </div>
             </div>
-            <!-- 新闻报道 -->
+            <!-- 新闻采访实录 -->
             <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="aspect-video bg-navy-100 flex items-center justify-center">
-                    <div class="text-center">
-                        <i data-lucide="newspaper" class="w-10 h-10 text-navy-300 mx-auto mb-2"></i>
-                        <span class="text-navy-400 text-sm">视频待补充</span>
-                    </div>
+                <div class="aspect-video">
+                    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                        <source src="videos/news-interview.mp4" type="video/mp4">
+                    </video>
                 </div>
                 <div class="p-4">
-                    <h4 class="font-semibold text-navy-900 text-sm">新闻报道</h4>
+                    <h4 class="font-semibold text-navy-900 text-sm">新闻采访实录</h4>
                     <p class="text-gray-500 text-xs mt-1">中国网 / 学习强国 / 大象新闻</p>
                 </div>
             </div>
-            <!-- 学生展演 -->
-            <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="aspect-video bg-navy-100 flex items-center justify-center">
-                    <div class="text-center">
-                        <i data-lucide="users" class="w-10 h-10 text-navy-300 mx-auto mb-2"></i>
-                        <span class="text-navy-400 text-sm">视频待补充</span>
-                    </div>
-                </div>
+            <!-- 学生展演 2x2 -->
+            <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden sm:col-span-2 lg:col-span-3">
                 <div class="p-4">
-                    <h4 class="font-semibold text-navy-900 text-sm">学生展演</h4>
-                    <p class="text-gray-500 text-xs mt-1">田家炳杯 / 研究生作品</p>
+                    <h4 class="font-semibold text-navy-900 text-sm mb-3">学生展演</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <div class="aspect-video rounded-lg overflow-hidden">
+                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                    <source src="videos/video2.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1.5 text-center">诗悦雅韵·研究生展演</p>
+                        </div>
+                        <div>
+                            <div class="aspect-video rounded-lg overflow-hidden">
+                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                    <source src="videos/student2.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
+                        </div>
+                        <div>
+                            <div class="aspect-video rounded-lg overflow-hidden">
+                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                    <source src="videos/student3.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
+                        </div>
+                        <div>
+                            <div class="aspect-video rounded-lg overflow-hidden">
+                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                    <source src="videos/student4.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- 流光分隔线 -->
+<div class="shimmer-line w-full"></div>
+
 <!-- ========== 6. 推广应用与媒体报道 ========== -->
-<section id="impact" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="impact" class="py-20 bg-gray-50 relative overflow-hidden">
+    <span class="floating-note text-blue-300/12 top-20 right-[12%]" style="animation-delay: 1s; animation-duration: 8s;">✦</span>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">推广应用与社会影响</h2>
             <p class="text-gray-600 text-lg">外回路评价——市场检验与社会认可</p>
@@ -660,20 +1257,47 @@
                 推广高校（7所）
             </h3>
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="p-4 bg-navy-50 rounded-xl text-center border border-navy-100">
+                <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
+                    <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i data-lucide="graduation-cap" class="w-5 h-5 text-navy-600"></i>
+                    </div>
                     <span class="text-navy-800 font-medium text-sm">浙江师范大学</span>
                 </div>
-                <div class="p-4 bg-navy-50 rounded-xl text-center border border-navy-100">
+                <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
+                    <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i data-lucide="music" class="w-5 h-5 text-navy-600"></i>
+                    </div>
                     <span class="text-navy-800 font-medium text-sm">哈尔滨音乐学院</span>
                 </div>
-                <div class="p-4 bg-navy-50 rounded-xl text-center border border-navy-100">
+                <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
+                    <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i data-lucide="building-2" class="w-5 h-5 text-navy-600"></i>
+                    </div>
                     <span class="text-navy-800 font-medium text-sm">天津工业大学</span>
                 </div>
-                <div class="p-4 bg-navy-50 rounded-xl text-center border border-navy-100">
+                <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
+                    <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i data-lucide="graduation-cap" class="w-5 h-5 text-navy-600"></i>
+                    </div>
                     <span class="text-navy-800 font-medium text-sm">南阳师范学院</span>
                 </div>
-                <div class="p-4 bg-navy-50 rounded-xl text-center border border-navy-100">
-                    <span class="text-navy-800 font-medium text-sm">更多合作院校</span>
+                <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
+                    <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i data-lucide="building-2" class="w-5 h-5 text-navy-600"></i>
+                    </div>
+                    <span class="text-navy-800 font-medium text-sm">郑州大学</span>
+                </div>
+                <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
+                    <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i data-lucide="graduation-cap" class="w-5 h-5 text-navy-600"></i>
+                    </div>
+                    <span class="text-navy-800 font-medium text-sm">华南师范大学</span>
+                </div>
+                <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
+                    <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i data-lucide="music" class="w-5 h-5 text-navy-600"></i>
+                    </div>
+                    <span class="text-navy-800 font-medium text-sm">武汉音乐学院</span>
                 </div>
             </div>
             <p class="text-gray-500 text-sm mt-4 text-center">覆盖师生逾 <span class="text-navy-700 font-semibold">1.6万</span> 人次</p>
@@ -707,6 +1331,203 @@
                     <span class="text-navy-900 font-semibold text-sm">河南日报客户端</span>
                 </div>
             </div>
+            <!-- 重点报道 -->
+            <h4 class="text-base font-semibold text-navy-800 mt-6 mb-4 flex items-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-navy-600"></i>
+                重点报道
+            </h4>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <a href="https://article.xuexi.cn/articles/index.html?art_id=16016700021027698493&item_id=16016700021027698493&study_style_id=feeds_opaque&pid=&ptype=-1&source=share&share_to=wx_single" target="_blank" onclick="window.open(this.href);return false;" class="card-hover block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-blue-400 transition-colors">
+                    <div class="flex h-full">
+                        <div class="w-1.5 bg-red-500 flex-shrink-0"></div>
+                        <div class="p-4 flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-bold text-navy-900 text-sm leading-snug mb-1">共绘“人工智能+教育”蓝图！河南师范大学举行河南省智慧教育专委会成立大会</h5>
+                                <p class="text-gray-600 text-xs line-clamp-1">河南省智慧教育专委会在河南师范大学成立，标志AI与教育深度融合关键一步</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 bg-red-50 text-red-700 text-xs rounded font-medium">学习强国</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://app.art1995.cn/detailArticle/23061660_32219_zgysb.html?source=1" target="_blank" onclick="window.open(this.href);return false;" class="card-hover block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-purple-400 transition-colors">
+                    <div class="flex h-full">
+                        <div class="w-1.5 bg-purple-500 flex-shrink-0"></div>
+                        <div class="p-4 flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-bold text-navy-900 text-sm leading-snug mb-1">苍凉凄美 寥阔高远——聆听古诗词艺术歌曲《蝶恋花》有感</h5>
+                                <p class="text-gray-600 text-xs line-clamp-1">中国艺术报深度评析余惠承教授古诗词艺术歌曲创作与演唱</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 bg-purple-50 text-purple-700 text-xs rounded font-medium">中国艺术报</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://mp.weixin.qq.com/s/47o2KucCxl3VYy4ABdicnQ" target="_blank" onclick="window.open(this.href);return false;" class="card-hover block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-amber-400 transition-colors">
+                    <div class="flex h-full">
+                        <div class="w-1.5 bg-amber-500 flex-shrink-0"></div>
+                        <div class="p-4 flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-bold text-navy-900 text-sm leading-snug mb-1">古诗新唱《凤求凰》：点击量何以破百亿？</h5>
+                                <p class="text-gray-600 text-xs line-clamp-1">余惠承领衔“诗乐雅韵”巡演，《凤求凰》网络点击超159亿</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-xs rounded font-medium">湖北文艺</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://mp.weixin.qq.com/s/LVtCZqhJHgYyH0lzhWxI8A" target="_blank" onclick="window.open(this.href);return false;" class="card-hover block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-emerald-400 transition-colors">
+                    <div class="flex h-full">
+                        <div class="w-1.5 bg-emerald-500 flex-shrink-0"></div>
+                        <div class="p-4 flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-bold text-navy-900 text-sm leading-snug mb-1">河南省智慧教育专委会成立大会在河南师范大学召开</h5>
+                                <p class="text-gray-600 text-xs line-clamp-1">60所本科高校代表共聚，共绘AI+教育河南蓝图</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-xs rounded font-medium">河南高教</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://search.bilibili.com/all?keyword=%E9%B2%81%E7%92%90+%E8%81%94%E5%90%88%E5%9B%BD" target="_blank" onclick="window.open(this.href);return false;" class="card-hover block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-red-400 transition-colors">
+                    <div class="flex h-full">
+                        <div class="w-1.5 bg-red-600 flex-shrink-0"></div>
+                        <div class="p-4 flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-bold text-navy-900 text-sm leading-snug mb-1">鲁璐携中国箜篌登联合国总部 《美美与共》奏响文明对话</h5>
+                                <p class="text-gray-600 text-xs line-clamp-1">2025年首个联合国“文明对话国际日”，鲁璐在联合国总部奏响中国箜篌</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 bg-red-50 text-red-700 text-xs rounded font-medium">新华网</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://search.bilibili.com/all?keyword=%E9%B2%81%E7%92%90+%E7%BB%8F%E5%85%B8%E5%92%8F%E6%B5%81%E4%BC%A0" target="_blank" onclick="window.open(this.href);return false;" class="card-hover block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-red-400 transition-colors">
+                    <div class="flex h-full">
+                        <div class="w-1.5 bg-red-500 flex-shrink-0"></div>
+                        <div class="p-4 flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-bold text-navy-900 text-sm leading-snug mb-1">央视《经典咏流传》鲁璐与白举纲跨界演绎《李凭箜篌引》</h5>
+                                <p class="text-gray-600 text-xs line-clamp-1">古今融合，箜篌与摇滚的碰撞，让千年古诗重焕生命力</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 bg-red-50 text-red-700 text-xs rounded font-medium">央视网</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://search.bilibili.com/all?keyword=%E9%B2%81%E7%92%90+%E5%9B%BD%E5%BA%8670%E5%91%A8%E5%B9%B4" target="_blank" onclick="window.open(this.href);return false;" class="card-hover block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-yellow-400 transition-colors">
+                    <div class="flex h-full">
+                        <div class="w-1.5 bg-yellow-500 flex-shrink-0"></div>
+                        <div class="p-4 flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-bold text-navy-900 text-sm leading-snug mb-1">国庆70周年群众游行：鲁璐登“中华文化”彩车奏“九天凤凰”箜篌</h5>
+                                <p class="text-gray-600 text-xs line-clamp-1">自主创意设计“九天凤凰”箜篌，代表中国青年箜篌领军人物登国庆彩车</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 bg-yellow-50 text-yellow-700 text-xs rounded font-medium">人民网</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://search.bilibili.com/all?keyword=%E9%B2%81%E7%92%90+%E7%AE%9C%E7%AF%8C%E5%8D%9A%E7%89%A9%E9%A6%86" target="_blank" onclick="window.open(this.href);return false;" class="card-hover block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-blue-400 transition-colors">
+                    <div class="flex h-full">
+                        <div class="w-1.5 bg-blue-500 flex-shrink-0"></div>
+                        <div class="p-4 flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-bold text-navy-900 text-sm leading-snug mb-1">鲁璐创建久鼎箜篌博物馆：中国首家箜篌非遗专题博物馆</h5>
+                                <p class="text-gray-600 text-xs line-clamp-1">陈列近200款古代箜篌复原仿制品，世界箜篌历史基础资源保护工程重要载体</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded font-medium">中国网</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 代表性成果展示 -->
+        <div class="mb-12">
+            <h3 class="text-lg font-semibold text-navy-800 mb-5 flex items-center gap-2">
+                <i data-lucide="film" class="w-5 h-5 text-purple-600"></i>
+                代表性成果展示 · 余惠承古诗词艺术歌曲在线视频库（12部作品）
+            </h3>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <a href="https://search.bilibili.com/all?keyword=%E4%BD%99%E6%83%A0%E6%89%BF+%E5%B9%B8%E7%A6%8F%E6%AD%8C" target="_blank" onclick="window.open(this.href);return false;" class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden block">
+                    <div class="aspect-video bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center relative">
+                        <i data-lucide="play-circle" class="w-10 h-10 text-red-400"></i>
+                        <span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded">CCTV-3</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-navy-900 text-sm">《幸福歌》</h4>
+                        <p class="text-gray-500 text-xs mt-1">央视 CCTV-3 · 天天把歌唱</p>
+                    </div>
+                </a>
+                <a href="https://search.bilibili.com/all?keyword=%E4%BD%99%E6%83%A0%E6%89%BF+%E7%99%BD%E5%A4%B4%E5%90%9F" target="_blank" onclick="window.open(this.href);return false;" class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden block">
+                    <div class="aspect-video bg-gradient-to-br from-pink-50 to-pink-100 flex items-center justify-center relative">
+                        <i data-lucide="play-circle" class="w-10 h-10 text-pink-400"></i>
+                        <span class="absolute top-2 right-2 bg-pink-500 text-white text-[10px] px-1.5 py-0.5 rounded">B站</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-navy-900 text-sm">《白头吟》</h4>
+                        <p class="text-gray-500 text-xs mt-1">B站 · 古诗词艺术歌曲MV</p>
+                    </div>
+                </a>
+                <a href="https://search.bilibili.com/all?keyword=%E4%BD%99%E6%83%A0%E6%89%BF+%E5%A3%B0%E5%A3%B0%E6%85%A2" target="_blank" onclick="window.open(this.href);return false;" class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden block">
+                    <div class="aspect-video bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center relative">
+                        <i data-lucide="play-circle" class="w-10 h-10 text-indigo-400"></i>
+                        <span class="absolute top-2 right-2 bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded">B站</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-navy-900 text-sm">《声声慢》</h4>
+                        <p class="text-gray-500 text-xs mt-1">B站 · 李清照词作演绎</p>
+                    </div>
+                </a>
+                <a href="https://search.bilibili.com/all?keyword=%E4%BD%99%E6%83%A0%E6%89%BF+%E6%9C%A8%E5%85%B0%E8%8A%B1%E4%BB%A4" target="_blank" onclick="window.open(this.href);return false;" class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden block">
+                    <div class="aspect-video bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center relative">
+                        <i data-lucide="play-circle" class="w-10 h-10 text-amber-400"></i>
+                        <span class="absolute top-2 right-2 bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded">B站</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-navy-900 text-sm">《木兰花令》</h4>
+                        <p class="text-gray-500 text-xs mt-1">B站 · 音律婉转 富有哲思</p>
+                    </div>
+                </a>
+                <a href="https://search.bilibili.com/all?keyword=%E4%BD%99%E6%83%A0%E6%89%BF+%E5%87%A4%E6%B1%82%E5%87%B0" target="_blank" onclick="window.open(this.href);return false;" class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden block">
+                    <div class="aspect-video bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center relative">
+                        <i data-lucide="play-circle" class="w-10 h-10 text-emerald-400"></i>
+                        <span class="absolute top-2 right-2 bg-emerald-500 text-white text-[10px] px-1.5 py-0.5 rounded">159亿+</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-navy-900 text-sm">《凤求凰》</h4>
+                        <p class="text-gray-500 text-xs mt-1">网络点击量破159亿 · 代表作</p>
+                    </div>
+                </a>
+                <a href="https://search.bilibili.com/all?keyword=%E4%BD%99%E6%83%A0%E6%89%BF+%E8%9D%B6%E6%81%8B%E8%8A%B1" target="_blank" onclick="window.open(this.href);return false;" class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden block">
+                    <div class="aspect-video bg-gradient-to-br from-violet-50 to-violet-100 flex items-center justify-center relative">
+                        <i data-lucide="play-circle" class="w-10 h-10 text-violet-400"></i>
+                        <span class="absolute top-2 right-2 bg-violet-500 text-white text-[10px] px-1.5 py-0.5 rounded">中国艺术报</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-navy-900 text-sm">《蝶恋花》</h4>
+                        <p class="text-gray-500 text-xs mt-1">中国艺术报深度评析 · 古诗词艺术歌曲</p>
+                    </div>
+                </a>
+            </div>
         </div>
 
         <!-- 核心数据 -->
@@ -722,57 +1543,254 @@
                     <div class="text-navy-300 text-sm mt-1">特教学校定制资源（壹基金支持）</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-gold-400 text-2xl font-bold">19篇</div>
-                    <div class="text-navy-300 text-sm mt-1">CSSCI论文</div>
+                    <div class="text-gold-400 text-2xl font-bold">73篇</div>
+                    <div class="text-navy-300 text-sm mt-1">CSSCI等高水平论文</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-gold-400 text-2xl font-bold">3项</div>
-                    <div class="text-navy-300 text-sm mt-1">计算机软件著作权</div>
+                    <div class="text-gold-400 text-2xl font-bold">20余项</div>
+                    <div class="text-navy-300 text-sm mt-1">计算机软著及专利</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- 流光分隔线 -->
+<div class="shimmer-line w-full"></div>
+
 <!-- ========== 7. 学生培养成效 ========== -->
-<section id="students" class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="students" class="py-20 bg-white relative overflow-hidden">
+    <span class="floating-note text-purple-300/15 bottom-20 right-[18%]" style="animation-delay: 2s; animation-duration: 7s;">♫</span>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">学生培养成效</h2>
             <p class="text-gray-600 text-lg">受益者成长证据</p>
         </div>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        <!-- 核心数据 -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-12">
             <div class="card-hover bg-white rounded-2xl p-6 text-center border border-gray-200 shadow-sm">
                 <div class="w-14 h-14 bg-gold-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i data-lucide="trophy" class="w-7 h-7 text-gold-600"></i>
                 </div>
-                <div class="text-3xl font-bold text-navy-900">6项</div>
-                <div class="text-gray-600 text-sm mt-2">田家炳杯国家级一等奖</div>
+                <div class="text-3xl font-bold text-navy-900">84项</div>
+                <div class="text-gray-600 text-sm mt-2">国家级教学技能竞赛一等奖</div>
             </div>
             <div class="card-hover bg-white rounded-2xl p-6 text-center border border-gray-200 shadow-sm">
                 <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i data-lucide="briefcase" class="w-7 h-7 text-blue-600"></i>
                 </div>
-                <div class="text-3xl font-bold text-navy-900">75%+</div>
-                <div class="text-gray-600 text-sm mt-2">研究生投身文化科技等核心产业</div>
+                <div class="text-3xl font-bold text-navy-900">73篇</div>
+                <div class="text-gray-600 text-sm mt-2">CSSCI等高水平论文</div>
             </div>
             <div class="card-hover bg-white rounded-2xl p-6 text-center border border-gray-200 shadow-sm">
                 <div class="w-14 h-14 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="file-text" class="w-7 h-7 text-purple-600"></i>
+                    <i data-lucide="award" class="w-7 h-7 text-purple-600"></i>
                 </div>
-                <div class="text-3xl font-bold text-navy-900">XX篇</div>
-                <div class="text-gray-600 text-sm mt-2">发表高水平论文</div>
+                <div class="text-3xl font-bold text-navy-900">168项</div>
+                <div class="text-gray-600 text-sm mt-2">省级以上竞赛获奖</div>
             </div>
             <div class="card-hover bg-white rounded-2xl p-6 text-center border border-gray-200 shadow-sm">
                 <div class="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="award" class="w-7 h-7 text-emerald-600"></i>
+                    <i data-lucide="users" class="w-7 h-7 text-emerald-600"></i>
                 </div>
-                <div class="text-3xl font-bold text-navy-900">XX项</div>
-                <div class="text-gray-600 text-sm mt-2">获省级以上竞赛奖励</div>
+                <div class="text-3xl font-bold text-navy-900">10万+</div>
+                <div class="text-gray-600 text-sm mt-2">受益师生人次</div>
+            </div>
+        </div>
+
+        <!-- 详细分类 -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <!-- 竞赛获奖 -->
+            <div class="bg-gradient-to-br from-gold-50 to-amber-50 rounded-2xl p-6 border border-gold-200/50">
+                <h3 class="font-bold text-navy-900 text-sm mb-3 flex items-center gap-2">
+                    <i data-lucide="trophy" class="w-4 h-4 text-gold-600"></i> 竞赛获奖
+                </h3>
+                <ul class="space-y-2 text-xs text-gray-700">
+                    <li>• 田家炳杯全国师范生教学技能竞赛一等奖 6项等</li>
+                    <li>• 国家级教学技能竞赛一等奖 84项等</li>
+                    <li>• 大创及“挑战杯”获奖 168项等</li>
+                    <li>• 研究生艺术展演/创作获省级以上奖励多项等</li>
+                </ul>
+            </div>
+            <!-- 学术成果 -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200/50">
+                <h3 class="font-bold text-navy-900 text-sm mb-3 flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i> 学术成果
+                </h3>
+                <ul class="space-y-2 text-xs text-gray-700">
+                    <li>• 发表CSSCI等高水平论文 73篇</li>
+                    <li>• 出版教材与专著 12部等</li>
+                    <li>• 计算机软著及专利 20余项等</li>
+                    <li>• 国家级省级教改项目 30余项等</li>
+                </ul>
+            </div>
+            <!-- 人才培养 -->
+            <div class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-200/50">
+                <h3 class="font-bold text-navy-900 text-sm mb-3 flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i> 人才培养与社会服务
+                </h3>
+                <ul class="space-y-2 text-xs text-gray-700">
+                    <li>• 涌现全国“最美教师”等先进典型 39名等</li>
+                    <li>• 研究生投身文化科技等核心产业比例 75%+</li>
+                    <li>• 毕业生赴新疆、西藏等地基层任教等</li>
+                    <li>• 推广应用服务师生 10万余人次</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 依托平台：音乐舞蹈学院 -->
+        <div class="mt-14 max-w-6xl mx-auto">
+            <h3 class="text-xl font-bold text-navy-900 mb-6 text-center">依托平台 · 河南师范大学音乐舞蹈学院</h3>
+            <div class="bg-gradient-to-br from-navy-50 to-indigo-50 rounded-2xl p-6 border border-navy-200/30">
+                <p class="text-gray-700 text-sm leading-relaxed mb-5">河南省音乐教育人才培养核心阵地，音乐、舞蹈、戏剧三大领域均摘国家级最高奖项。学院构建“5系6中心”发展格局，推动艺术实践与学术研究协同并进。</p>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- 师资 -->
+                    <div class="bg-white/80 rounded-xl p-4 text-center">
+                        <div class="text-2xl mb-2">🎓</div>
+                        <div class="text-navy-900 font-bold text-sm">师资力量</div>
+                        <p class="text-gray-500 text-xs mt-1">教授等6人、副教托40人<br>博导4名、硕导39名<br>硕博占比94%+</p>
+                    </div>
+                    <!-- 6中心 -->
+                    <div class="bg-white/80 rounded-xl p-4 text-center">
+                        <div class="text-2xl mb-2">🏛️</div>
+                        <div class="text-navy-900 font-bold text-sm">6大特色平台</div>
+                        <p class="text-gray-500 text-xs mt-1">帕瓦罗蒂音乐艺术中心<br>国际篱篁艺术研创中心<br>黄河流域音乐文化研究中心等</p>
+                    </div>
+                    <!-- 团队 -->
+                    <div class="bg-white/80 rounded-xl p-4 text-center">
+                        <div class="text-2xl mb-2">🎵</div>
+                        <div class="text-navy-900 font-bold text-sm">“四团一队”</div>
+                        <p class="text-gray-500 text-xs mt-1">交响乐团、管乐团<br>民乐团、合唱团<br>舞蹈队</p>
+                    </div>
+                    <!-- 名家 -->
+                    <div class="bg-white/80 rounded-xl p-4 text-center">
+                        <div class="text-2xl mb-2">⭐</div>
+                        <div class="text-navy-900 font-bold text-sm">外聘名家</div>
+                        <p class="text-gray-500 text-xs mt-1">汤沐海、关牧村、郁钧剑<br>保罗·科尼、赵塔里木<br>马可·贝雷依等</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- 横向循环滚动照片展示栏 -->
+<div class="scroll-gallery">
+    <div class="scroll-track">
+        <img src="gallery/g1.jpg" alt="" loading="lazy">
+        <img src="gallery/g2.jpg" alt="" loading="lazy">
+        <img src="gallery/g3.jpg" alt="" loading="lazy">
+        <img src="gallery/g4.jpg" alt="" loading="lazy">
+        <img src="gallery/g5.jpg" alt="" loading="lazy">
+        <img src="gallery/g6.jpg" alt="" loading="lazy">
+        <img src="gallery/g7.jpg" alt="" loading="lazy">
+        <img src="gallery/g8.jpg" alt="" loading="lazy">
+        <img src="gallery/g9.jpg" alt="" loading="lazy">
+        <img src="gallery/g10.jpg" alt="" loading="lazy">
+        <img src="gallery/g11.jpg" alt="" loading="lazy">
+        <img src="gallery/g12.jpg" alt="" loading="lazy">
+        <img src="gallery/g13.jpg" alt="" loading="lazy">
+        <img src="gallery/g14.jpg" alt="" loading="lazy">
+        <img src="gallery/g15.jpg" alt="" loading="lazy">
+        <img src="gallery/g16.jpg" alt="" loading="lazy">
+        <img src="gallery/g17.jpg" alt="" loading="lazy">
+        <img src="gallery/g18.jpg" alt="" loading="lazy">
+        <img src="gallery/g19.jpg" alt="" loading="lazy">
+        <img src="gallery/g20.jpg" alt="" loading="lazy">
+        <img src="gallery/g21.jpg" alt="" loading="lazy">
+        <img src="gallery/g22.jpg" alt="" loading="lazy">
+        <img src="gallery/g23.jpg" alt="" loading="lazy">
+        <img src="gallery/g24.jpg" alt="" loading="lazy">
+        <img src="gallery/g25.jpg" alt="" loading="lazy">
+        <img src="gallery/g26.jpg" alt="" loading="lazy">
+        <img src="gallery/g27.jpg" alt="" loading="lazy">
+        <img src="gallery/g28.jpg" alt="" loading="lazy">
+        <img src="gallery/g29.jpg" alt="" loading="lazy">
+        <img src="gallery/g30.jpg" alt="" loading="lazy">
+        <img src="gallery/g31.jpg" alt="" loading="lazy">
+        <img src="gallery/g32.jpg" alt="" loading="lazy">
+        <img src="gallery/g33.jpg" alt="" loading="lazy">
+        <img src="gallery/g34.jpg" alt="" loading="lazy">
+        <img src="gallery/g35.jpg" alt="" loading="lazy">
+        <img src="gallery/g36.jpg" alt="" loading="lazy">
+        <img src="gallery/g37.jpg" alt="" loading="lazy">
+        <img src="gallery/g38.jpg" alt="" loading="lazy">
+        <img src="gallery/g39.jpg" alt="" loading="lazy">
+        <img src="gallery/g40.jpg" alt="" loading="lazy">
+        <img src="gallery/g41.jpg" alt="" loading="lazy">
+        <img src="gallery/g42.jpg" alt="" loading="lazy">
+        <img src="gallery/g43.jpg" alt="" loading="lazy">
+        <img src="gallery/g44.jpg" alt="" loading="lazy">
+        <img src="gallery/g45.jpg" alt="" loading="lazy">
+        <img src="gallery/g46.jpg" alt="" loading="lazy">
+        <img src="gallery/g47.jpg" alt="" loading="lazy">
+        <img src="gallery/g48.jpg" alt="" loading="lazy">
+        <img src="gallery/g49.jpg" alt="" loading="lazy">
+        <img src="gallery/g50.jpg" alt="" loading="lazy">
+        <img src="gallery/g51.jpg" alt="" loading="lazy">
+        <img src="gallery/g52.jpg" alt="" loading="lazy">
+        <img src="gallery/g53.jpg" alt="" loading="lazy">
+        <img src="gallery/g54.jpg" alt="" loading="lazy">
+        <img src="gallery/g55.jpg" alt="" loading="lazy">
+        <!-- 重复一遍实现无缝循环 -->
+        <img src="gallery/g1.jpg" alt="" loading="lazy">
+        <img src="gallery/g2.jpg" alt="" loading="lazy">
+        <img src="gallery/g3.jpg" alt="" loading="lazy">
+        <img src="gallery/g4.jpg" alt="" loading="lazy">
+        <img src="gallery/g5.jpg" alt="" loading="lazy">
+        <img src="gallery/g6.jpg" alt="" loading="lazy">
+        <img src="gallery/g7.jpg" alt="" loading="lazy">
+        <img src="gallery/g8.jpg" alt="" loading="lazy">
+        <img src="gallery/g9.jpg" alt="" loading="lazy">
+        <img src="gallery/g10.jpg" alt="" loading="lazy">
+        <img src="gallery/g11.jpg" alt="" loading="lazy">
+        <img src="gallery/g12.jpg" alt="" loading="lazy">
+        <img src="gallery/g13.jpg" alt="" loading="lazy">
+        <img src="gallery/g14.jpg" alt="" loading="lazy">
+        <img src="gallery/g15.jpg" alt="" loading="lazy">
+        <img src="gallery/g16.jpg" alt="" loading="lazy">
+        <img src="gallery/g17.jpg" alt="" loading="lazy">
+        <img src="gallery/g18.jpg" alt="" loading="lazy">
+        <img src="gallery/g19.jpg" alt="" loading="lazy">
+        <img src="gallery/g20.jpg" alt="" loading="lazy">
+        <img src="gallery/g21.jpg" alt="" loading="lazy">
+        <img src="gallery/g22.jpg" alt="" loading="lazy">
+        <img src="gallery/g23.jpg" alt="" loading="lazy">
+        <img src="gallery/g24.jpg" alt="" loading="lazy">
+        <img src="gallery/g25.jpg" alt="" loading="lazy">
+        <img src="gallery/g26.jpg" alt="" loading="lazy">
+        <img src="gallery/g27.jpg" alt="" loading="lazy">
+        <img src="gallery/g28.jpg" alt="" loading="lazy">
+        <img src="gallery/g29.jpg" alt="" loading="lazy">
+        <img src="gallery/g30.jpg" alt="" loading="lazy">
+        <img src="gallery/g31.jpg" alt="" loading="lazy">
+        <img src="gallery/g32.jpg" alt="" loading="lazy">
+        <img src="gallery/g33.jpg" alt="" loading="lazy">
+        <img src="gallery/g34.jpg" alt="" loading="lazy">
+        <img src="gallery/g35.jpg" alt="" loading="lazy">
+        <img src="gallery/g36.jpg" alt="" loading="lazy">
+        <img src="gallery/g37.jpg" alt="" loading="lazy">
+        <img src="gallery/g38.jpg" alt="" loading="lazy">
+        <img src="gallery/g39.jpg" alt="" loading="lazy">
+        <img src="gallery/g40.jpg" alt="" loading="lazy">
+        <img src="gallery/g41.jpg" alt="" loading="lazy">
+        <img src="gallery/g42.jpg" alt="" loading="lazy">
+        <img src="gallery/g43.jpg" alt="" loading="lazy">
+        <img src="gallery/g44.jpg" alt="" loading="lazy">
+        <img src="gallery/g45.jpg" alt="" loading="lazy">
+        <img src="gallery/g46.jpg" alt="" loading="lazy">
+        <img src="gallery/g47.jpg" alt="" loading="lazy">
+        <img src="gallery/g48.jpg" alt="" loading="lazy">
+        <img src="gallery/g49.jpg" alt="" loading="lazy">
+        <img src="gallery/g50.jpg" alt="" loading="lazy">
+        <img src="gallery/g51.jpg" alt="" loading="lazy">
+        <img src="gallery/g52.jpg" alt="" loading="lazy">
+        <img src="gallery/g53.jpg" alt="" loading="lazy">
+        <img src="gallery/g54.jpg" alt="" loading="lazy">
+        <img src="gallery/g55.jpg" alt="" loading="lazy">
+    </div>
+</div>
 
 <!-- ========== 页脚 ========== -->
 <footer class="bg-navy-950 py-12 border-t border-navy-800">
@@ -823,6 +1841,153 @@
             }
         });
     });
+
+    // Main video audio toggle with autoplay fallback
+    (function() {
+        const mainVideo = document.getElementById('main-video');
+        const audioBtn = document.getElementById('audio-toggle');
+        // Try autoplay with sound; if blocked, fallback to muted autoplay
+        const playPromise = mainVideo.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                // Autoplay with sound was blocked, fallback to muted
+                mainVideo.muted = true;
+                audioBtn.innerHTML = '\uD83D\uDD07';
+                mainVideo.play();
+            });
+        }
+        audioBtn.addEventListener('click', () => {
+            mainVideo.muted = !mainVideo.muted;
+            audioBtn.innerHTML = mainVideo.muted ? '\uD83D\uDD07' : '\uD83D\uDD0A';
+            if (!mainVideo.muted) {
+                mainVideo.play();
+            }
+        });
+        // Update button state based on initial muted status
+        if (!mainVideo.muted) {
+            audioBtn.innerHTML = '\uD83D\uDD0A';
+        }
+    })();
+
+    // AI Tools expand/collapse toggle
+    function toggleToolList(id) {
+        const panel = document.getElementById(id);
+        const arrow = document.getElementById(id + '-arrow');
+        if (panel.style.maxHeight === '0px' || panel.style.maxHeight === '0') {
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+            // After transition ends, set overflow visible so links are clickable
+            setTimeout(() => { panel.style.overflow = 'visible'; }, 420);
+            arrow.textContent = '↓';
+        } else {
+            panel.style.overflow = 'hidden';
+            panel.style.maxHeight = '0';
+            arrow.textContent = '→';
+        }
+    }
+
+    // AI Assistant Chat
+    (function() {
+        const fab = document.getElementById('ai-assistant-fab');
+        const chatWindow = document.getElementById('ai-chat-window');
+        const closeBtn = document.getElementById('ai-chat-close');
+        fab.addEventListener('click', () => {
+            chatWindow.classList.toggle('hidden');
+            fab.classList.toggle('hidden');
+        });
+        closeBtn.addEventListener('click', () => {
+            chatWindow.classList.add('hidden');
+            fab.classList.remove('hidden');
+        });
+    })();
+
+    // 鼠标追随·樂
+    (function() {
+        const cursor = document.getElementById('cursor-follow');
+        let mouseX = 0, mouseY = 0;
+        let curX = 0, curY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // 平滑追随（有延迟感）
+        function animate() {
+            curX += (mouseX - curX) * 0.08;
+            curY += (mouseY - curY) * 0.08;
+            cursor.style.left = curX + 'px';
+            cursor.style.top = curY + 'px';
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 鼠标离开页面时淡出
+        document.addEventListener('mouseleave', () => {
+            cursor.style.opacity = '0';
+        });
+        document.addEventListener('mouseenter', () => {
+            cursor.style.opacity = '0.35';
+        });
+    })();
+
+    // Scrollspy: highlight active nav link
+    (function() {
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+
+        function updateActive() {
+            let current = '';
+            const scrollY = window.scrollY + 120;
+            sections.forEach(section => {
+                if (scrollY >= section.offsetTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('text-gold-400');
+                link.classList.add('text-gray-200');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('text-gold-400');
+                    link.classList.remove('text-gray-200');
+                    link.style.setProperty('--after-width', '100%');
+                } else {
+                    link.style.setProperty('--after-width', '0');
+                }
+            });
+            mobileLinks.forEach(link => {
+                link.classList.remove('text-gold-400');
+                link.classList.add('text-gray-200');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('text-gold-400');
+                    link.classList.remove('text-gray-200');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActive);
+        updateActive();
+    })();
 </script>
+
+<!-- AI智能助手浮动按钮 -->
+<div id="ai-assistant-fab" class="ai-fab fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center cursor-pointer shadow-lg">
+    <div class="relative flex items-center justify-center">
+        <span class="text-xl leading-none">🎵</span>
+        <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] leading-none text-gold-300 font-bold">𝄞</span>
+    </div>
+</div>
+
+<!-- AI助手聊天窗口 -->
+<div id="ai-chat-window" class="hidden fixed bottom-6 right-6 z-50 w-[90vw] max-w-[400px] h-[520px] rounded-2xl ai-chat-window border border-gray-200 shadow-2xl flex flex-col overflow-hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white">
+        <span class="font-semibold text-sm">🎵 美育智能助手</span>
+        <button id="ai-chat-close" class="w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors text-lg">&times;</button>
+    </div>
+    <!-- Coze Bot Iframe -->
+    <iframe src="https://www.coze.cn/store/bot/7650058321361911848?bot_id=true&hide_bot_greet=false" style="width:100%;flex:1;border:none;" allow="microphone"></iframe>
+</div>
+
 </body>
 </html>
