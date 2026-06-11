@@ -1191,18 +1191,24 @@
                         </ul>
                     </div>
                     <div class="p-4 bg-gradient-to-br from-navy-50 to-purple-50">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
-                            <source src="videos/lulu-demo.mp4" type="video/mp4">
-                        </video>
-                        <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
-                            <source src="videos/lulu-demo2.mp4" type="video/mp4">
-                        </video>
-                        <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
-                            <source src="videos/lulu-demo3.mp4" type="video/mp4">
-                        </video>
-                    </div>
+                        <div class="flex gap-4 items-center">
+                            <!-- 竖屏放左边 -->
+                            <div class="w-1/4 flex-shrink-0">
+                                <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
+                                    <source src="videos/lulu-demo2.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <!-- 两个横屏放右边，上下堆叠 -->
+                            <div class="flex-1 flex flex-col gap-4">
+                                <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
+                                    <source src="videos/lulu-demo.mp4" type="video/mp4">
+                                </video>
+                                <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
+                                    <source src="videos/lulu-demo3.mp4" type="video/mp4">
+                                </video>
+                            </div>
                         </div>
+                    </div>
                 </div>
             </div>
             <!-- 余惠承·古诗词艺术歌曲核心成果 -->
@@ -1269,7 +1275,7 @@
             <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                 <div class="p-4">
                     <h4 class="font-semibold text-navy-900 text-sm mb-3">学生实践</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                         <div>
                             <div class="aspect-video rounded-lg overflow-hidden">
                                 <video autoplay muted loop playsinline class="w-full h-full object-cover">
@@ -1302,7 +1308,7 @@
                             </div>
                             <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
                     </div>
-                    <div class="grid grid-cols-3 gap-4 mt-4 max-w-lg mx-auto">
+                    <div class="grid grid-cols-3 gap-3 mt-5 max-w-sm mx-auto">
                         </div>
                         <div>
                             <div class="aspect-[9/16] rounded-lg overflow-hidden bg-black">
