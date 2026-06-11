@@ -271,7 +271,7 @@
                 <div class="video-center-main">
                     <h2 class="text-lg sm:text-xl font-bold text-center mb-3" style="background: linear-gradient(135deg, #e5b040 0%, #faf0d4 40%, #e5b040 70%, #d4982e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">编钟礼乐 · 服务大国外交</h2>
                     <div class="video-card aspect-video shadow-2xl shadow-gold-400/10" style="border-color: rgba(229,176,64,0.3);">
-                        <video id="main-video" autoplay loop playsinline>
+                        <video id="main-video" autoplay playsinline>
                             <source src="videos/video3.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -1842,27 +1842,61 @@
         });
     });
 
-    // Main video audio toggle with autoplay fallback
+    // Main video audio + BGM logic
     (function() {
         const mainVideo = document.getElementById('main-video');
         const audioBtn = document.getElementById('audio-toggle');
+        
+        // Create background music audio element
+        const bgm = new Audio('videos/bgm-spring.mp3');
+        bgm.loop = true;
+        bgm.volume = 0.6;
+        let bgmStarted = false;
+
         // Try autoplay with sound; if blocked, fallback to muted autoplay
         const playPromise = mainVideo.play();
         if (playPromise !== undefined) {
             playPromise.catch(() => {
-                // Autoplay with sound was blocked, fallback to muted
                 mainVideo.muted = true;
                 audioBtn.innerHTML = '\uD83D\uDD07';
                 mainVideo.play();
             });
         }
-        audioBtn.addEventListener('click', () => {
-            mainVideo.muted = !mainVideo.muted;
-            audioBtn.innerHTML = mainVideo.muted ? '\uD83D\uDD07' : '\uD83D\uDD0A';
+
+        // When video ends, don't loop — start BGM instead
+        mainVideo.addEventListener('ended', () => {
+            // Video stays on last frame, start BGM
             if (!mainVideo.muted) {
-                mainVideo.play();
+                bgm.play();
+                bgmStarted = true;
+            }
+            // Optionally replay video muted with BGM as background
+            mainVideo.muted = true;
+            mainVideo.loop = true;
+            mainVideo.play();
+        });
+
+        // Audio toggle controls both video sound and BGM
+        audioBtn.addEventListener('click', () => {
+            if (bgmStarted) {
+                // Toggle BGM
+                if (bgm.paused) {
+                    bgm.play();
+                    audioBtn.innerHTML = '\uD83D\uDD0A';
+                } else {
+                    bgm.pause();
+                    audioBtn.innerHTML = '\uD83D\uDD07';
+                }
+            } else {
+                // Toggle video sound (before BGM starts)
+                mainVideo.muted = !mainVideo.muted;
+                audioBtn.innerHTML = mainVideo.muted ? '\uD83D\uDD07' : '\uD83D\uDD0A';
+                if (!mainVideo.muted) {
+                    mainVideo.play();
+                }
             }
         });
+
         // Update button state based on initial muted status
         if (!mainVideo.muted) {
             audioBtn.innerHTML = '\uD83D\uDD0A';
