@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>从时空解码到多模态创智——国家级教学成果奖展示</title>
+    <title>生成式AI赋能多模态创智——国家级教学成果奖展示</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
@@ -43,7 +43,10 @@
     </script>
     <style>
         html { scroll-behavior: smooth; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; }
+        body { font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; font-size: 16px; line-height: 1.7; letter-spacing: 0.02em; }
+        /* 调大基础字号，适配年长专家阅读 */
+        .text-xs { font-size: 0.8rem !important; line-height: 1.5; }
+        .text-sm { font-size: 0.9rem !important; line-height: 1.6; }
         .gradient-bg { background: linear-gradient(135deg, #0a1530 0%, #1e3570 50%, #2d1b69 100%); }
         .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
@@ -141,7 +144,11 @@
         @keyframes ai-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
         @keyframes ai-glow-pulse { 0%, 100% { box-shadow: 0 0 12px rgba(139,92,246,0.4); } 50% { box-shadow: 0 0 24px rgba(139,92,246,0.7); } }
         .ai-fab { animation: ai-float 3s ease-in-out infinite, ai-glow-pulse 3s ease-in-out infinite; transition: transform 0.2s ease; }
-        .ai-fab:hover { transform: scale(1.1); }
+        .ai-fab:hover { transform: scale(1.15); }
+        .ai-fab svg { animation: robot-blink 4s ease-in-out infinite; }
+        @keyframes robot-blink { 0%,90%,100% { opacity: 1; } 95% { opacity: 0.3; } }
+        @keyframes bounce-in { 0% { transform: scale(0) translateY(10px); opacity: 0; } 50% { transform: scale(1.05) translateY(-2px); } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+        .animate-bounce-in { animation: bounce-in 0.5s ease-out forwards; }
         .ai-chat-window { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,0.85); }
 
         /* 横向循环滚动展示栏 */
@@ -237,10 +244,10 @@
         <!-- 标题区 -->
         <div class="text-center mb-10">
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold title-gradient mb-4 leading-tight">
-                从时空解码到多模态创智
+                生成式AI赋能多模态创智
             </h1>
             <p class="text-xl sm:text-2xl text-navy-200 mb-6">
-                产教融合视域下研究生美育范式重构与实践
+                产教融合视域下本研共用美育新范式实践
             </p>
             <div class="flex flex-wrap justify-center gap-3 mb-4">
                 <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">艺术学</span>
@@ -252,7 +259,7 @@
         <!-- 五个视频布局：左2小+中1大+右2小 -->
         <div class="mb-14 relative">
             <!-- 音频开关按钮 -->
-            <button id="audio-toggle" class="absolute top-3 right-3 z-20 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white text-lg transition-all cursor-pointer" title="切换音频">🔇</button>
+            <button id="audio-toggle" class="fixed top-20 right-4 z-50 w-11 h-11 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/40 flex items-center justify-center text-white text-xl transition-all cursor-pointer shadow-lg" title="切换音频">🔇</button>
             <div class="video-layout-5 max-w-6xl mx-auto">
                 <!-- 左侧2个小视频 -->
                 <div class="video-side-stack">
@@ -448,6 +455,16 @@
                             <p class="text-gray-500 text-xs mt-1">阿里云大模型，支持文本/代码/图像</p>
                             <a href="https://tongyi.aliyun.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-gold-600 hover:text-gold-800 text-xs mt-2 font-medium">访问 ↗</a>
                         </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-gold-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">国家智慧教育平台·美育</h5>
+                            <p class="text-gray-500 text-xs mt-1">教育部官方美育数字资源库，权威全面</p>
+                            <a href="https://basic.smartedu.cn/art" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-gold-600 hover:text-gold-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-gold-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">中国大学MOOC·美育课程</h5>
+                            <p class="text-gray-500 text-xs mt-1">高校美育开放课程资源，免费学习</p>
+                            <a href="https://www.icourse163.org/search.htm?search=%E7%BE%8E%E8%82%B2" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-gold-600 hover:text-gold-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -500,6 +517,21 @@
                             <h5 class="font-semibold text-navy-900 text-sm">堆友AI</h5>
                             <p class="text-gray-500 text-xs mt-1">阿里AI设计创作平台</p>
                             <a href="https://d.design/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-purple-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">海绵音乐</h5>
+                            <p class="text-gray-500 text-xs mt-1">国产AI音乐创作平台，免费体验</p>
+                            <a href="https://www.haimianyinyue.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-purple-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">网易天音</h5>
+                            <p class="text-gray-500 text-xs mt-1">网易AI音乐创作，智能编曲+伴奏生成</p>
+                            <a href="https://tianyin.163.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-purple-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">OpenMusic AI</h5>
+                            <p class="text-gray-500 text-xs mt-1">多风格音乐生成，支持母带处理与音轨分离</p>
+                            <a href="https://openmusic.ai/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 text-xs mt-2 font-medium">访问 ↗</a>
                         </div>
                     </div>
                 </div>
@@ -605,6 +637,16 @@
                             <h5 class="font-semibold text-navy-900 text-sm">ECharts</h5>
                             <p class="text-gray-500 text-xs mt-1">数据可视化图表库</p>
                             <a href="https://echarts.apache.org/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-emerald-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">喜马拉雅·美育课堂</h5>
+                            <p class="text-gray-500 text-xs mt-1">音频美育课程与讲座资源聚合</p>
+                            <a href="https://www.ximalaya.com/" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs mt-2 font-medium">访问 ↗</a>
+                        </div>
+                        <div class="p-3 bg-white/70 rounded-lg border border-emerald-100">
+                            <h5 class="font-semibold text-navy-900 text-sm">Coze智能体平台</h5>
+                            <p class="text-gray-500 text-xs mt-1">自建美育教学AI助手，知识库问答</p>
+                            <a href="https://www.coze.cn/store" target="_blank" onclick="window.open(this.href);return false;" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs mt-2 font-medium">访问 ↗</a>
                         </div>
                     </div>
                 </div>
@@ -1036,18 +1078,18 @@
             <p class="text-gray-600 text-lg">视频及其他补充支撑材料</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- 教学实录（2个并排） -->
+            <!-- 教学实录微课（5个并排） -->
             <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden sm:col-span-2 lg:col-span-2">
-                <div class="grid md:grid-cols-2 gap-0">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-0">
                     <div>
                         <div class="aspect-video">
                             <video autoplay muted loop playsinline class="w-full h-full object-cover">
                                 <source src="videos/video1.mp4" type="video/mp4">
                             </video>
                         </div>
-                        <div class="p-4">
-                            <h4 class="font-semibold text-navy-900 text-sm">教学实录</h4>
-                            <p class="text-gray-500 text-xs mt-1">课堂教学实录与平台介绍</p>
+                        <div class="p-3">
+                            <h4 class="font-semibold text-navy-900 text-xs">教学实录</h4>
+                            <p class="text-gray-500 text-xs mt-0.5">课堂教学与平台介绍</p>
                         </div>
                     </div>
                     <div>
@@ -1056,9 +1098,42 @@
                                 <source src="videos/weike-henanzhui.mp4" type="video/mp4">
                             </video>
                         </div>
-                        <div class="p-4">
-                            <h4 class="font-semibold text-navy-900 text-sm">微课·虚拟仿真中的河南坠子</h4>
-                            <p class="text-gray-500 text-xs mt-1">数字化再现焦裕禄精神</p>
+                        <div class="p-3">
+                            <h4 class="font-semibold text-navy-900 text-xs">微课·河南坠子</h4>
+                            <p class="text-gray-500 text-xs mt-0.5">虚拟仿真数字化再现</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="aspect-video">
+                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                <source src="videos/teaching3.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-semibold text-navy-900 text-xs">教学展示</h4>
+                            <p class="text-gray-500 text-xs mt-0.5">课堂教学展示</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="aspect-video">
+                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                <source src="videos/news-interview.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-semibold text-navy-900 text-xs">新闻采访实录</h4>
+                            <p class="text-gray-500 text-xs mt-0.5">中国网/学习强国/大象新闻</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="aspect-video">
+                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                <source src="videos/teaching4.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-semibold text-navy-900 text-xs">教学实践</h4>
+                            <p class="text-gray-500 text-xs mt-0.5">教学实践展示</p>
                         </div>
                     </div>
                 </div>
@@ -1115,9 +1190,15 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="p-3 bg-gradient-to-br from-navy-50 to-purple-50 flex items-center justify-center">
+                    <div class="p-3 bg-gradient-to-br from-navy-50 to-purple-50 flex flex-col gap-2 justify-center">
                         <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
                             <source src="videos/lulu-demo.mp4" type="video/mp4">
+                        </video>
+                        <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
+                            <source src="videos/lulu-demo2.mp4" type="video/mp4">
+                        </video>
+                        <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
+                            <source src="videos/lulu-demo3.mp4" type="video/mp4">
                         </video>
                     </div>
                 </div>
@@ -1181,23 +1262,12 @@
                     </div>
                 </div>
             </div>
-            <!-- 新闻采访实录 -->
-            <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="aspect-video">
-                    <video autoplay muted loop playsinline class="w-full h-full object-cover">
-                        <source src="videos/news-interview.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <div class="p-4">
-                    <h4 class="font-semibold text-navy-900 text-sm">新闻采访实录</h4>
-                    <p class="text-gray-500 text-xs mt-1">中国网 / 学习强国 / 大象新闻</p>
-                </div>
-            </div>
-            <!-- 学生展演 2x2 -->
+
+            <!-- 学生实践 -->
             <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden sm:col-span-2 lg:col-span-3">
                 <div class="p-4">
-                    <h4 class="font-semibold text-navy-900 text-sm mb-3">学生展演</h4>
-                    <div class="grid grid-cols-2 gap-3">
+                    <h4 class="font-semibold text-navy-900 text-sm mb-3">学生实践</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                         <div>
                             <div class="aspect-video rounded-lg overflow-hidden">
                                 <video autoplay muted loop playsinline class="w-full h-full object-cover">
@@ -1226,6 +1296,30 @@
                             <div class="aspect-video rounded-lg overflow-hidden">
                                 <video autoplay muted loop playsinline class="w-full h-full object-cover">
                                     <source src="videos/student4.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
+                        </div>
+                        <div>
+                            <div class="aspect-video rounded-lg overflow-hidden">
+                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                    <source src="videos/student5.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
+                        </div>
+                        <div>
+                            <div class="aspect-video rounded-lg overflow-hidden">
+                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                    <source src="videos/student6.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
+                        </div>
+                        <div>
+                            <div class="aspect-video rounded-lg overflow-hidden">
+                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                    <source src="videos/student7.mp4" type="video/mp4">
                                 </video>
                             </div>
                             <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
@@ -1259,15 +1353,15 @@
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
                     <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <i data-lucide="graduation-cap" class="w-5 h-5 text-navy-600"></i>
-                    </div>
-                    <span class="text-navy-800 font-medium text-sm">浙江师范大学</span>
-                </div>
-                <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
-                    <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <i data-lucide="music" class="w-5 h-5 text-navy-600"></i>
                     </div>
                     <span class="text-navy-800 font-medium text-sm">哈尔滨音乐学院</span>
+                </div>
+                <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
+                    <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i data-lucide="graduation-cap" class="w-5 h-5 text-navy-600"></i>
+                    </div>
+                    <span class="text-navy-800 font-medium text-sm">浙江师范大学</span>
                 </div>
                 <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
                     <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -1277,30 +1371,30 @@
                 </div>
                 <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
                     <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <i data-lucide="graduation-cap" class="w-5 h-5 text-navy-600"></i>
+                        <i data-lucide="building-2" class="w-5 h-5 text-navy-600"></i>
                     </div>
-                    <span class="text-navy-800 font-medium text-sm">南阳师范学院</span>
+                    <span class="text-navy-800 font-medium text-sm">中南林业科技大学</span>
                 </div>
                 <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
                     <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <i data-lucide="building-2" class="w-5 h-5 text-navy-600"></i>
                     </div>
-                    <span class="text-navy-800 font-medium text-sm">郑州大学</span>
+                    <span class="text-navy-800 font-medium text-sm">郑州航空工业管理学院</span>
                 </div>
                 <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
                     <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <i data-lucide="graduation-cap" class="w-5 h-5 text-navy-600"></i>
                     </div>
-                    <span class="text-navy-800 font-medium text-sm">华南师范大学</span>
+                    <span class="text-navy-800 font-medium text-sm">信阳师范大学</span>
                 </div>
                 <div class="p-5 bg-navy-50 rounded-xl text-center border border-navy-100">
                     <div class="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <i data-lucide="music" class="w-5 h-5 text-navy-600"></i>
+                        <i data-lucide="graduation-cap" class="w-5 h-5 text-navy-600"></i>
                     </div>
-                    <span class="text-navy-800 font-medium text-sm">武汉音乐学院</span>
+                    <span class="text-navy-800 font-medium text-sm">商丘师范学院</span>
                 </div>
             </div>
-            <p class="text-gray-500 text-sm mt-4 text-center">覆盖师生逾 <span class="text-navy-700 font-semibold">1.6万</span> 人次</p>
+            <p class="text-gray-500 text-sm mt-4 text-center">覆盖师生逾 <span class="text-navy-700 font-semibold">10万</span> 人次</p>
         </div>
 
         <!-- 媒体报道 -->
@@ -1795,8 +1889,8 @@
 <!-- ========== 页脚 ========== -->
 <footer class="bg-navy-950 py-12 border-t border-navy-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h3 class="text-white font-bold text-lg mb-2">从时空解码到多模态创智</h3>
-        <p class="text-navy-300 text-sm mb-6">产教融合视域下研究生美育范式重构与实践</p>
+        <h3 class="text-white font-bold text-lg mb-2">生成式AI赋能多模态创智</h3>
+        <p class="text-navy-300 text-sm mb-6">产教融合视域下本研共用美育新范式实践</p>
         <div class="flex flex-wrap justify-center gap-3 mb-6">
             <span class="px-3 py-1.5 bg-navy-800/60 rounded-lg text-navy-200 text-xs">河南师范大学</span>
             <span class="px-3 py-1.5 bg-navy-800/60 rounded-lg text-navy-200 text-xs">上海音乐学院</span>
@@ -1842,65 +1936,57 @@
         });
     });
 
-    // Main video audio + BGM logic
+    // Background music + video audio logic
     (function() {
         const mainVideo = document.getElementById('main-video');
         const audioBtn = document.getElementById('audio-toggle');
         
-        // Create background music audio element
+        // BGM: starts immediately, loops forever
         const bgm = new Audio('videos/bgm-spring.mp3');
         bgm.loop = true;
-        bgm.volume = 0.6;
-        let bgmStarted = false;
+        bgm.volume = 0.5;
+        let audioUnlocked = false;
 
-        // Try autoplay with sound; if blocked, fallback to muted autoplay
-        const playPromise = mainVideo.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(() => {
-                mainVideo.muted = true;
-                audioBtn.innerHTML = '\uD83D\uDD07';
-                mainVideo.play();
+        // Video plays muted (visuals only), BGM provides audio
+        mainVideo.muted = true;
+        mainVideo.loop = true;
+        mainVideo.play();
+
+        // Try to autoplay BGM immediately
+        const bgmPlay = bgm.play();
+        if (bgmPlay !== undefined) {
+            bgmPlay.then(() => {
+                audioUnlocked = true;
+                audioBtn.innerHTML = '\uD83D\uDD0A';
+            }).catch(() => {
+                // Browser blocked autoplay audio — unlock on first user interaction
+                audioBtn.innerHTML = '\uD83D\uDD0A';
+                const unlock = () => {
+                    bgm.play().then(() => { audioUnlocked = true; });
+                    document.removeEventListener('click', unlock);
+                    document.removeEventListener('touchstart', unlock);
+                    document.removeEventListener('scroll', unlock);
+                };
+                document.addEventListener('click', unlock, {once: false});
+                document.addEventListener('touchstart', unlock, {once: false});
+                document.addEventListener('scroll', unlock, {once: true});
             });
         }
 
-        // When video ends, don't loop — start BGM instead
-        mainVideo.addEventListener('ended', () => {
-            // Video stays on last frame, start BGM
-            if (!mainVideo.muted) {
-                bgm.play();
-                bgmStarted = true;
-            }
-            // Optionally replay video muted with BGM as background
-            mainVideo.muted = true;
-            mainVideo.loop = true;
-            mainVideo.play();
-        });
-
-        // Audio toggle controls both video sound and BGM
-        audioBtn.addEventListener('click', () => {
-            if (bgmStarted) {
-                // Toggle BGM
-                if (bgm.paused) {
-                    bgm.play();
-                    audioBtn.innerHTML = '\uD83D\uDD0A';
-                } else {
-                    bgm.pause();
-                    audioBtn.innerHTML = '\uD83D\uDD07';
-                }
+        // Audio toggle: controls BGM
+        audioBtn.innerHTML = '\uD83D\uDD0A';
+        let isMuted = false;
+        audioBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isMuted = !isMuted;
+            if (isMuted) {
+                bgm.pause();
+                audioBtn.innerHTML = '\uD83D\uDD07';
             } else {
-                // Toggle video sound (before BGM starts)
-                mainVideo.muted = !mainVideo.muted;
-                audioBtn.innerHTML = mainVideo.muted ? '\uD83D\uDD07' : '\uD83D\uDD0A';
-                if (!mainVideo.muted) {
-                    mainVideo.play();
-                }
+                bgm.play();
+                audioBtn.innerHTML = '\uD83D\uDD0A';
             }
         });
-
-        // Update button state based on initial muted status
-        if (!mainVideo.muted) {
-            audioBtn.innerHTML = '\uD83D\uDD0A';
-        }
     })();
 
     // AI Tools expand/collapse toggle
@@ -1924,9 +2010,21 @@
         const fab = document.getElementById('ai-assistant-fab');
         const chatWindow = document.getElementById('ai-chat-window');
         const closeBtn = document.getElementById('ai-chat-close');
+        const welcomeBubble = document.getElementById('ai-welcome-bubble');
+
+        // 欢迎气泡8秒后自动消失
+        setTimeout(() => {
+            if (welcomeBubble) {
+                welcomeBubble.style.transition = 'opacity 0.5s ease';
+                welcomeBubble.style.opacity = '0';
+                setTimeout(() => welcomeBubble.remove(), 500);
+            }
+        }, 8000);
+
         fab.addEventListener('click', () => {
             chatWindow.classList.toggle('hidden');
             fab.classList.toggle('hidden');
+            if (welcomeBubble) welcomeBubble.remove();
         });
         closeBtn.addEventListener('click', () => {
             chatWindow.classList.add('hidden');
@@ -2005,11 +2103,20 @@
 </script>
 
 <!-- AI智能助手浮动按钮 -->
-<div id="ai-assistant-fab" class="ai-fab fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center cursor-pointer shadow-lg">
-    <div class="relative flex items-center justify-center">
-        <span class="text-xl leading-none">🎵</span>
-        <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] leading-none text-gold-300 font-bold">𝄞</span>
-    </div>
+<div id="ai-assistant-fab" class="ai-fab fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center cursor-pointer shadow-xl border-2 border-white/30">
+    <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="4" y="4" width="16" height="12" rx="3" />
+        <circle cx="9" cy="10" r="1.5" fill="currentColor" />
+        <circle cx="15" cy="10" r="1.5" fill="currentColor" />
+        <path d="M9 14h6" stroke-linecap="round" />
+        <path d="M12 16v3" />
+        <path d="M8 22h8" stroke-linecap="round" />
+    </svg>
+</div>
+<!-- AI助手欢迎气泡 -->
+<div id="ai-welcome-bubble" class="fixed bottom-24 right-4 z-50 bg-blue-50/90 backdrop-blur-sm rounded-xl shadow-lg border border-blue-200/60 p-3 max-w-[240px] animate-bounce-in">
+    <div class="text-sm text-gray-700 leading-relaxed">您好，我是本成果的AI助教。您可以有问题随时和我沟通。✨</div>
+    <div class="absolute -bottom-2 right-8 w-4 h-4 bg-white border-r border-b border-gray-200 transform rotate-45"></div>
 </div>
 
 <!-- AI助手聊天窗口 -->
