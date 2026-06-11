@@ -1078,9 +1078,9 @@
             <p class="text-gray-600 text-lg">视频及其他补充支撑材料</p>
         </div>
         <div class="grid grid-cols-1 gap-6">
-            <!-- 教学实录微课（5个并排） -->
+            <!-- 教学实录微课 -->
             <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-0">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 p-3">
                     <div>
                         <div class="aspect-video">
                             <video autoplay muted loop playsinline class="w-full h-full object-cover">
@@ -1140,7 +1140,7 @@
             </div>
             <!-- 鲁璐·箜篌艺术核心成果 -->
             <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="grid md:grid-cols-2 gap-0">
+                <div class="flex flex-col">
                     <div class="p-5">
                         <h4 class="font-bold text-navy-900 text-base mb-3 flex items-center gap-2">
                             <span class="text-lg">🎵</span> 鲁璐·箜篌艺术核心成果
@@ -1190,7 +1190,8 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="p-3 bg-gradient-to-br from-navy-50 to-purple-50 flex flex-col gap-2 justify-center">
+                    <div class="p-4 bg-gradient-to-br from-navy-50 to-purple-50">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
                             <source src="videos/lulu-demo.mp4" type="video/mp4">
                         </video>
@@ -1201,11 +1202,12 @@
                             <source src="videos/lulu-demo3.mp4" type="video/mp4">
                         </video>
                     </div>
+                        </div>
                 </div>
             </div>
             <!-- 余惠承·古诗词艺术歌曲核心成果 -->
             <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="grid md:grid-cols-2 gap-0">
+                <div class="flex flex-col">
                     <div class="p-5">
                         <h4 class="font-bold text-navy-900 text-base mb-3 flex items-center gap-2">
                             <span class="text-lg">🎤</span> 余惠承·古诗词艺术歌曲核心成果
@@ -1255,11 +1257,11 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="aspect-video">
+                    <div class="p-4 bg-gradient-to-br from-amber-50 to-orange-50"><div class="max-w-2xl mx-auto aspect-video">
                         <video autoplay muted loop playsinline class="w-full h-full object-cover">
                             <source src="videos/yuhc-demo.mp4" type="video/mp4">
                         </video>
-                    </div>
+                    </div></div>
                 </div>
             </div>
 
@@ -1267,7 +1269,7 @@
             <div class="card-hover bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                 <div class="p-4">
                     <h4 class="font-semibold text-navy-900 text-sm mb-3">学生实践</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                             <div class="aspect-video rounded-lg overflow-hidden">
                                 <video autoplay muted loop playsinline class="w-full h-full object-cover">
@@ -1299,26 +1301,28 @@
                                 </video>
                             </div>
                             <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mt-4 max-w-lg mx-auto">
                         </div>
                         <div>
-                            <div class="aspect-video rounded-lg overflow-hidden">
-                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <div class="aspect-[9/16] rounded-lg overflow-hidden bg-black">
+                                <video autoplay muted loop playsinline class="w-full h-full object-contain">
                                     <source src="videos/student5.mp4" type="video/mp4">
                                 </video>
                             </div>
                             <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
                         </div>
                         <div>
-                            <div class="aspect-video rounded-lg overflow-hidden">
-                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <div class="aspect-[9/16] rounded-lg overflow-hidden bg-black">
+                                <video autoplay muted loop playsinline class="w-full h-full object-contain">
                                     <source src="videos/student6.mp4" type="video/mp4">
                                 </video>
                             </div>
                             <p class="text-gray-500 text-xs mt-1.5 text-center">学生实践展示</p>
                         </div>
                         <div>
-                            <div class="aspect-video rounded-lg overflow-hidden">
-                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <div class="aspect-[9/16] rounded-lg overflow-hidden bg-black">
+                                <video autoplay muted loop playsinline class="w-full h-full object-contain">
                                     <source src="videos/student7.mp4" type="video/mp4">
                                 </video>
                             </div>
@@ -2127,7 +2131,7 @@
         <button id="ai-chat-close" class="w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors text-lg">&times;</button>
     </div>
     <!-- Coze Bot Iframe -->
-    <iframe src="https://www.coze.cn/store/bot/7650058321361911848?bot_id=true&hide_bot_greet=false" style="width:100%;flex:1;border:none;" allow="microphone"></iframe>
+    <iframe id="coze-iframe" src="https://www.coze.cn/store/bot/7650058321361911848/chat" style="width:100%;flex:1;border:none;" allow="microphone"></iframe>
 </div>
 
 </body>
