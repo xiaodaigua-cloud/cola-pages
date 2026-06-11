@@ -118,7 +118,7 @@
         /* 5视频布局 */
         .video-layout-5 {
             display: grid;
-            grid-template-columns: 32fr 35fr 32fr;
+            grid-template-columns: 25fr 50fr 25fr;
             gap: 0.75rem;
             align-items: center;
         }
@@ -260,6 +260,11 @@
 
         <!-- 五个视频布局：左2小+中1大+右2小 -->
         <div class="mb-14 relative">
+            <!-- Loading提示 -->
+            <div id="video-loading-tip" class="absolute top-4 left-4 z-30 bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 shadow-md border border-gray-200/50 flex items-center gap-2 transition-opacity duration-500">
+                <svg class="animate-spin w-4 h-4 text-gold-500" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.3"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+                <span class="text-gray-600 text-xs">主页视频正在加载中，请耐心等待...</span>
+            </div>
             <!-- 音频开关按钮 -->
             <button id="audio-toggle" class="fixed top-20 right-4 z-50 w-11 h-11 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/40 flex items-center justify-center text-white text-xl transition-all cursor-pointer shadow-lg" title="切换音频">🔇</button>
             <div class="video-layout-5 max-w-6xl mx-auto">
@@ -1935,7 +1940,23 @@
     (function() {
         const mainVideo = document.getElementById('main-video');
         const audioBtn = document.getElementById('audio-toggle');
-        
+        const loadingTip = document.getElementById('video-loading-tip');
+
+        // Hide loading tip when video can play
+        mainVideo.addEventListener('canplay', () => {
+            if (loadingTip) {
+                loadingTip.style.opacity = '0';
+                setTimeout(() => loadingTip.remove(), 500);
+            }
+        });
+        // Fallback: hide after 8s regardless
+        setTimeout(() => {
+            if (loadingTip) {
+                loadingTip.style.opacity = '0';
+                setTimeout(() => loadingTip.remove(), 500);
+            }
+        }, 8000);
+
         // BGM: starts immediately, loops forever
         const bgm = new Audio('videos/bgm-spring.mp3');
         bgm.loop = true;
