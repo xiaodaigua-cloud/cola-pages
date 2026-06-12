@@ -149,9 +149,8 @@
         @keyframes robot-blink { 0%,90%,100% { opacity: 1; } 95% { opacity: 0.3; } }
         @keyframes bounce-in { 0% { transform: scale(0) translateY(10px); opacity: 0; } 50% { transform: scale(1.05) translateY(-2px); } 100% { transform: scale(1) translateY(0); opacity: 1; } }
         .animate-bounce-in { animation: bounce-in 0.5s ease-out forwards; }
-        .ai-chat-window { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,0.95); transform-origin: bottom right; transition: transform 0.3s ease, opacity 0.3s ease; }
-        .ai-chat-window.hidden { transform: scale(0.3); opacity: 0; pointer-events: none; display: flex !important; }
-        .ai-chat-window.visible { transform: scale(1); opacity: 1; pointer-events: auto; }
+        .ai-chat-window { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,0.95); transform-origin: bottom right; transition: transform 0.3s ease, opacity 0.3s ease; display: none; }
+        .ai-chat-window.open { display: flex !important; flex-direction: column; transform: scale(1); opacity: 1; pointer-events: auto; }
 
         /* 横向循环滚动展示栏 */
         .scroll-gallery {
@@ -187,7 +186,7 @@
 
 <!-- ========== 顶部导航栏（毛玻璃） ========== -->
 <nav class="fixed top-0 left-0 right-0 z-50 bg-navy-950/80 backdrop-blur-xl border-b border-navy-700/30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <div class="flex-shrink-0">
                 <span class="text-gold-400 font-bold text-lg">教学成果奖</span>
@@ -242,7 +241,7 @@
     <span class="floating-note text-gold-300/25 bottom-48 right-[25%]" style="animation-delay: 3s; animation-duration: 6s;">♬</span>
     <span class="floating-note text-purple-200/20 top-[60%] left-[5%]" style="animation-delay: 4s; animation-duration: 10s;">♪</span>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
         <!-- 标题区 -->
         <div class="text-center mb-10">
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold title-gradient mb-4 leading-tight">
@@ -267,16 +266,16 @@
             </div>
             <!-- 音频开关按钮 -->
             <button id="audio-toggle" class="fixed top-20 right-4 z-50 w-11 h-11 rounded-full bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/40 flex items-center justify-center text-white text-xl transition-all cursor-pointer shadow-lg" title="切换音频">🔇</button>
-            <div class="video-layout-5 max-w-6xl mx-auto">
+            <div class="video-layout-5 max-w-[1300px] mx-auto">
                 <!-- 左侧2个小视频 -->
                 <div class="video-side-stack">
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline>
+                        <video autoplay muted loop playsinline preload="auto" controls>
                             <source src="videos/video1.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline>
+                        <video autoplay muted loop playsinline preload="auto" controls>
                             <source src="videos/video2.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -285,7 +284,7 @@
                 <div class="video-center-main">
                     <h2 class="text-lg sm:text-xl font-bold text-center mb-3" style="background: linear-gradient(135deg, #e5b040 0%, #faf0d4 40%, #e5b040 70%, #d4982e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">编钟礼乐 · 服务大国外交</h2>
                     <div class="video-card aspect-video shadow-2xl shadow-gold-400/10" style="border-color: rgba(229,176,64,0.3);">
-                        <video id="main-video" autoplay playsinline>
+                        <video id="main-video" autoplay playsinline preload="auto" controls>
                             <source src="videos/video3.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -293,12 +292,12 @@
                 <!-- 右侧2个小视频 -->
                 <div class="video-side-stack">
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline>
+                        <video autoplay muted loop playsinline preload="auto" controls>
                             <source src="videos/video4.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline>
+                        <video autoplay muted loop playsinline preload="auto" controls>
                             <source src="videos/video5-vmus.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -407,7 +406,7 @@
     <span class="floating-note text-gold-300/15 top-16 left-[8%]" style="animation-delay: 0.5s; animation-duration: 9s;">✧</span>
     <span class="floating-note text-purple-300/12 bottom-20 right-[6%]" style="animation-delay: 2s; animation-duration: 8s;">♫</span>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">AI赋能美育工具库</h2>
             <p class="text-gray-600 text-lg">人工智能驱动的美育教学全链条工具生态</p>
@@ -671,7 +670,7 @@
     <span class="floating-note text-purple-300/15 top-20 right-[8%]" style="animation-delay: 1s; animation-duration: 9s;">✦</span>
     <span class="floating-note text-gold-400/15 bottom-16 left-[12%]" style="animation-delay: 2.5s; animation-duration: 7s;">♪</span>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">三大核心平台</h2>
             <p class="text-gray-600 text-lg">课程独创平台——技术驱动的音乐教育创新基座</p>
@@ -746,7 +745,7 @@
     <span class="floating-note text-blue-300/15 top-24 left-[6%]" style="animation-delay: 0.5s; animation-duration: 8s;">♫</span>
     <span class="floating-note text-gold-300/12 bottom-20 right-[10%]" style="animation-delay: 3s; animation-duration: 11s;">✧</span>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">AI赋能教学资源</h2>
             <p class="text-gray-600 text-lg">人工智能驱动的协同教学与智能评价体系</p>
@@ -867,7 +866,7 @@
     <span class="floating-note text-purple-300/12 top-32 right-[5%]" style="animation-delay: 1.5s; animation-duration: 10s;">♩</span>
     <span class="floating-note text-gold-300/15 bottom-24 left-[8%]" style="animation-delay: 0s; animation-duration: 8s;">♬</span>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">成果团队</h2>
             <p class="text-gray-600 text-lg">跨学科、跨院校的15人协同创新团队</p>
@@ -1079,7 +1078,7 @@
 <section id="practice" class="py-20 bg-white relative overflow-hidden">
     <span class="floating-note text-gold-300/15 top-16 left-[15%]" style="animation-delay: 2s; animation-duration: 9s;">♪</span>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">教学实践与成果展示</h2>
             <p class="text-gray-600 text-lg">视频及其他补充支撑材料</p>
@@ -1090,7 +1089,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 p-3">
                     <div>
                         <div class="aspect-video">
-                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                                 <source src="videos/video1.mp4" type="video/mp4">
                             </video>
                         </div>
@@ -1101,7 +1100,7 @@
                     </div>
                     <div>
                         <div class="aspect-video">
-                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                                 <source src="videos/weike-henanzhui.mp4" type="video/mp4">
                             </video>
                         </div>
@@ -1112,7 +1111,7 @@
                     </div>
                     <div>
                         <div class="aspect-video">
-                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                                 <source src="videos/teaching3.mp4" type="video/mp4">
                             </video>
                         </div>
@@ -1123,7 +1122,7 @@
                     </div>
                     <div>
                         <div class="aspect-video">
-                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                                 <source src="videos/news-interview.mp4" type="video/mp4">
                             </video>
                         </div>
@@ -1134,7 +1133,7 @@
                     </div>
                     <div>
                         <div class="aspect-video">
-                            <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                                 <source src="videos/teaching4.mp4" type="video/mp4">
                             </video>
                         </div>
@@ -1201,16 +1200,16 @@
                         <div class="flex gap-4 items-center">
                             <!-- 竖屏放左边 -->
                             <div class="w-1/3 flex-shrink-0">
-                                <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
+                                <video autoplay muted loop playsinline controls class="w-full rounded-lg shadow-md">
                                     <source src="videos/lulu-demo2.mp4" type="video/mp4">
                                 </video>
                             </div>
                             <!-- 两个横屏放右边，上下堆叠 -->
                             <div class="flex-1 flex flex-col gap-4">
-                                <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
+                                <video autoplay muted loop playsinline controls class="w-full rounded-lg shadow-md">
                                     <source src="videos/lulu-demo.mp4" type="video/mp4">
                                 </video>
-                                <video autoplay muted loop playsinline class="w-full rounded-lg shadow-md">
+                                <video autoplay muted loop playsinline controls class="w-full rounded-lg shadow-md">
                                     <source src="videos/lulu-demo3.mp4" type="video/mp4">
                                 </video>
                             </div>
@@ -1271,7 +1270,7 @@
                         </ul>
                     </div>
                     <div class="p-4 bg-gradient-to-br from-amber-50 to-orange-50"><div class="max-w-2xl mx-auto aspect-video">
-                        <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                        <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                             <source src="videos/yuhc-demo.mp4" type="video/mp4">
                         </video>
                     </div></div>
@@ -1286,22 +1285,22 @@
                         <!-- 左侧：4个横屏 2x2 -->
                         <div class="w-3/5 grid grid-cols-2 gap-3">
                             <div class="aspect-video rounded-lg overflow-hidden">
-                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                                     <source src="videos/video2.mp4" type="video/mp4">
                                 </video>
                             </div>
                             <div class="aspect-video rounded-lg overflow-hidden">
-                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                                     <source src="videos/student2.mp4" type="video/mp4">
                                 </video>
                             </div>
                             <div class="aspect-video rounded-lg overflow-hidden">
-                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                                     <source src="videos/student3.mp4" type="video/mp4">
                                 </video>
                             </div>
                             <div class="aspect-video rounded-lg overflow-hidden">
-                                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                                <video autoplay muted loop playsinline controls class="w-full h-full object-cover">
                                     <source src="videos/student4.mp4" type="video/mp4">
                                 </video>
                             </div>
@@ -1309,17 +1308,17 @@
                         <!-- 右侧：3个竖屏 -->
                         <div class="w-2/5 grid grid-cols-3 gap-3">
                             <div class="rounded-lg overflow-hidden bg-gray-900">
-                                <video autoplay muted loop playsinline class="w-full h-full object-contain">
+                                <video autoplay muted loop playsinline controls class="w-full h-full object-contain">
                                     <source src="videos/student5.mp4" type="video/mp4">
                                 </video>
                             </div>
                             <div class="rounded-lg overflow-hidden bg-gray-900">
-                                <video autoplay muted loop playsinline class="w-full h-full object-contain">
+                                <video autoplay muted loop playsinline controls class="w-full h-full object-contain">
                                     <source src="videos/student6.mp4" type="video/mp4">
                                 </video>
                             </div>
                             <div class="rounded-lg overflow-hidden bg-gray-900">
-                                <video autoplay muted loop playsinline class="w-full h-full object-contain">
+                                <video autoplay muted loop playsinline controls class="w-full h-full object-contain">
                                     <source src="videos/student7.mp4" type="video/mp4">
                                 </video>
                             </div>
@@ -1338,7 +1337,7 @@
 <section id="impact" class="py-20 bg-gray-50 relative overflow-hidden">
     <span class="floating-note text-blue-300/12 top-20 right-[12%]" style="animation-delay: 1s; animation-duration: 8s;">✦</span>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">推广应用与社会影响</h2>
             <p class="text-gray-600 text-lg">外回路评价——市场检验与社会认可</p>
@@ -1394,7 +1393,7 @@
                     <span class="text-navy-800 font-medium text-sm">商丘师范学院</span>
                 </div>
             </div>
-            <p class="text-gray-500 text-sm mt-4 text-center">覆盖师生逾 <span class="text-navy-700 font-semibold">10万</span> 人次</p>
+            <p class="text-gray-500 text-sm mt-4 text-center">覆盖师生逾 <span class="text-navy-700 font-semibold">1.2万</span> 人次</p>
         </div>
 
         <!-- 媒体报道 -->
@@ -1656,7 +1655,7 @@
 <section id="students" class="py-20 bg-white relative overflow-hidden">
     <span class="floating-note text-purple-300/15 bottom-20 right-[18%]" style="animation-delay: 2s; animation-duration: 7s;">♫</span>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-14">
             <h2 class="text-3xl sm:text-4xl font-bold text-navy-900 mb-3">学生培养成效</h2>
             <p class="text-gray-600 text-lg">受益者成长证据</p>
@@ -1688,13 +1687,13 @@
                 <div class="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i data-lucide="users" class="w-7 h-7 text-emerald-600"></i>
                 </div>
-                <div class="text-3xl font-bold text-navy-900">10万+</div>
+                <div class="text-3xl font-bold text-navy-900">1.2万+</div>
                 <div class="text-gray-600 text-sm mt-2">受益师生人次</div>
             </div>
         </div>
 
         <!-- 详细分类 -->
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[1300px] mx-auto">
             <!-- 竞赛获奖 -->
             <div class="bg-gradient-to-br from-gold-50 to-amber-50 rounded-2xl p-6 border border-gold-200/50">
                 <h3 class="font-bold text-navy-900 text-sm mb-3 flex items-center gap-2">
@@ -1728,13 +1727,13 @@
                     <li>• 涌现全国“最美教师”等先进典型 39名等</li>
                     <li>• 研究生投身文化科技等核心产业比例 75%+</li>
                     <li>• 毕业生赴新疆、西藏等地基层任教等</li>
-                    <li>• 推广应用服务师生 10万余人次</li>
+                    <li>• 推广应用服务师生 1.2万余人次</li>
                 </ul>
             </div>
         </div>
 
         <!-- 依托平台：音乐舞蹈学院 -->
-        <div class="mt-14 max-w-6xl mx-auto">
+        <div class="mt-14 max-w-[1300px] mx-auto">
             <h3 class="text-xl font-bold text-navy-900 mb-6 text-center">依托平台 · 河南师范大学音乐舞蹈学院</h3>
             <div class="bg-gradient-to-br from-navy-50 to-indigo-50 rounded-2xl p-6 border border-navy-200/30">
                 <p class="text-gray-700 text-sm leading-relaxed mb-5">河南省音乐教育人才培养核心阵地，音乐、舞蹈、戏剧三大领域均摘国家级最高奖项。学院构建“5系6中心”发展格局，推动艺术实践与学术研究协同并进。</p>
@@ -1888,7 +1887,7 @@
 
 <!-- ========== 页脚 ========== -->
 <footer class="bg-navy-950 py-12 border-t border-navy-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h3 class="text-white font-bold text-lg mb-2">生成式AI赋能多模态创智</h3>
         <p class="text-navy-300 text-sm mb-6">产教融合视域下本研共用美育新范式实践</p>
         <div class="flex flex-wrap justify-center gap-3 mb-6">
@@ -1969,25 +1968,19 @@
         mainVideo.play();
 
         // Try to autoplay BGM immediately
-        const bgmPlay = bgm.play();
-        if (bgmPlay !== undefined) {
-            bgmPlay.then(() => {
-                audioUnlocked = true;
-                audioBtn.innerHTML = '\uD83D\uDD0A';
-            }).catch(() => {
-                // Browser blocked autoplay audio — unlock on first user interaction
-                audioBtn.innerHTML = '\uD83D\uDD0A';
-                const unlock = () => {
-                    bgm.play().then(() => { audioUnlocked = true; });
-                    document.removeEventListener('click', unlock);
-                    document.removeEventListener('touchstart', unlock);
-                    document.removeEventListener('scroll', unlock);
-                };
-                document.addEventListener('click', unlock, {once: false});
-                document.addEventListener('touchstart', unlock, {once: false});
-                document.addEventListener('scroll', unlock, {once: true});
-            });
+        function startBGM() {
+            bgm.play().then(() => { audioUnlocked = true; audioBtn.innerHTML = '\uD83D\uDD0A'; }).catch(()=>{});
         }
+        startBGM();
+        // Unlock on ANY user interaction (browsers block autoplay without gesture)
+        const unlockEvents = ['click', 'touchstart', 'scroll', 'keydown', 'mousemove'];
+        const unlockBGM = () => {
+            if (!audioUnlocked && !isMuted) {
+                startBGM();
+            }
+            unlockEvents.forEach(e => document.removeEventListener(e, unlockBGM));
+        };
+        unlockEvents.forEach(e => document.addEventListener(e, unlockBGM, {once: true}));
 
         // Audio toggle: controls BGM
         audioBtn.innerHTML = '\uD83D\uDD0A';
@@ -2038,21 +2031,20 @@
         }, 8000);
 
         let chatOpen = false;
-        fab.addEventListener('click', () => {
+        fab.addEventListener('click', (e) => {
+            e.stopPropagation();
             chatOpen = !chatOpen;
             if (chatOpen) {
-                chatWindow.classList.remove('hidden');
-                chatWindow.classList.add('visible');
+                chatWindow.classList.add('open');
             } else {
-                chatWindow.classList.add('hidden');
-                chatWindow.classList.remove('visible');
+                chatWindow.classList.remove('open');
             }
             if (welcomeBubble) welcomeBubble.remove();
         });
-        closeBtn.addEventListener('click', () => {
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             chatOpen = false;
-            chatWindow.classList.add('hidden');
-            chatWindow.classList.remove('visible');
+            chatWindow.classList.remove('open');
         });
     })();
 
@@ -2144,7 +2136,7 @@
 </div>
 
 <!-- AI助手聊天窗口 -->
-<div id="ai-chat-window" class="hidden fixed bottom-24 right-6 z-50 w-[360px] max-w-[85vw] h-[480px] rounded-2xl ai-chat-window border border-gray-200 shadow-2xl flex flex-col overflow-hidden">
+<div id="ai-chat-window" class="fixed bottom-24 right-6 z-50 w-[360px] max-w-[85vw] h-[480px] rounded-2xl ai-chat-window border border-gray-200 shadow-2xl flex-col overflow-hidden">
     <!-- Header -->
     <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white">
         <span class="font-semibold text-sm">🎵 美育智能助手</span>
