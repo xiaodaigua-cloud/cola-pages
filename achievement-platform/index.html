@@ -913,7 +913,7 @@
                         <img src="photos/余惠承.jpg" alt="余惠承" class="w-full h-full object-cover object-top">
                     </div>
                     <div class="min-w-0">
-                        <h4 class="font-bold text-navy-900 text-sm">余惠承</h4>
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://9069ec74d61841169107b214e81f23c4.app.codebuddy.work/" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">余惠承</a></h4>
                         <p class="text-gray-500 text-xs">教授 · 武汉音乐学院</p>
                         <p class="text-gray-600 text-xs mt-1 truncate">国务院津贴，国家艺术基金巡演</p>
                     </div>
@@ -1961,6 +1961,7 @@
         bgm.loop = true;
         bgm.volume = 0.5;
         let audioUnlocked = false;
+        let isMuted = false;
 
         // Video plays muted (visuals only), BGM provides audio
         mainVideo.muted = true;
@@ -1984,7 +1985,6 @@
 
         // Audio toggle: controls BGM
         audioBtn.innerHTML = '\uD83D\uDD0A';
-        let isMuted = false;
         audioBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             isMuted = !isMuted;
@@ -2143,7 +2143,9 @@
         <button id="ai-chat-close" class="w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors text-lg">&times;</button>
     </div>
     <!-- Coze Bot Iframe -->
-    <iframe id="coze-iframe" src="https://www.coze.cn/store/bot/7650058321361911848/chat" style="width:100%;flex:1;border:none;" allow="microphone"></iframe>
+    <div id="coze-chat-body" style="width:100%;flex:1;overflow:hidden;position:relative;">
+        <iframe src="https://www.coze.cn/store/bot/7650058321361911848" style="width:100%;height:100%;border:none;position:absolute;top:0;left:0;" allow="microphone"></iframe>
+    </div>
 </div>
 
 </body>
