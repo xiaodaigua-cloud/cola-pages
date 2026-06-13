@@ -225,6 +225,24 @@
     </div>
 </nav>
 
+<!-- ========== 入场封面层（解锁BGM） ========== -->
+<div id="splash-overlay" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-br from-[#0a0e27] via-[#141a3d] to-[#1a1040] cursor-pointer" onclick="dismissSplash()">
+    <div class="text-center px-6">
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent mb-6 leading-tight">生成式AI赋能研究生美育</h1>
+        <p class="text-lg sm:text-xl text-gray-300 mb-10">跨界创智能力培养新范式构建与实践</p>
+        <button class="px-8 py-3 bg-gradient-to-r from-amber-500 to-yellow-400 text-[#0a0e27] font-bold rounded-full text-lg shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-105 transition-all duration-300">进入展示</button>
+        <p class="text-gray-500 text-sm mt-4">点击任意位置即可进入</p>
+    </div>
+</div>
+<script>
+function dismissSplash() {
+    const overlay = document.getElementById('splash-overlay');
+    overlay.style.transition = 'opacity 0.6s ease';
+    overlay.style.opacity = '0';
+    setTimeout(() => overlay.remove(), 600);
+}
+</script>
+
 <!-- ========== 1. 首页/成果总览 ========== -->
 <section id="overview" class="gradient-bg pt-24 pb-20 min-h-screen flex items-center relative overflow-hidden">
     <!-- 流光背景光斑 -->
@@ -1992,13 +2010,12 @@
         mainVideo.loop = true;
         mainVideo.play();
 
-        // Try to autoplay BGM immediately
+        // Start BGM on first user click (splash overlay counts as gesture)
         function startBGM() {
             bgm.play().then(() => { audioUnlocked = true; audioBtn.innerHTML = '\uD83D\uDD0A'; }).catch(()=>{});
         }
-        startBGM();
-        // Unlock on ANY user interaction (browsers block autoplay without gesture)
-        const unlockEvents = ['click', 'touchstart', 'scroll', 'keydown', 'mousemove'];
+        // Listen for first click/touch (splash dismiss triggers this)
+        const unlockEvents = ['click', 'touchstart'];
         const unlockBGM = () => {
             if (!audioUnlocked && !isMuted) {
                 startBGM();
