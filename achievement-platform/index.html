@@ -243,13 +243,12 @@ window.__bgm.loop = true;
 window.__bgm.volume = 0.5;
 window.__bgmUnlocked = false;
 // 封面显示期间就开始预加载首屏视频
-['videos/video3.mp4','videos/video1.mp4','videos/video2.mp4','videos/video4.mp4','videos/video5-vmus.mp4'].forEach(src => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'video';
-    link.href = src;
-    document.head.appendChild(link);
-});
+// 只预加载主视频，小视频用poster占位
+const link = document.createElement('link');
+link.rel = 'preload';
+link.as = 'video';
+link.href = 'videos/video3.mp4';
+document.head.appendChild(link);
 
 function dismissSplash() {
     const overlay = document.getElementById('splash-overlay');
@@ -262,9 +261,16 @@ function dismissSplash() {
         const btn = document.getElementById('audio-toggle');
         if (btn) btn.innerHTML = '\uD83D\uDD0A';
     }).catch(()=>{});
-    // 首屏视频已在autoplay，确保主视频也开始
+    // 主视频立即播放（已preload）
     const mainV = document.getElementById('main-video');
     if (mainV) { mainV.play().catch(()=>{}); }
+    // 2秒后播放首屏4个小视频
+    setTimeout(() => {
+        document.querySelectorAll('.side-video').forEach(v => {
+            v.preload = 'auto';
+            v.play().catch(()=>{});
+        });
+    }, 2000);
     // 5秒后加载非首屏视频
     setTimeout(() => {
         document.querySelectorAll('.lazy-video').forEach(v => {
@@ -323,12 +329,12 @@ function dismissSplash() {
                 <!-- 左侧2个小视频 -->
                 <div class="video-side-stack">
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline preload="auto" controls>
+                        <video class="side-video" muted loop playsinline preload="none" poster="videos/video1-poster.jpg" controls>
                             <source src="videos/video1.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline preload="auto" controls>
+                        <video class="side-video" muted loop playsinline preload="none" poster="videos/video2-poster.jpg" controls>
                             <source src="videos/video2.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -345,12 +351,12 @@ function dismissSplash() {
                 <!-- 右侧2个小视频 -->
                 <div class="video-side-stack">
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline preload="auto" controls>
+                        <video class="side-video" muted loop playsinline preload="none" poster="videos/video4-poster.jpg" controls>
                             <source src="videos/video4.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline preload="auto" controls>
+                        <video class="side-video" muted loop playsinline preload="none" poster="videos/video5-vmus-poster.jpg" controls>
                             <source src="videos/video5-vmus.mp4" type="video/mp4">
                         </video>
                     </div>
