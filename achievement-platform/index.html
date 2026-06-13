@@ -235,7 +235,7 @@
     </div>
 </div>
 <script>
-// 提前创建BGM对象，确保封面点击时已就绪
+// BGM最高优先级加载，不等视频
 window.__bgm = new Audio();
 window.__bgm.preload = 'auto';
 window.__bgm.src = 'videos/bgm-spring.mp3';
@@ -248,13 +248,22 @@ function dismissSplash() {
     overlay.style.transition = 'opacity 0.6s ease';
     overlay.style.opacity = '0';
     setTimeout(() => overlay.remove(), 600);
-    // 直接播放BGM（此刻用户已点击，浏览器允许播放）
+    // BGM立即播放，最高优先级
     window.__bgm.play().then(() => {
         window.__bgmUnlocked = true;
         const btn = document.getElementById('audio-toggle');
         if (btn) btn.innerHTML = '\uD83D\uDD0A';
     }).catch(()=>{});
-    // 触发所有懒加载视频播放
+    // 1.5秒后再加载首屏视频，让BGM先响
+    setTimeout(() => {
+        const mainV = document.getElementById('main-video');
+        if (mainV) { mainV.preload = 'auto'; mainV.muted = true; mainV.loop = true; mainV.play().catch(()=>{}); }
+        document.querySelectorAll('.hero-video').forEach(v => {
+            v.preload = 'auto';
+            v.play().catch(()=>{});
+        });
+    }, 1500);
+    // 3秒后加载非首屏懒加载视频
     setTimeout(() => {
         document.querySelectorAll('.lazy-video').forEach(v => {
             if (!v.dataset.started) {
@@ -263,7 +272,7 @@ function dismissSplash() {
                 v.dataset.started = '1';
             }
         });
-    }, 800);
+    }, 3000);
 }
 </script>
 
@@ -312,12 +321,12 @@ function dismissSplash() {
                 <!-- 左侧2个小视频 -->
                 <div class="video-side-stack">
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline preload="auto" controls>
+                        <video muted loop playsinline preload="none" class="hero-video" controls>
                             <source src="videos/video1.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline preload="auto" controls>
+                        <video muted loop playsinline preload="none" class="hero-video" controls>
                             <source src="videos/video2.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -326,7 +335,7 @@ function dismissSplash() {
                 <div class="video-center-main">
                     <h2 class="text-lg sm:text-xl font-bold text-center mb-3" style="background: linear-gradient(135deg, #e5b040 0%, #faf0d4 40%, #e5b040 70%, #d4982e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">编钟礼乐 · 服务大国外交</h2>
                     <div class="video-card aspect-video shadow-2xl shadow-gold-400/10" style="border-color: rgba(229,176,64,0.3);">
-                        <video id="main-video" autoplay playsinline preload="auto" controls>
+                        <video id="main-video" playsinline preload="none" controls>
                             <source src="videos/video3.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -334,12 +343,12 @@ function dismissSplash() {
                 <!-- 右侧2个小视频 -->
                 <div class="video-side-stack">
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline preload="auto" controls>
+                        <video muted loop playsinline preload="none" class="hero-video" controls>
                             <source src="videos/video4.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="video-card aspect-video">
-                        <video autoplay muted loop playsinline preload="auto" controls>
+                        <video muted loop playsinline preload="none" class="hero-video" controls>
                             <source src="videos/video5-vmus.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -2026,9 +2035,9 @@ function dismissSplash() {
         let isMuted = false;
 
         // Video plays muted (visuals only), BGM provides audio
+        // mainVideo already started by dismissSplash with delay
         mainVideo.muted = true;
         mainVideo.loop = true;
-        mainVideo.play();
 
         // Start BGM (may already be started by splash dismiss)
         function startBGM() {
