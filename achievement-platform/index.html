@@ -235,13 +235,21 @@
     </div>
 </div>
 <script>
-// BGM最高优先级加载，不等视频
+// BGM最高优先级加载
 window.__bgm = new Audio();
 window.__bgm.preload = 'auto';
 window.__bgm.src = 'videos/bgm-spring.mp3';
 window.__bgm.loop = true;
 window.__bgm.volume = 0.5;
 window.__bgmUnlocked = false;
+// 封面显示期间就开始预加载首屏视频
+['videos/video3.mp4','videos/video1.mp4','videos/video2.mp4','videos/video4.mp4','videos/video5-vmus.mp4'].forEach(src => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'video';
+    link.href = src;
+    document.head.appendChild(link);
+});
 
 function dismissSplash() {
     const overlay = document.getElementById('splash-overlay');
