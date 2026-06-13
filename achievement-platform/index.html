@@ -235,20 +235,26 @@
     </div>
 </div>
 <script>
+// 提前创建BGM对象，确保封面点击时已就绪
+window.__bgm = new Audio();
+window.__bgm.preload = 'auto';
+window.__bgm.src = 'videos/bgm-spring.mp3';
+window.__bgm.loop = true;
+window.__bgm.volume = 0.5;
+window.__bgmUnlocked = false;
+
 function dismissSplash() {
     const overlay = document.getElementById('splash-overlay');
     overlay.style.transition = 'opacity 0.6s ease';
     overlay.style.opacity = '0';
     setTimeout(() => overlay.remove(), 600);
-    // 直接播放BGM
-    if (window.__bgm) {
-        window.__bgm.play().then(() => {
-            window.__bgmUnlocked = true;
-            const btn = document.getElementById('audio-toggle');
-            if (btn) btn.innerHTML = '\uD83D\uDD0A';
-        }).catch(()=>{});
-    }
-    // 触发所有懒加载视频重新检测
+    // 直接播放BGM（此刻用户已点击，浏览器允许播放）
+    window.__bgm.play().then(() => {
+        window.__bgmUnlocked = true;
+        const btn = document.getElementById('audio-toggle');
+        if (btn) btn.innerHTML = '\uD83D\uDD0A';
+    }).catch(()=>{});
+    // 触发所有懒加载视频播放
     setTimeout(() => {
         document.querySelectorAll('.lazy-video').forEach(v => {
             if (!v.dataset.started) {
@@ -2014,15 +2020,9 @@ function dismissSplash() {
             }
         }, 8000);
 
-        // BGM: preload immediately for faster start
-        const bgm = new Audio();
-        bgm.preload = 'auto';
-        bgm.src = 'videos/bgm-spring.mp3';
-        bgm.loop = true;
-        bgm.volume = 0.5;
-        window.__bgm = bgm;
-        window.__bgmUnlocked = false;
-        let audioUnlocked = false;
+        // BGM: 复用顶部已创建的对象
+        const bgm = window.__bgm;
+        let audioUnlocked = window.__bgmUnlocked || false;
         let isMuted = false;
 
         // Video plays muted (visuals only), BGM provides audio
@@ -2034,20 +2034,10 @@ function dismissSplash() {
         function startBGM() {
             bgm.play().then(() => { audioUnlocked = true; window.__bgmUnlocked = true; audioBtn.innerHTML = '\uD83D\uDD0A'; }).catch(()=>{});
         }
-        // If splash already started it, sync state
+        // Sync state if splash already started BGM
         if (window.__bgmUnlocked) {
             audioUnlocked = true;
             audioBtn.innerHTML = '\uD83D\uDD0A';
-        } else {
-            // Fallback: listen for click/touch
-            const unlockEvents = ['click', 'touchstart'];
-            const unlockBGM = () => {
-                if (!audioUnlocked && !isMuted) {
-                    startBGM();
-                }
-                unlockEvents.forEach(e => document.removeEventListener(e, unlockBGM));
-            };
-            unlockEvents.forEach(e => document.addEventListener(e, unlockBGM, {once: true}));
         }
 
         // Audio toggle: controls BGM
