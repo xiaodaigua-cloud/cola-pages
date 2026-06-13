@@ -248,22 +248,16 @@ function dismissSplash() {
     overlay.style.transition = 'opacity 0.6s ease';
     overlay.style.opacity = '0';
     setTimeout(() => overlay.remove(), 600);
-    // BGM立即播放，最高优先级
+    // BGM立即播放
     window.__bgm.play().then(() => {
         window.__bgmUnlocked = true;
         const btn = document.getElementById('audio-toggle');
         if (btn) btn.innerHTML = '\uD83D\uDD0A';
     }).catch(()=>{});
-    // 1.5秒后再加载首屏视频，让BGM先响
-    setTimeout(() => {
-        const mainV = document.getElementById('main-video');
-        if (mainV) { mainV.preload = 'auto'; mainV.muted = true; mainV.loop = true; mainV.play().catch(()=>{}); }
-        document.querySelectorAll('.hero-video').forEach(v => {
-            v.preload = 'auto';
-            v.play().catch(()=>{});
-        });
-    }, 1500);
-    // 3秒后加载非首屏懒加载视频
+    // 首屏视频已在autoplay，确保主视频也开始
+    const mainV = document.getElementById('main-video');
+    if (mainV) { mainV.play().catch(()=>{}); }
+    // 5秒后加载非首屏视频
     setTimeout(() => {
         document.querySelectorAll('.lazy-video').forEach(v => {
             if (!v.dataset.started) {
@@ -272,7 +266,7 @@ function dismissSplash() {
                 v.dataset.started = '1';
             }
         });
-    }, 3000);
+    }, 5000);
 }
 </script>
 
@@ -321,12 +315,12 @@ function dismissSplash() {
                 <!-- 左侧2个小视频 -->
                 <div class="video-side-stack">
                     <div class="video-card aspect-video">
-                        <video muted loop playsinline preload="none" class="hero-video" controls>
+                        <video autoplay muted loop playsinline preload="auto" controls>
                             <source src="videos/video1.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="video-card aspect-video">
-                        <video muted loop playsinline preload="none" class="hero-video" controls>
+                        <video autoplay muted loop playsinline preload="auto" controls>
                             <source src="videos/video2.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -335,7 +329,7 @@ function dismissSplash() {
                 <div class="video-center-main">
                     <h2 class="text-lg sm:text-xl font-bold text-center mb-3" style="background: linear-gradient(135deg, #e5b040 0%, #faf0d4 40%, #e5b040 70%, #d4982e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">编钟礼乐 · 服务大国外交</h2>
                     <div class="video-card aspect-video shadow-2xl shadow-gold-400/10" style="border-color: rgba(229,176,64,0.3);">
-                        <video id="main-video" playsinline preload="none" controls>
+                        <video id="main-video" muted loop playsinline preload="auto" controls>
                             <source src="videos/video3.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -343,12 +337,12 @@ function dismissSplash() {
                 <!-- 右侧2个小视频 -->
                 <div class="video-side-stack">
                     <div class="video-card aspect-video">
-                        <video muted loop playsinline preload="none" class="hero-video" controls>
+                        <video autoplay muted loop playsinline preload="auto" controls>
                             <source src="videos/video4.mp4" type="video/mp4">
                         </video>
                     </div>
                     <div class="video-card aspect-video">
-                        <video muted loop playsinline preload="none" class="hero-video" controls>
+                        <video autoplay muted loop playsinline preload="auto" controls>
                             <source src="videos/video5-vmus.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -2035,9 +2029,9 @@ function dismissSplash() {
         let isMuted = false;
 
         // Video plays muted (visuals only), BGM provides audio
-        // mainVideo already started by dismissSplash with delay
         mainVideo.muted = true;
         mainVideo.loop = true;
+        mainVideo.play().catch(()=>{});
 
         // Start BGM (may already be started by splash dismiss)
         function startBGM() {
@@ -2114,34 +2108,23 @@ function dismissSplash() {
         });
     })();
 
-    // 视频懒加载：封面消失后才开始观察，滚动到可视区域自动播放
+    // 视频懒加载：滚动到附近时自动播放
     (function() {
-        function initLazyVideos() {
-            const lazyVideos = document.querySelectorAll('.lazy-video');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const video = entry.target;
-                        if (!video.dataset.started) {
-                            video.preload = 'auto';
-                            video.play().catch(()=>{});
-                            video.dataset.started = '1';
-                        }
-                        observer.unobserve(video);
+        const lazyVideos = document.querySelectorAll('.lazy-video');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const video = entry.target;
+                    if (!video.dataset.started) {
+                        video.preload = 'auto';
+                        video.play().catch(()=>{});
+                        video.dataset.started = '1';
                     }
-                });
-            }, { rootMargin: '800px' });
-            lazyVideos.forEach(v => observer.observe(v));
-        }
-        // 等封面层消失后再初始化（如果封面已经消失则直接执行）
-        const checkSplash = setInterval(() => {
-            if (!document.getElementById('splash-overlay')) {
-                clearInterval(checkSplash);
-                initLazyVideos();
-            }
-        }, 300);
-        // 安全网：5秒后无论如何启动
-        setTimeout(() => { clearInterval(checkSplash); initLazyVideos(); }, 5000);
+                    observer.unobserve(video);
+                }
+            });
+        }, { rootMargin: '400px' });
+        lazyVideos.forEach(v => observer.observe(v));
     })();
 
     // 鼠标追随·樂
