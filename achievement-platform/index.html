@@ -238,33 +238,44 @@
     </div>
 </div>
 <script>
-// BGM最高优先级加载
+// BGM加载（90秒压缩版，1MB，循环播放）
 window.__bgm = new Audio();
 window.__bgm.preload = 'auto';
 window.__bgm.src = 'videos/bgm-spring.mp3';
 window.__bgm.loop = true;
 window.__bgm.volume = 0.5;
 window.__bgmUnlocked = false;
-// 封面显示期间就开始预加载首屏视频
-// 只预加载主视频，小视频用poster占位
-const link = document.createElement('link');
-link.rel = 'preload';
-link.as = 'video';
-link.href = 'videos/video3.mp4';
-document.head.appendChild(link);
+
+// 主视频最高优先级preload
+const preloadMain = document.createElement('link');
+preloadMain.rel = 'preload';
+preloadMain.as = 'video';
+preloadMain.href = 'videos/video3.mp4';
+document.head.appendChild(preloadMain);
+
+// 尝试自动播放BGM（多数浏览器会阻止，但某些场景可以）
+window.addEventListener('DOMContentLoaded', () => {
+    window.__bgm.play().then(() => {
+        window.__bgmUnlocked = true;
+        const btn = document.getElementById('audio-toggle');
+        if (btn) btn.innerHTML = '\uD83D\uDD0A';
+    }).catch(()=>{});
+});
 
 function dismissSplash() {
     const overlay = document.getElementById('splash-overlay');
     overlay.style.transition = 'opacity 0.6s ease';
     overlay.style.opacity = '0';
     setTimeout(() => overlay.remove(), 600);
-    // BGM立即播放
-    window.__bgm.play().then(() => {
-        window.__bgmUnlocked = true;
-        const btn = document.getElementById('audio-toggle');
-        if (btn) btn.innerHTML = '\uD83D\uDD0A';
-    }).catch(()=>{});
-    // 主视频立即播放（已preload）
+    // BGM播放（如果自动播放失败，这里用用户手势解锁）
+    if (!window.__bgmUnlocked) {
+        window.__bgm.play().then(() => {
+            window.__bgmUnlocked = true;
+            const btn = document.getElementById('audio-toggle');
+            if (btn) btn.innerHTML = '\uD83D\uDD0A';
+        }).catch(()=>{});
+    }
+    // 主视频立即播放
     const mainV = document.getElementById('main-video');
     if (mainV) { mainV.play().catch(()=>{}); }
     // 2秒后播放首屏4个小视频
@@ -346,7 +357,7 @@ function dismissSplash() {
                 <div class="video-center-main">
                     <h2 class="text-lg sm:text-xl font-bold text-center mb-3" style="background: linear-gradient(135deg, #e5b040 0%, #faf0d4 40%, #e5b040 70%, #d4982e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">编钟礼乐 · 服务大国外交</h2>
                     <div class="video-card aspect-video shadow-2xl shadow-gold-400/10" style="border-color: rgba(229,176,64,0.3);">
-                        <video id="main-video" muted loop playsinline preload="auto" controls>
+                        <video id="main-video" autoplay muted loop playsinline preload="auto" controls>
                             <source src="videos/video3.mp4" type="video/mp4">
                         </video>
                     </div>
