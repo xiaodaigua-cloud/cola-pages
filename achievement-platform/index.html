@@ -254,67 +254,31 @@ preloadMain.as = 'video';
 preloadMain.href = 'videos/video3.mp4';
 document.head.appendChild(preloadMain);
 
-// 尝试自动播放BGM（多策略绕过浏览器限制）
-window.addEventListener('DOMContentLoaded', () => {
-    // 策略1：直接play
-    window.__bgm.play().then(() => {
-        window.__bgmUnlocked = true;
-        const btn = document.getElementById('audio-toggle');
-        if (btn) btn.innerHTML = '\uD83D\uDD0A';
-    }).catch(()=>{
-        // 策略2：用AudioContext解锁
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const source = ctx.createMediaElementSource(window.__bgm);
-        source.connect(ctx.destination);
-        ctx.resume().then(() => {
-            window.__bgm.play().then(() => {
-                window.__bgmUnlocked = true;
-                const btn = document.getElementById('audio-toggle');
-                if (btn) btn.innerHTML = '\uD83D\uDD0A';
-            }).catch(()=>{});
-        }).catch(()=>{});
-    });
-    // 策略3：监听任何用户交互解锁
-    const unlockOnce = () => {
-        if (!window.__bgmUnlocked) {
-            window.__bgm.play().then(() => {
-                window.__bgmUnlocked = true;
-                const btn = document.getElementById('audio-toggle');
-                if (btn) btn.innerHTML = '\uD83D\uDD0A';
-            }).catch(()=>{});
-        }
-        document.removeEventListener('touchstart', unlockOnce);
-        document.removeEventListener('mousedown', unlockOnce);
-        document.removeEventListener('scroll', unlockOnce);
-    };
-    document.addEventListener('touchstart', unlockOnce, {once:true});
-    document.addEventListener('mousedown', unlockOnce, {once:true});
-    document.addEventListener('scroll', unlockOnce, {once:true});
-});
+// BGM在用户点击封面后播放（浏览器要求用户交互后才允许音频，封面点击=交互）
 
 function dismissSplash() {
     const overlay = document.getElementById('splash-overlay');
     overlay.style.transition = 'opacity 0.6s ease';
     overlay.style.opacity = '0';
     setTimeout(() => overlay.remove(), 600);
-    // BGM播放（用户点击=手势解锁，强制播放）
-    try {
-        window.__bgm.muted = false;
-        window.__bgm.volume = 0.5;
-        const playPromise = window.__bgm.play();
-        if (playPromise) playPromise.then(() => {
-            window.__bgmUnlocked = true;
-            const btn = document.getElementById('audio-toggle');
-            if (btn) btn.innerHTML = '\uD83D\uDD0A';
-        }).catch(()=>{});
-    } catch(e){}
-    if (!window.__bgmUnlocked) {
-        window.__bgm.play().then(() => {
-            window.__bgmUnlocked = true;
-            const btn = document.getElementById('audio-toggle');
-            if (btn) btn.innerHTML = '\uD83D\uDD0A';
-        }).catch(()=>{});
-    }
+    // BGM播放：封面点击就是用户交互，浏览器必允许
+    window.__bgm.muted = false;
+    window.__bgm.volume = 0.5;
+    window.__bgm.currentTime = 0;
+    window.__bgm.play().then(() => {
+        window.__bgmUnlocked = true;
+        const btn = document.getElementById('audio-toggle');
+        if (btn) btn.innerHTML = '\uD83D\uDD0A';
+    }).catch(()=>{
+        // 极端情况下再试一次
+        setTimeout(() => {
+            window.__bgm.play().then(() => {
+                window.__bgmUnlocked = true;
+                const btn = document.getElementById('audio-toggle');
+                if (btn) btn.innerHTML = '\uD83D\uDD0A';
+            }).catch(()=>{});
+        }, 100);
+    });
     // 主视频立即播放
     const mainV = document.getElementById('main-video');
     if (mainV) { mainV.play().catch(()=>{}); }
@@ -363,10 +327,11 @@ function dismissSplash() {
             <p class="text-xl sm:text-2xl text-navy-200 mb-6">
                 跨界创智能力培养新范式构建与实践
             </p>
+            <p class="text-navy-300 text-xs sm:text-sm mb-2">成果所属类别及领域代码：</p>
             <div class="flex flex-wrap justify-center gap-3 mb-4">
-                <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">艺术学</span>
-                <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">强化AI运用</span>
-                <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">研究生+本科贯通</span>
+                <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">所属学科：艺术学-13</span>
+                <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">评审具体领域：强化AI运用-04</span>
+                <span class="px-4 py-1.5 glass rounded-full text-sm text-gold-300">成果门类：本科与研究生共用-2</span>
             </div>
         </div>
 
