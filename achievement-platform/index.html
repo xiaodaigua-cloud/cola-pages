@@ -297,7 +297,17 @@ function dismissSplash() {
     overlay.style.transition = 'opacity 0.6s ease';
     overlay.style.opacity = '0';
     setTimeout(() => overlay.remove(), 600);
-    // BGM播放（如果自动播放失败，这里用用户手势解锁）
+    // BGM播放（用户点击=手势解锁，强制播放）
+    try {
+        window.__bgm.muted = false;
+        window.__bgm.volume = 0.5;
+        const playPromise = window.__bgm.play();
+        if (playPromise) playPromise.then(() => {
+            window.__bgmUnlocked = true;
+            const btn = document.getElementById('audio-toggle');
+            if (btn) btn.innerHTML = '\uD83D\uDD0A';
+        }).catch(()=>{});
+    } catch(e){}
     if (!window.__bgmUnlocked) {
         window.__bgm.play().then(() => {
             window.__bgmUnlocked = true;
@@ -2111,6 +2121,18 @@ function dismissSplash() {
             }
         });
     })();
+
+    // 视频点击切换静音/有声（给所有video加上点击切换muted的能力）
+    document.querySelectorAll('video').forEach(v => {
+        v.addEventListener('click', function(e) {
+            // 如果是点击原生controls区域，不处理
+            const rect = v.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            // controls通常在底部40px区域
+            if (clickY > rect.height - 40) return;
+            v.muted = !v.muted;
+        });
+    });
 
     // AI Tools expand/collapse toggle
     function toggleToolList(id) {
