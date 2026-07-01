@@ -149,7 +149,7 @@
         @keyframes robot-blink { 0%,90%,100% { opacity: 1; } 95% { opacity: 0.3; } }
         @keyframes bounce-in { 0% { transform: scale(0) translateY(10px); opacity: 0; } 50% { transform: scale(1.05) translateY(-2px); } 100% { transform: scale(1) translateY(0); opacity: 1; } }
         .animate-bounce-in { animation: bounce-in 0.5s ease-out forwards; }
-        .ai-chat-window { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,0.95); transform-origin: bottom right; transition: transform 0.3s ease, opacity 0.3s ease; display: none; }
+        .ai-chat-window { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,0.95); transform-origin: bottom right; transition: transform 0.3s ease, opacity 0.3s ease; display: none; flex-direction: column; }
         .ai-chat-window.open { display: flex !important; flex-direction: column; transform: scale(1); opacity: 1; pointer-events: auto; }
 
         /* 横向循环滚动展示栏 */
@@ -228,7 +228,7 @@
 <!-- ========== 入场封面层（解锁BGM） ========== -->
 <div id="splash-overlay" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-br from-[#0a0e27] via-[#141a3d] to-[#1a1040] cursor-pointer" onclick="dismissSplash()">
     <div class="text-center px-6">
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent mb-6 leading-tight tracking-wide">基于AI·PACT框架的<br class="hidden sm:block">音乐学科研究生美育转化能力培养新范式</h1>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent mb-6 leading-relaxed tracking-wide">基于AI·PACT框架的<br class="hidden sm:block">音乐学科研究生美育转化能力培养新范式</h1>
         <p class="text-sm sm:text-base text-gray-300 mb-3 max-w-2xl mx-auto leading-relaxed">成果实践落实《教育发展“十五五”规划》战略任务</p>
         <div class="flex flex-wrap justify-center gap-2 mb-8">
             <span class="px-3 py-1 rounded-full text-xs text-amber-200 border border-amber-400/40 bg-amber-900/20">“推进学科美育教学改革”</span>
@@ -325,7 +325,7 @@ function dismissSplash() {
     <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
         <!-- 标题区 -->
         <div class="text-center mb-10">
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black title-gradient mb-4 leading-tight tracking-wide">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black title-gradient mb-4 leading-relaxed tracking-wide">
                 基于AI·PACT框架的<br class="hidden sm:block">音乐学科研究生美育转化能力培养新范式
             </h1>
 
@@ -1055,17 +1055,6 @@ function dismissSplash() {
                 <div class="flex-1 h-px bg-gradient-to-r from-emerald-200 to-transparent ml-4"></div>
             </div>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- 王红 -->
-                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
-                        <img src="photos/王红.jpg" alt="王红" class="w-full h-full object-cover object-top">
-                    </div>
-                    <div class="min-w-0">
-                        <h4 class="font-bold text-navy-900 text-sm"><a href="http://cte.scnu.edu.cn/shiziduiwu/zhuanrenjiaoshi/" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">王红</a></h4>
-                        <p class="text-gray-500 text-xs">教授 · 华南师范大学</p>
-                        <p class="text-gray-600 text-xs mt-1 truncate">国家教学成果一等奖</p>
-                    </div>
-                </div>
                 <!-- 宋晔 -->
                 <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
                     <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
@@ -1075,6 +1064,17 @@ function dismissSplash() {
                         <h4 class="font-bold text-navy-900 text-sm"><a href="https://www.htu.edu.cn/_s3/2022/0711/c13035a247829/page.psp" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">宋晔</a></h4>
                         <p class="text-gray-500 text-xs">教授 · 河南师范大学</p>
                         <p class="text-gray-600 text-xs mt-1 truncate">副校长，教育理论+VR+数字教材</p>
+                    </div>
+                </div>
+                <!-- 王红 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/王红.jpg" alt="王红" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="http://cte.scnu.edu.cn/shiziduiwu/zhuanrenjiaoshi/" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">王红</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 华南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">国家教学成果一等奖</p>
                     </div>
                 </div>
                 <!-- 曹玉涛 -->
@@ -1099,6 +1099,28 @@ function dismissSplash() {
                         <p class="text-gray-600 text-xs mt-1 truncate">国务院津贴，文旅部旅游规划人才</p>
                     </div>
                 </div>
+                <!-- 刘志芳 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/刘志芳.jpg" alt="刘志芳" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://7b2526f5f9ea4a64afaca77b35567ac8.app.codebuddy.work/" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">刘志芳</a></h4>
+                        <p class="text-gray-500 text-xs">教授 · 河南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">教育部"拓金计划"示范课程</p>
+                    </div>
+                </div>
+                <!-- 张云婷 -->
+                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
+                        <img src="photos/张云婷.jpg" alt="张云婷" class="w-full h-full object-cover object-top">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://769f6df1a02a4f798d4fb49d88f0056b.app.codebuddy.work/" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">张云婷</a></h4>
+                        <p class="text-gray-500 text-xs">副教授 · 华南师范大学</p>
+                        <p class="text-gray-600 text-xs mt-1 truncate">教育部师德师风建设基地研究员</p>
+                    </div>
+                </div>
                 <!-- 孟萌 -->
                 <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
                     <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
@@ -1106,7 +1128,7 @@ function dismissSplash() {
                     </div>
                     <div class="min-w-0">
                         <h4 class="font-bold text-navy-900 text-sm">孟萌</h4>
-                        <p class="text-gray-500 text-xs">副教授 · 河南师范大学</p>
+                        <p class="text-gray-500 text-xs">校聘副教授 · 河南师范大学</p>
                         <p class="text-gray-600 text-xs mt-1 truncate">教育专业博士，小学教育·教育评价</p>
                     </div>
                 </div>
@@ -1117,34 +1139,11 @@ function dismissSplash() {
                     </div>
                     <div class="min-w-0">
                         <h4 class="font-bold text-navy-900 text-sm"><a href="https://www.htu.edu.cn/tjb/2023/1106/c17365a289374/page.htm" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">牛宇帆</a></h4>
-                        <p class="text-gray-500 text-xs">讲师 · 河南师范大学</p>
+                        <p class="text-gray-500 text-xs">校聘副教授 · 河南师范大学</p>
                         <p class="text-gray-600 text-xs mt-1 truncate">教育数据分析</p>
                     </div>
                 </div>
-                <!-- 张云婷 -->
-                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
-                        <img src="photos/张云婷.jpg" alt="张云婷" class="w-full h-full object-cover object-top">
-                    </div>
-                    <div class="min-w-0">
-                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://769f6df1a02a4f798d4fb49d88f0056b.app.codebuddy.work/" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">张云婷</a></h4>
-                        <p class="text-gray-500 text-xs">华南师范大学</p>
-                        <p class="text-gray-600 text-xs mt-1 truncate">教育部师德师风建设基地（华南师范大学）研究员</p>
-                    </div>
-                </div>
-                <!-- 刘志芳 -->
-                <div class="member-card glass-light rounded-xl p-4 flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-gold-300/50">
-                        <img src="photos/刘志芳.jpg" alt="刘志芳" class="w-full h-full object-cover object-top">
-                    </div>
-                    <div class="min-w-0">
-                        <h4 class="font-bold text-navy-900 text-sm"><a href="https://7b2526f5f9ea4a64afaca77b35567ac8.app.codebuddy.work/" target="_blank" onclick="window.open(this.href);return false;" class="member-name-link">刘志芳</a></h4>
-                        <p class="text-gray-500 text-xs">河南师范大学</p>
-                        <p class="text-gray-600 text-xs mt-1 truncate">教育部“拓金计划”示范课程</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </div>
 </section>
 
@@ -1510,7 +1509,7 @@ function dismissSplash() {
                         <img src="photos/wuhequan-book.jpg" alt="邬贺铨院士推荐" class="w-32 h-auto rounded-lg shadow-md">
                         <div>
                             <h4 class="font-bold text-base mb-2"><span class="text-gold-600">中国工程院院士、中国互联网协会专家咨询委员会主任</span><br><span class="text-navy-900 text-lg">邬贺铨</span></h4>
-                            <p class="text-gray-600 text-sm leading-relaxed">为团队成果出版物《豆包高效学习：AI辅助中小学生学习的方法与技巧》（机械工业出版社）作序推荐，充分肯定AI赋能基础教育美育的实践价值。</p>
+                            <p class="text-gray-600 text-sm leading-relaxed">为团队成果出版物作序推荐，充分肯定AI赋能美育的实践价值。</p>
                         </div>
                     </div>
                 </div>
@@ -2198,7 +2197,7 @@ function dismissSplash() {
 </div>
 
 <!-- AI助手聊天窗口 -->
-<div id="ai-chat-window" class="fixed bottom-24 right-6 z-50 w-[360px] max-w-[85vw] h-[480px] rounded-2xl ai-chat-window border border-gray-200 shadow-2xl flex-col overflow-hidden">
+<div id="ai-chat-window" class="fixed bottom-24 right-6 z-50 w-[360px] max-w-[85vw] h-[480px] rounded-2xl ai-chat-window border border-gray-200 shadow-2xl overflow-hidden">
     <!-- Header -->
     <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white">
         <span class="font-semibold text-sm">🎵 美育智能助手</span>
