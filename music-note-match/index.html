@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>音乐知识连连看 · 音符时值</title>
+<style>
+  /* ========== 基础样式：大屏 16:9、大字、高对比 ========== */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Heiti SC", "SimHei", sans-serif;
+    background: #FFF8E7;
+    color: #1F2A44;
+    font-size: 28px;
+    overflow: hidden;
+    user-select: none;
+  }
+  #app {
+    width: 100vw; height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  /* 顶部信息栏 */
+  #topbar {
+    flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px; padding: 14px 32px;
+    background: #1F4E9C; color: #FFFFFF;
+    font-size: 30px; font-weight: bold;
+  }
+  #topbar .info { display: flex; gap: 32px; align-items: center; }
+  .tempo-box { display: flex; align-items: center; gap: 12px; font-size: 28px; }
+  .tempo-box svg { width: 28px; height: 40px; }
+  .tempo-box input[type=range] { width: 200px; height: 36px; accent-color: #FFC83D; }
+  #screen {
+    flex: 1 1 auto; position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px 32px;
+  }
+  h1 { font-size: 64px; margin-bottom: 24px; color: #1F4E9C; }
+  h2 { font-size: 44px; margin-bottom: 16px; color: #1F4E9C; }
+  p.tip { font-size: 32px; margin-bottom: 16px; text-align: center; line-height: 1.5; }
+
+  /* 大按钮 */
+  .btn {
+    font-family: inherit; font-size: 36px; font-weight: bold;
+    min-width: 240px; min-height: 90px; padding: 12px 40px; margin: 12px;
+    border: 4px solid #1F2A44; border-radius: 20px;
+    background: #FFC83D; color: #1F2A44; cursor: pointer;
+    box-shadow: 0 6px 0 #1F2A44;
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1F2A44; }
+  .btn.secondary { background: #FFFFFF; }
+
+  /* 卡片网格 */
+  #board { display: grid; gap: 22px; justify-content: center; align-content: center; }
+  .card {
+    position: relative;
+    min-width: 120px; min-height: 120px;
+    background: #FFFFFF;
+    border: 5px solid #1F2A44; border-radius: 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 34px; font-weight: bold;
+    box-shadow: 0 6px 0 rgba(31,42,68,0.35);
+    transition: transform 0.15s, background 0.2s;
+  }
+  .card svg.note { width: 55%; height: 62%; }
+  .card .name { font-size: 28px; margin-top: 4px; }
+  .card .big-text { font-size: 44px; text-align: center; line-height: 1.25; padding: 0 8px; }
+  .card .listen {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 40px; padding: 12px 22px; border-radius: 16px;
+    background: #FFC83D; border: 4px solid #1F2A44;
+  }
+  .card .listen svg { width: 34px; height: 34px; }
+  /* 选中：蓝色粗框 + 上浮（不只靠颜色） */
+  .card.selected { border-color: #1F4E9C; border-width: 9px; transform: translateY(-8px); background: #E3EEFF; }
+  /* 配对成功：绿色 + ✓ 图标 + 实线粗框 */
+  .card.matched { background: #2E9E5B; color: #FFFFFF; border-color: #145A32; cursor: default; }
+  .card.matched svg.note { fill: #FFFFFF; stroke: #FFFFFF; }
+  .card.matched .listen { background: #FFFFFF; color: #1F2A44; }
+  /* 配对失败：橙色 + ✗ 图标 + 虚线框 + 抖动 */
+  .card.wrong { background: #FFD9B3; border-color: #C0392B; border-style: dashed; animation: shake 0.5s; }
+  .mark {
+    position: absolute; top: -18px; right: -18px;
+    width: 56px; height: 56px; border-radius: 50%;
+    display: none; align-items: center; justify-content: center;
+    border: 4px solid #1F2A44; background: #FFFFFF;
+  }
+  .mark svg { width: 34px; height: 34px; }
+  .card.matched .mark.ok { display: flex; }
+  .card.wrong .mark.no { display: flex; }
+  .beat-tip {
+    position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+    background: #1F2A44; color: #FFFFFF; font-size: 28px;
+    padding: 4px 14px; border-radius: 12px; white-space: nowrap; display: none;
+  }
+  .card.wrong .beat-tip { display: block; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+  }
+
+  /* 结果页表格 */
+  table.result { border-collapse: collapse; margin: 16px 0 24px; font-size: 32px; }
+  table.result th, table.result td { border: 3px solid #1F2A44; padding: 12px 36px; text-align: center; }
+  table.result th { background: #1F4E9C; color: #FFFFFF; }
+  .confuse { font-size: 34px; margin-bottom: 20px; background: #FFFFFF; border: 4px dashed #C0392B; border-radius: 16px; padding: 12px 28px; }
+  .row { display: flex; flex-wrap: wrap; justify-content: center; }
+  .banner { font-size: 34px; margin-bottom: 18px; font-weight: bold; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div id="titleText">音符时值连连看</div>
+    <div class="info">
+      <span id="levelText"></span>
+      <span id="timeText"></span>
+      <span id="errText"></span>
+      <label class="tempo-box">
+        <span id="tempoIcon"></span>
+        <span>= <b id="tempoVal">80</b></span>
+        <input id="tempoRange" type="range" min="60" max="100" step="5" value="80">
+      </label>
+    </div>
+  </div>
+  <div id="screen"></div>
+</div>
+
+<script>
+/* =====================================================================
+ * 第一层：CONFIG 数据层（老师换知识点只改这里）
+ * ---------------------------------------------------------------------
+ * pairs 每一行就是一对卡片：
+ *   name    ：名称（第 1 关卡片下方显示，结果页“最常配错”也用它）
+ *   symbol  ：左卡显示什么
+ *             { note: 'whole' | 'half' | 'quarter' | 'eighth' | 'sixteenth', dot: true/false }  → 画五线谱音符
+ *             { text: '2/4' }                                                                     → 显示文字
+ *   meaning ：右卡（第 2 关）显示的文字，配错时也用它提示“这张卡是几拍”
+ *   beats   ：拍数（以四分音符为一拍）
+ *   sound   ：（可选）声音怎么播。默认：用 beats 当一个音的长度，在一小节（meter 拍）里重复
+ *             { unit: 每个音几拍, meter: 这一小节几拍 }
+ * ===================================================================== */
+const CONFIG = {
+  title: '音符时值连连看',
+  meter: 4,            // 配对成功时播放的一小节拍数（4/4 拍）
+  tempo: 80,           // 默认速度 ♩ = 80
+  tempoMin: 60,        // 速度可调范围
+  tempoMax: 100,
+  failDelay: 1500,     // 配错后多少毫秒翻回（1.5 秒）
+  levels: [
+    { name: '认外观', tip: '找出两张一模一样的音符卡！' },
+    { name: '对含义', tip: '音符和它的拍数，手拉手配成一对！' },
+    { name: '听声音', tip: '点“听”按钮，听一听，找出是哪个音符！' }
+  ],
+  pairs: [
+    { id: 1, name: '四分音符',     symbol: { note: 'quarter' },              meaning: '1 拍',       beats: 1 },
+    { id: 2, name: '八分音符',     symbol: { note: 'eighth' },               meaning: '半拍',       beats: 0.5 },
+    { id: 3, name: '十六分音符',   symbol: { note: 'sixteenth' },            meaning: '四分之一拍', beats: 0.25 },
+    { id: 4, name: '附点四分音符', symbol: { note: 'quarter', dot: true },   meaning: '一拍半',     beats: 1.5 }
+  ]
+};
+
+/* =====================================================================
+ * 声音模块：Web Audio API 现场合成（不使用任何音频文件）
+ * 第一次点击“开始”时才创建 AudioContext，适配浏览器自动播放限制
+ * ===================================================================== */
+let audioCtx = null;
+let currentBus = null;   // 当前正在播放的那一小节，用于打断
+
+function initAudio() {
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) audioCtx = new AC();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+// 停止正在播放的声音
+function stopSound() {
+  if (currentBus) {
+    try { currentBus.gain.setValueAtTime(0, audioCtx.currentTime); currentBus.disconnect(); } catch (e) {}
+    currentBus = null;
+  }
+}
+
+// 播放一个音：freq 频率，start 开始时间，dur 时长，type 波形，vol 音量
+function tone(bus, freq, start, dur, type, vol) {
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, start);
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.exponentialRampToValueAtTime(vol, start + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  osc.connect(g); g.connect(bus);
+  osc.start(start); osc.stop(start + dur + 0.02);
+}
+
+// 播放某一对的节奏：一小节里重复这个时值 + 拍点声（重拍音高一些）
+// 返回这一小节的毫秒数
+function playPairRhythm(pair, tempo) {
+  const unit = (pair.sound && pair.sound.unit) || pair.beats;
+  const meter = (pair.sound && pair.sound.meter) || CONFIG.meter;
+  const spb = 60 / tempo;                       // 每拍秒数
+  if (!audioCtx) return meter * spb * 1000;
+  stopSound();
+  const bus = audioCtx.createGain();
+  bus.gain.value = 1;
+  bus.connect(audioCtx.destination);
+  currentBus = bus;
+  const t0 = audioCtx.currentTime + 0.08;
+  // 拍点声：第 1 拍是重拍，音高一些
+  for (let b = 0; b < meter; b++) {
+    tone(bus, b === 0 ? 1760 : 1046, t0 + b * spb, 0.06, 'square', b === 0 ? 0.25 : 0.15);
+  }
+  // 节奏音：在一小节里能放几个就放几个，剩下的只听拍点
+  for (let t = 0; t + unit <= meter + 1e-9; t += unit) {
+    tone(bus, 523.25, t0 + t * spb, Math.max(0.08, unit * spb * 0.85), 'triangle', 0.5);
+  }
+  return meter * spb * 1000 + 100;
+}
+
+/* =====================================================================
+ * 第二层：规则层（配对判断、关卡切换、计分）—— 只管数据，不碰界面
+ * ===================================================================== */
+const state = {
+  level: 0,          // 当前关卡 0/1/2
+  onlyOne: false,    // 是否“换一关”只玩一关
+  cards: [],         // 当前关的卡片
+  first: null,       // 第一张被选中的卡
+  locked: false,     // 判断中，暂时不能点
+  tempo: CONFIG.tempo,
+  stats: [],         // 每关 { time, errors, played }
+  wrongPairs: {},    // 配错统计 { '四分音符 ↔ 八分音符': 次数 }
+  levelStart: 0
+};
+
+function findPair(pid) { return CONFIG.pairs.find(p => p.id === pid); }
+
+// 随机打乱（洗牌）
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// 生成某一关的卡片：卡片数 = 配对数 × 2
+function buildDeck(level) {
+  const faceB = ['symbol', 'meaning', 'sound'][level];
+  const deck = [];
+  CONFIG.pairs.forEach(p => {
+    deck.push({ pid: p.id, face: 'symbol', matched: false });
+    deck.push({ pid: p.id, face: faceB, matched: false });
+  });
+  return shuffle(deck).map((c, i) => Object.assign(c, { uid: i }));
+}
+
+// 判断两张卡是否配对
+function isMatch(a, b) {
+  return a.uid !== b.uid && a.pid === b.pid;
+}
+
+// 记录一次配错
+function recordError(a, b) {
+  state.stats[state.level].errors++;
+  const names = [findPair(a.pid).name, findPair(b.pid).name].sort();
+  const key = names[0] === names[1] ? names[0] : names.join(' ↔ ');
+  state.wrongPairs[key] = (state.wrongPairs[key] || 0) + 1;
+}
+
+// 当前关是否全部配完
+function levelDone() { return state.cards.every(c => c.matched); }
+
+// 最常配错的一对
+function mostConfused() {
+  let best = null, n = 0;
+  Object.keys(state.wrongPairs).forEach(k => {
+    if (state.wrongPairs[k] > n) { best = k; n = state.wrongPairs[k]; }
+  });
+  return best ? { key: best, count: n } : null;
+}
+
+// 开始整局游戏（从第 startLevel 关开始；onlyOne = 只玩这一关）
+function startGame(startAt, onlyOne) {
+  initAudio();   // 第一次点击“开始”时启动声音
+  state.onlyOne = !!onlyOne;
+  state.stats = CONFIG.levels.map(() => ({ time: 0, errors: 0, played: false }));
+  state.wrongPairs = {};
+  startLevel(startAt);
+}
+
+// 开始某一关
+function startLevel(level) {
+  state.level = level;
+  state.cards = buildDeck(level);
+  state.first = null;
+  state.locked = false;
+  state.levelStart = Date.now();
+  state.stats[level].played = true;
+  ui.renderLevel();
+}
+
+// 一关结束：记录用时，进入下一关或结果页
+function finishLevel() {
+  state.stats[state.level].time = Math.round((Date.now() - state.levelStart) / 1000);
+  if (state.onlyOne || state.level >= CONFIG.levels.length - 1) {
+    ui.renderResult();
+  } else {
+    startLevel(state.level + 1);
+  }
+}
+
+// 点击一张卡（规则核心）
+function clickCard(uid) {
+  if (state.locked) return;
+  const card = state.cards[uid];
+  if (!card || card.matched) return;
+  // 第 3 关：点“听”卡就播放它的节奏
+  if (card.face === 'sound') playPairRhythm(findPair(card.pid), state.tempo);
+
+  if (!state.first) {                       // 第一张
+    state.first = card;
+    ui.select(card, true);
+    return;
+  }
+  if (state.first.uid === card.uid) {       // 点同一张 = 取消选中
+    ui.select(card, false);
+    state.first = null;
+    return;
+  }
+  const a = state.first, b = card;
+  state.first = null;
+  if (isMatch(a, b)) {                      // 配对成功
+    a.matched = b.matched = true;
+    ui.select(a, false);
+    ui.showMatch(a, b);
+    const ms = playPairRhythm(findPair(a.pid), state.tempo);
+    if (levelDone()) {
+      state.locked = true;
+      setTimeout(finishLevel, Math.max(ms, 1200) + 300);
+    }
+  } else {                                  // 配对失败
+    recordError(a, b);
+    state.locked = true;
+    ui.select(a, false);
+    ui.showWrong(a, b);
+    setTimeout(() => {
+      ui.clearWrong(a, b);
+      state.locked = false;
+    }, CONFIG.failDelay);
+  }
+}
+
+/* =====================================================================
+ * 第三层：界面层（只负责显示和动画）
+ * ===================================================================== */
+const ui = {
+  screen: document.getElementById('screen'),
+  timer: null,
+
+  // 画音符的 SVG：符头、符干、符尾、附点
+  noteSVG(symbol) {
+    const type = symbol.note;
+    const hollow = (type === 'whole' || type === 'half');
+    const hasStem = (type !== 'whole');
+    const flags = type === 'eighth' ? 1 : type === 'sixteenth' ? 2 : 0;
+    let s = '<svg class="note" viewBox="0 0 100 140" fill="#1F2A44" stroke="#1F2A44" xmlns="http://www.w3.org/2000/svg">';
+    // 符头（略倾斜的椭圆）
+    s += '<ellipse cx="40" cy="108" rx="19" ry="13" transform="rotate(-22 40 108)" ' +
+         (hollow ? 'fill="none" stroke-width="6"' : 'stroke-width="0"') + '/>';
+    // 符干
+    if (hasStem) s += '<rect x="54" y="18" width="6" height="88" stroke-width="0"/>';
+    // 符尾
+    for (let i = 0; i < flags; i++) {
+      const y = 18 + i * 22;
+      s += '<path d="M57 ' + y + ' C 62 ' + (y + 22) + ', 92 ' + (y + 30) + ', 80 ' + (y + 62) +
+           ' C 84 ' + (y + 38) + ', 66 ' + (y + 32) + ', 57 ' + (y + 26) + ' Z" stroke-width="0"/>';
+    }
+    // 附点
+    if (symbol.dot) s += '<circle cx="76" cy="110" r="7" stroke-width="0"/>';
+    s += '</svg>';
+    return s;
+  },
+  // 左卡内容：音符或文字
+  symbolHTML(pair, showName) {
+    if (pair.symbol.note) {
+      return this.noteSVG(pair.symbol) + (showName ? '<div class="name">' + pair.name + '</div>' : '');
+    }
+    return '<div class="big-text">' + pair.symbol.text + '</div>';
+  },
+  iconOK() { return '<svg viewBox="0 0 40 40"><path d="M7 21 L17 31 L34 10" fill="none" stroke="#145A32" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>'; },
+  iconNO() { return '<svg viewBox="0 0 40 40"><path d="M9 9 L31 31 M31 9 L9 31" fill="none" stroke="#C0392B" stroke-width="7" stroke-linecap="round"/></svg>'; },
+  iconPlay() { return '<svg viewBox="0 0 40 40"><path d="M10 5 L35 20 L10 35 Z" fill="#1F2A44"/></svg>'; },
+
+  // 顶部信息
+  updateBar() {
+    const lv = state.level;
+    document.getElementById('levelText').textContent = '第 ' + (lv + 1) + ' 关 · ' + CONFIG.levels[lv].name;
+    document.getElementById('errText').textContent = '错 ' + state.stats[lv].errors + ' 次';
+    document.getElementById('timeText').textContent = '⏱ ' + Math.round((Date.now() - state.levelStart) / 1000) + ' 秒';
+  },
+  clearBar() {
+    ['levelText', 'timeText', 'errText'].forEach(id => document.getElementById(id).textContent = '');
+  },
+
+  // 首页
+  renderStart() {
+    clearInterval(this.timer);
+    this.clearBar();
+    this.screen.innerHTML =
+      '<h1>' + CONFIG.title + '</h1>' +
+      '<p class="tip">一共 3 关：认外观 → 对含义 → 听声音<br>点一张卡，再点一张，配成一对就变绿！</p>' +
+      '<button class="btn" id="btnStart">开始</button>';
+    document.getElementById('btnStart').onclick = () => startGame(0, false);
+  },
+
+  // 关卡页
+  renderLevel() {
+    const lv = state.level;
+    const n = state.cards.length;
+    const cols = Math.ceil(Math.sqrt(n * 1.6));
+    const rows = Math.ceil(n / cols);
+    let html = '<div class="banner">第 ' + (lv + 1) + ' 关｜' + CONFIG.levels[lv].name + '：' + CONFIG.levels[lv].tip + '</div>';
+    html += '<div id="board" style="grid-template-columns: repeat(' + cols + ', auto);">';
+    state.cards.forEach(c => {
+      const p = findPair(c.pid);
+      let inner = '';
+      if (c.face === 'symbol') inner = this.symbolHTML(p, lv === 0);
+      else if (c.face === 'meaning') inner = '<div class="big-text">' + p.meaning + '</div>';
+      else inner = '<div class="listen">' + this.iconPlay() + '<span>听</span></div>';
+      html += '<div class="card" id="card' + c.uid + '" data-uid="' + c.uid + '" data-pid="' + c.pid + '">' +
+              inner +
+              '<div class="mark ok">' + this.iconOK() + '</div>' +
+              '<div class="mark no">' + this.iconNO() + '</div>' +
+              '<div class="beat-tip">' + p.meaning + '</div>' +
+              '</div>';
+    });
+    html += '</div>';
+    this.screen.innerHTML = html;
+    this.sizeCards(cols, rows);
+    document.querySelectorAll('.card').forEach(el => {
+      el.onclick = () => clickCard(Number(el.dataset.uid));
+    });
+    clearInterval(this.timer);
+    this.updateBar();
+    this.timer = setInterval(() => this.updateBar(), 500);
+  },
+
+  // 卡片大小：铺满屏幕，最小 120×120
+  sizeCards(cols, rows) {
+    const scr = this.screen.getBoundingClientRect();
+    const gap = 22;
+    const w = (scr.width - 80 - gap * (cols - 1)) / cols;
+    const h = (scr.height - 110 - gap * (rows - 1)) / rows;
+    const size = Math.max(120, Math.min(w, h, 260));
+    document.querySelectorAll('.card').forEach(el => {
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+    });
+  },
+
+  select(card, on) {
+    const el = document.getElementById('card' + card.uid);
+    if (el) el.classList.toggle('selected', on);
+  },
+  showMatch(a, b) {
+    [a, b].forEach(c => document.getElementById('card' + c.uid).classList.add('matched'));
+  },
+  showWrong(a, b) {
+    [a, b].forEach(c => document.getElementById('card' + c.uid).classList.add('wrong'));
+    this.updateBar();
+  },
+  clearWrong(a, b) {
+    [a, b].forEach(c => {
+      const el = document.getElementById('card' + c.uid);
+      if (el) el.classList.remove('wrong');
+    });
+  },
+
+  // 结果页 = 学习证据
+  renderResult() {
+    clearInterval(this.timer);
+    this.clearBar();
+    let rows = '';
+    CONFIG.levels.forEach((lv, i) => {
+      const s = state.stats[i];
+      rows += '<tr><td>第 ' + (i + 1) + ' 关 · ' + lv.name + '</td><td>' +
+              (s.played ? s.time + ' 秒' : '—') + '</td><td>' +
+              (s.played ? s.errors + ' 次' : '—') + '</td></tr>';
+    });
+    const mc = mostConfused();
+    const confuse = mc ? '最常配错的一对：<b>' + mc.key + '</b>（' + mc.count + ' 次）' : '一次都没配错，太棒了！';
+    this.screen.innerHTML =
+      '<h2>闯关成功！</h2>' +
+      '<table class="result"><tr><th>关卡</th><th>用时</th><th>错误次数</th></tr>' + rows + '</table>' +
+      '<div class="confuse">' + confuse + '</div>' +
+      '<div class="row"><button class="btn" id="btnAgain">再来一次</button>' +
+      '<button class="btn secondary" id="btnPick">换一关</button></div>' +
+      '<div class="row" id="pickRow"></div>';
+    document.getElementById('btnAgain').onclick = () => startGame(0, false);
+    document.getElementById('btnPick').onclick = () => this.renderPick();
+  },
+
+  // 换一关：选择想玩的关
+  renderPick() {
+    const row = document.getElementById('pickRow');
+    row.innerHTML = CONFIG.levels.map((lv, i) =>
+      '<button class="btn secondary pick" data-lv="' + i + '">第 ' + (i + 1) + ' 关 · ' + lv.name + '</button>').join('');
+    row.querySelectorAll('.pick').forEach(b => {
+      b.onclick = () => startGame(Number(b.dataset.lv), true);
+    });
+  }
+};
+
+/* ========== 速度调节：♩ = 60—100 ========== */
+(function initTempo() {
+  const range = document.getElementById('tempoRange');
+  range.min = CONFIG.tempoMin; range.max = CONFIG.tempoMax; range.value = CONFIG.tempo;
+  document.getElementById('tempoVal').textContent = CONFIG.tempo;
+  document.getElementById('tempoIcon').innerHTML =
+    '<svg viewBox="0 0 30 44"><ellipse cx="11" cy="36" rx="8" ry="6" transform="rotate(-22 11 36)" fill="#FFFFFF"/><rect x="17" y="4" width="3" height="32" fill="#FFFFFF"/></svg>';
+  range.oninput = () => {
+    state.tempo = Number(range.value);
+    document.getElementById('tempoVal').textContent = range.value;
+  };
+  document.getElementById('titleText').textContent = CONFIG.title;
+})();
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('board')) {
+    const n = state.cards.length, cols = Math.ceil(Math.sqrt(n * 1.6));
+    ui.sizeCards(cols, Math.ceil(n / cols));
+  }
+});
+
+ui.renderStart();
+</script>
+</body>
+</html>
