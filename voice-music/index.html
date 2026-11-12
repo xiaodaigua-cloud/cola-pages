@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>声语成乐 · 声音转译实验室</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">◒</span><div><h1>声语成乐</h1><p>VOICE → MUSIC LAB</p></div></div>
+      <div class="top-meta"><span class="live-dot"></span><span id="statusText">准备就绪</span><span class="pill">16:9 大屏模式</span></div>
+    </header>
+    <section class="hero-grid">
+      <div class="hero-copy"><span class="eyebrow">声音转译实验室 / 01</span><h2>把自然语言<br/><em>听见</em>成旋律</h2><p>录下你的声音，观察波形与频谱如何随播放移动，并将可辨识的基频转译为音符。</p><div class="hero-actions"><button id="recordBtn" class="primary"><span>●</span> 开始录音</button><button id="uploadBtn" class="secondary">导入音频</button><input id="fileInput" type="file" accept="audio/*" hidden /></div></div>
+      <div class="signal-card"><div class="section-head"><div><span class="eyebrow">LIVE SIGNAL</span><h3>原始声音波形</h3></div><span id="duration">00:00.0</span></div><canvas id="waveCanvas"></canvas><div class="timeline"><span>00:00</span><div class="timeline-track"><i id="playhead"></i></div><span id="totalTime">00:00</span></div><div class="player-row"><button id="playBtn" class="play" disabled>▶</button><div class="file-name" id="fileName">尚未录入声音 · 点击开始录音</div><button id="clearBtn" class="icon-btn" title="清空">↺</button></div></div>
+    </section>
+    <section class="dashboard">
+      <div class="panel spectrum-panel"><div class="section-head"><div><span class="eyebrow">02 · FREQUENCY</span><h3>频谱 / 音高追踪</h3></div><div class="legend"><span><i class="blue"></i>频谱能量</span><span><i class="orange"></i>基频 F0</span></div></div><canvas id="spectrumCanvas"></canvas><div class="metric-row"><div><small>当前音高</small><strong id="pitchValue">—</strong><span id="pitchHz">等待信号</span></div><div><small>置信度</small><strong id="confidenceValue">—</strong><span id="confidenceLabel">未检测</span></div><div><small>识别状态</small><strong id="noteValue">—</strong><span id="uncertainty">不确定性将被标注</span></div></div></div>
+      <div class="panel instrument-panel"><div class="section-head"><div><span class="eyebrow">03 · INSTRUMENT</span><h3>选择转译乐器</h3></div></div><div class="instrument-grid"><button class="instrument active" data-instrument="piano"><span class="instrument-icon">♢</span><b>钢琴</b><small>明亮 · 清晰</small></button><button class="instrument" data-instrument="violin"><span class="instrument-icon">♧</span><b>小提琴</b><small>连贯 · 有机</small></button><button class="instrument" data-instrument="flute"><span class="instrument-icon">〰</span><b>长笛</b><small>轻盈 · 气息</small></button></div><div class="mode-block"><label>转译方式</label><label class="radio"><input type="radio" name="mode" value="quantized" checked> 十二平均律音符 <span>适合五线谱</span></label><label class="radio"><input type="radio" name="mode" value="continuous"> 保留原始语调 <span>连续 F0 曲线</span></label></div><button id="convertBtn" class="convert" disabled>♫ 转译为旋律</button></div>
+      <div class="panel score-panel"><div class="section-head"><div><span class="eyebrow">04 · SCORE</span><h3>五线谱预览</h3></div><span class="score-note" id="scoreMeta">演示旋律 · 等待录音</span></div><div class="staff-wrap"><canvas id="staffCanvas"></canvas></div><div class="score-footer"><span>转译结果仅代表可听见的音高轮廓</span><span id="scoreConfidence">—</span></div></div>
+    </section>
+    <footer><span>声语成乐 / 可视化声音研究原型</span><span>自然语音的辅音、滑音与混响会影响 F0 识别；低置信度音符会以虚线标记。</span></footer>
+  </main><script src="./app.js"></script>
+</body></html>
